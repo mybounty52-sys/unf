@@ -13,9 +13,10 @@ STORAGE_FOLDER = "storage"
 MODS_FILE = os.path.join(STORAGE_FOLDER, "mods.zip")
 VERSIONS_FILE = "versions.json"
 
-# Создаём папку
-os.makedirs(STORAGE_FOLDER, exist_ok=True)
-
+# Проверяем и создаём папку (если её нет)
+if not os.path.exists(STORAGE_FOLDER):
+    os.makedirs(STORAGE_FOLDER)
+    
 # ============ ОСНОВНЫЕ ЭНДПОИНТЫ ============
 
 @app.route('/')
