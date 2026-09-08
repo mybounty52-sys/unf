@@ -7,157 +7,148 @@
     <script src="https://telegram.org/js/telegram-web-app.js?56"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        /* ===== (весь ваш стиль из предыдущих версий, я его не сокращаю, он уже был) ===== */
-        /* Я вставлю полный стиль, чтобы не было проблем */
+        /* ===== Базовые стили ===== */
         * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
-        :root { --bg-primary:#fff; --bg-secondary:#f5f5f5; --bg-card:#fff; --bg-input:#f0f0f0; --text-primary:#1a1a1a; --text-secondary:#555; --text-muted:#888; --border-color:#e0e0e0; --shadow:0 4px 20px rgba(0,0,0,0.08); --shadow-hover:0 8px 30px rgba(0,0,0,0.15); --accent:#FFCC00; --accent-dark:#e6b800; --radius:16px; --radius-sm:10px; --transition:0.3s cubic-bezier(0.4,0,0.2,1); --header-height:64px; --font:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif; --toast-bg:#1a1a1a; --toast-text:#fff; --scrollbar-bg:#e0e0e0; --scrollbar-thumb:#bbb; --badge-bg:#f0f0f0; --badge-text:#333; }
-        [data-theme="dark"] { --bg-primary:#0d0d0d; --bg-secondary:#1a1a1a; --bg-card:#222; --bg-input:#2a2a2a; --text-primary:#f0f0f0; --text-secondary:#aaa; --text-muted:#777; --border-color:#333; --shadow:0 4px 20px rgba(0,0,0,0.4); --shadow-hover:0 8px 30px rgba(0,0,0,0.6); --accent:#CC9900; --accent-dark:#b38800; --toast-bg:#2a2a2a; --toast-text:#f0f0f0; --scrollbar-bg:#2a2a2a; --scrollbar-thumb:#444; --badge-bg:#2a2a2a; --badge-text:#ccc; }
-        html,body { height:100%; font-family:var(--font); background:var(--bg-primary); color:var(--text-primary); transition:background var(--transition),color var(--transition); overflow:hidden; touch-action:manipulation; }
-        ::-webkit-scrollbar { width:4px; height:4px; }
-        ::-webkit-scrollbar-track { background:var(--scrollbar-bg); }
-        ::-webkit-scrollbar-thumb { background:var(--scrollbar-thumb); border-radius:4px; }
-        #app { display:flex; flex-direction:column; height:100vh; height:100dvh; max-width:480px; margin:0 auto; position:relative; background:var(--bg-primary); overflow:hidden; transition:background var(--transition); }
-        .app-header { display:flex; align-items:center; justify-content:space-between; padding:0 16px; height:var(--header-height); min-height:var(--header-height); background:var(--bg-primary); border-bottom:1px solid var(--border-color); position:sticky; top:0; z-index:100; transition:background var(--transition),border-color var(--transition); }
-        .header-brand { display:flex; align-items:center; gap:10px; font-size:20px; font-weight:800; letter-spacing:0.5px; cursor:default; user-select:none; background:linear-gradient(90deg,var(--accent),#ffffff,var(--accent)); background-size:300% 100%; -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; animation:shimmerText 4s ease-in-out infinite; white-space:nowrap; }
-        @keyframes shimmerText { 0%,100% { background-position:0% 50%; } 50% { background-position:100% 50%; } }
-        .header-actions { display:flex; align-items:center; gap:8px; }
-        .theme-toggle { background:var(--bg-secondary); border:none; width:36px; height:36px; border-radius:50%; font-size:18px; cursor:pointer; transition:background var(--transition),transform 0.2s; display:flex; align-items:center; justify-content:center; color:var(--text-primary); }
-        .theme-toggle:active { transform:scale(0.92); }
-        .header-user { display:flex; align-items:center; gap:8px; font-size:13px; font-weight:500; color:var(--text-secondary); padding:4px 12px 4px 8px; background:var(--bg-secondary); border-radius:20px; cursor:default; transition:background var(--transition); }
-        .header-user .avatar { width:28px; height:28px; border-radius:50%; background:var(--accent); display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; color:#1a1a1a; text-transform:uppercase; }
-        .header-user .role-badge { font-size:9px; text-transform:uppercase; padding:2px 6px; border-radius:10px; background:var(--accent); color:#1a1a1a; font-weight:700; letter-spacing:0.3px; }
-        .main-content { flex:1; overflow-y:auto; overflow-x:hidden; padding:16px 16px 90px 16px; background:var(--bg-primary); transition:background var(--transition); -webkit-overflow-scrolling:touch; }
-        .page { display:none; animation:fadeSlideIn 0.3s ease; }
+        :root {
+            --bg:#fff; --bg2:#f5f5f5; --card:#fff; --text:#1a1a1a; --text2:#555; --muted:#888;
+            --border:#ddd; --shadow:0 2px 12px rgba(0,0,0,0.08); --accent:#FFCC00;
+            --radius:12px; --font:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+        }
+        [data-theme="dark"] {
+            --bg:#0d0d0d; --bg2:#1a1a1a; --card:#222; --text:#f0f0f0; --text2:#aaa; --muted:#777;
+            --border:#333; --accent:#CC9900;
+        }
+        html,body { height:100%; font-family:var(--font); background:var(--bg); color:var(--text); transition:0.3s; overflow:hidden; }
+        #app { display:flex; flex-direction:column; height:100vh; max-width:480px; margin:0 auto; background:var(--bg); overflow:hidden; }
+        /* Хедер */
+        .header { display:flex; align-items:center; justify-content:space-between; padding:0 16px; height:60px; background:var(--bg); border-bottom:1px solid var(--border); flex-shrink:0; }
+        .brand { font-size:20px; font-weight:800; background:linear-gradient(90deg,var(--accent),#fff,var(--accent)); background-size:300%; -webkit-background-clip:text; -webkit-text-fill-color:transparent; animation:shimmer 4s infinite; }
+        @keyframes shimmer { 0%,100%{background-position:0%} 50%{background-position:100%} }
+        .header-actions { display:flex; gap:8px; align-items:center; }
+        .theme-btn { background:var(--bg2); border:none; width:36px; height:36px; border-radius:50%; font-size:18px; cursor:pointer; color:var(--text); }
+        .user-badge { display:flex; align-items:center; gap:6px; background:var(--bg2); padding:4px 12px 4px 8px; border-radius:20px; font-size:13px; color:var(--text2); }
+        .user-badge .avatar { width:28px; height:28px; border-radius:50%; background:var(--accent); display:flex; align-items:center; justify-content:center; font-weight:700; color:#1a1a1a; text-transform:uppercase; }
+        .user-badge .role { font-size:9px; text-transform:uppercase; background:var(--accent); padding:2px 6px; border-radius:10px; color:#1a1a1a; font-weight:700; }
+        /* Контент */
+        .content { flex:1; overflow-y:auto; padding:16px; padding-bottom:80px; }
+        .page { display:none; animation:fade .3s; }
         .page.active { display:block; }
-        @keyframes fadeSlideIn { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
-        .dashboard-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; padding-top:4px; }
-        .dash-card { background:var(--bg-card); border-radius:var(--radius); padding:20px 14px; box-shadow:var(--shadow); cursor:pointer; transition:transform 0.2s,box-shadow 0.3s,background var(--transition); border:1px solid var(--border-color); display:flex; flex-direction:column; align-items:center; text-align:center; gap:8px; position:relative; min-height:100px; justify-content:center; }
-        .dash-card:active { transform:scale(0.96); box-shadow:var(--shadow-hover); }
-        .dash-card .icon { font-size:28px; line-height:1; }
-        .dash-card .label { font-size:14px; font-weight:600; color:var(--text-primary); transition:color var(--transition); line-height:1.3; }
-        .dash-card .badge { position:absolute; top:8px; right:8px; font-size:9px; padding:2px 8px; border-radius:10px; background:var(--accent); color:#1a1a1a; font-weight:700; text-transform:uppercase; letter-spacing:0.3px; }
-        .dash-card .sub { font-size:11px; color:var(--text-muted); }
-        .form-group { margin-bottom:16px; }
-        .form-group label { display:block; font-size:13px; font-weight:600; margin-bottom:5px; color:var(--text-secondary); transition:color var(--transition); }
-        .form-group input, .form-group textarea, .form-group select { width:100%; padding:12px 14px; border-radius:var(--radius-sm); border:2px solid var(--border-color); background:var(--bg-input); color:var(--text-primary); font-size:15px; font-family:var(--font); transition:border-color 0.2s,background var(--transition),color var(--transition); outline:none; -webkit-appearance:none; }
+        @keyframes fade { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+        /* Карточки дашборда */
+        .grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+        .card { background:var(--card); border-radius:var(--radius); padding:16px; box-shadow:var(--shadow); border:1px solid var(--border); text-align:center; cursor:pointer; transition:0.2s; }
+        .card:active { transform:scale(0.96); }
+        .card .icon { font-size:28px; }
+        .card .label { font-weight:600; font-size:14px; margin-top:4px; color:var(--text); }
+        .card .sub { font-size:12px; color:var(--muted); }
+        .card .badge { position:absolute; top:6px; right:6px; background:var(--accent); color:#1a1a1a; font-size:9px; padding:2px 8px; border-radius:10px; font-weight:700; }
+        .card { position:relative; }
+        /* Формы */
+        .form-group { margin-bottom:14px; }
+        .form-group label { display:block; font-size:13px; font-weight:600; color:var(--text2); margin-bottom:4px; }
+        .form-group input, .form-group textarea, .form-group select { width:100%; padding:10px 12px; border:2px solid var(--border); border-radius:8px; background:var(--bg2); color:var(--text); font-size:15px; outline:none; transition:0.2s; }
         .form-group input:focus, .form-group textarea:focus { border-color:var(--accent); }
-        .form-group textarea { min-height:80px; resize:vertical; }
-        .btn { display:inline-flex; align-items:center; justify-content:center; gap:8px; padding:12px 24px; border:none; border-radius:var(--radius-sm); font-size:15px; font-weight:600; font-family:var(--font); cursor:pointer; transition:transform 0.15s,box-shadow 0.2s,background 0.2s; touch-action:manipulation; min-height:48px; width:100%; color:#1a1a1a; }
+        .btn { display:inline-flex; align-items:center; justify-content:center; gap:6px; padding:10px 20px; border:none; border-radius:8px; font-size:15px; font-weight:600; cursor:pointer; transition:0.2s; min-height:44px; width:100%; color:#1a1a1a; }
         .btn:active { transform:scale(0.97); }
-        .btn-primary { background:var(--accent); color:#1a1a1a; }
-        .btn-primary:active { background:var(--accent-dark); }
-        .btn-secondary { background:var(--bg-secondary); color:var(--text-primary); border:1px solid var(--border-color); }
+        .btn-primary { background:var(--accent); }
+        .btn-primary:active { background:#e6b800; }
+        .btn-secondary { background:var(--bg2); color:var(--text); border:1px solid var(--border); }
         .btn-danger { background:#e74c3c; color:#fff; }
         .btn-success { background:#27ae60; color:#fff; }
-        .btn-warning { background:#f39c12; color:#fff; }
-        .btn-outline { background:transparent; border:2px solid var(--accent); color:var(--accent); }
-        .btn-sm { padding:8px 14px; font-size:13px; min-height:36px; width:auto; }
-        .btn-block { width:100%; }
-        .btn:disabled { opacity:0.5; pointer-events:none; }
-        .card-list { display:flex; flex-direction:column; gap:10px; }
-        .card-item { background:var(--bg-card); border-radius:var(--radius-sm); padding:14px 16px; border:1px solid var(--border-color); box-shadow:var(--shadow); transition:background var(--transition),border-color var(--transition); display:flex; justify-content:space-between; align-items:center; gap:10px; }
-        .card-item .info { flex:1; min-width:0; }
-        .card-item .info .title { font-weight:600; font-size:14px; color:var(--text-primary); transition:color var(--transition); }
-        .card-item .info .desc { font-size:13px; color:var(--text-secondary); margin-top:2px; transition:color var(--transition); word-break:break-word; }
-        .card-item .info .meta { font-size:11px; color:var(--text-muted); margin-top:4px; }
-        .card-item .actions { display:flex; gap:6px; flex-shrink:0; flex-wrap:wrap; }
-        .card-item .actions .btn-sm { min-height:32px; padding:6px 12px; font-size:12px; }
-        .progress-wrap { width:100%; height:8px; background:var(--bg-secondary); border-radius:4px; overflow:hidden; margin-top:6px; transition:background var(--transition); }
-        .progress-wrap .bar { height:100%; background:var(--accent); border-radius:4px; transition:width 0.4s ease; }
-        .section-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; flex-wrap:wrap; gap:8px; }
-        .section-header h2 { font-size:20px; font-weight:700; color:var(--text-primary); transition:color var(--transition); }
-        .section-header .actions { display:flex; gap:8px; flex-wrap:wrap; }
-        .back-btn { display:inline-flex; align-items:center; gap:6px; color:var(--text-secondary); font-size:14px; font-weight:500; cursor:pointer; padding:6px 0; transition:color 0.2s; background:none; border:none; font-family:var(--font); }
-        .back-btn:hover { color:var(--accent); }
-        .auth-container { max-width:400px; margin:20px auto; padding:24px 20px; background:var(--bg-card); border-radius:var(--radius); border:1px solid var(--border-color); box-shadow:var(--shadow); transition:background var(--transition),border-color var(--transition); }
-        .auth-container .auth-title { font-size:24px; font-weight:700; text-align:center; margin-bottom:6px; background:linear-gradient(90deg,var(--accent),#ffffff,var(--accent)); background-size:300% 100%; -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; animation:shimmerText 4s ease-in-out infinite; }
-        .auth-container .auth-sub { text-align:center; color:var(--text-secondary); font-size:14px; margin-bottom:20px; transition:color var(--transition); }
-        .auth-container .auth-status { text-align:center; padding:16px; border-radius:var(--radius-sm); background:var(--bg-secondary); color:var(--text-secondary); font-size:14px; transition:background var(--transition),color var(--transition); }
-        .auth-container .auth-status .big-icon { font-size:48px; display:block; margin-bottom:8px; }
-        .tabs { display:flex; gap:4px; background:var(--bg-secondary); padding:4px; border-radius:var(--radius-sm); margin-bottom:16px; overflow-x:auto; transition:background var(--transition); }
-        .tabs .tab { flex:1; min-width:60px; padding:8px 12px; text-align:center; border-radius:8px; font-size:13px; font-weight:600; color:var(--text-secondary); cursor:pointer; transition:background 0.2s,color 0.2s; border:none; background:transparent; font-family:var(--font); white-space:nowrap; }
-        .tabs .tab.active { background:var(--bg-card); color:var(--text-primary); box-shadow:var(--shadow); }
-        .tabs .tab:active { transform:scale(0.96); }
-        .tab-content { display:none; animation:fadeSlideIn 0.25s ease; }
-        .tab-content.active { display:block; }
-        .toast-container { position:fixed; bottom:80px; left:50%; transform:translateX(-50%); z-index:999; max-width:90%; pointer-events:none; }
-        .toast { background:var(--toast-bg); color:var(--toast-text); padding:12px 20px; border-radius:var(--radius-sm); font-size:14px; font-weight:500; box-shadow:0 8px 30px rgba(0,0,0,0.3); opacity:0; transform:translateY(20px); transition:opacity 0.3s,transform 0.3s; pointer-events:auto; text-align:center; min-width:200px; }
-        .toast.show { opacity:1; transform:translateY(0); }
-        .toast.success { border-left:4px solid #27ae60; }
-        .toast.error { border-left:4px solid #e74c3c; }
-        .toast.warning { border-left:4px solid #f39c12; }
-        .empty-state { text-align:center; padding:40px 20px; color:var(--text-muted); transition:color var(--transition); }
-        .empty-state .icon { font-size:48px; margin-bottom:12px; }
-        .empty-state h3 { font-size:18px; color:var(--text-secondary); margin-bottom:4px; transition:color var(--transition); }
-        .empty-state p { font-size:14px; }
-        .modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:200; display:flex; align-items:center; justify-content:center; padding:16px; animation:fadeIn 0.2s ease; backdrop-filter:blur(4px); }
-        @keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
-        .modal-box { background:var(--bg-card); border-radius:var(--radius); max-width:420px; width:100%; padding:24px 20px; max-height:90vh; overflow-y:auto; box-shadow:0 20px 60px rgba(0,0,0,0.4); animation:slideUp 0.25s ease; transition:background var(--transition); }
-        @keyframes slideUp { from { transform:translateY(30px); opacity:0; } to { transform:translateY(0); opacity:1; } }
-        .modal-box h3 { font-size:20px; font-weight:700; margin-bottom:16px; color:var(--text-primary); transition:color var(--transition); }
-        .modal-box .modal-actions { display:flex; gap:10px; margin-top:16px; flex-wrap:wrap; }
-        .modal-box .modal-actions .btn { flex:1; min-width:80px; }
-        .spinner { display:inline-block; width:24px; height:24px; border:3px solid var(--bg-secondary); border-top-color:var(--accent); border-radius:50%; animation:spin 0.7s linear infinite; }
-        @keyframes spin { to { transform:rotate(360deg); } }
-        .loading-center { display:flex; justify-content:center; align-items:center; padding:40px 0; }
-        .tag { display:inline-block; padding:2px 10px; border-radius:12px; font-size:11px; font-weight:600; background:var(--badge-bg); color:var(--badge-text); transition:background var(--transition),color var(--transition); }
+        .btn-sm { padding:6px 12px; font-size:13px; min-height:32px; width:auto; }
+        /* Список карточек */
+        .list { display:flex; flex-direction:column; gap:10px; }
+        .list-item { background:var(--card); border-radius:8px; padding:12px 14px; border:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; gap:10px; }
+        .list-item .info { flex:1; min-width:0; }
+        .list-item .title { font-weight:600; font-size:14px; color:var(--text); }
+        .list-item .desc { font-size:13px; color:var(--text2); }
+        .list-item .meta { font-size:11px; color:var(--muted); margin-top:2px; }
+        .list-item .actions { display:flex; gap:6px; flex-wrap:wrap; }
+        .progress-wrap { height:6px; background:var(--bg2); border-radius:4px; overflow:hidden; margin-top:4px; }
+        .progress-wrap .bar { height:100%; background:var(--accent); transition:width 0.4s; }
+        .share-btn { background:transparent; border:1px solid var(--accent); color:var(--accent); padding:4px 12px; border-radius:16px; font-size:12px; font-weight:600; cursor:pointer; }
+        .empty { text-align:center; padding:40px 20px; color:var(--muted); }
+        .empty .icon { font-size:48px; }
+        .empty h3 { font-size:18px; color:var(--text2); margin-top:8px; }
+        /* Модалка */
+        .modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:1000; display:flex; align-items:center; justify-content:center; padding:16px; backdrop-filter:blur(4px); }
+        .modal-box { background:var(--card); border-radius:var(--radius); max-width:400px; width:100%; padding:24px; max-height:90vh; overflow-y:auto; }
+        .modal-box h3 { font-size:20px; font-weight:700; margin-bottom:16px; }
+        .modal-actions { display:flex; gap:10px; margin-top:16px; }
+        .modal-actions .btn { flex:1; }
+        .tag { display:inline-block; padding:2px 10px; border-radius:12px; font-size:11px; font-weight:600; }
         .tag-pending { background:#f39c12; color:#fff; }
         .tag-approved { background:#27ae60; color:#fff; }
         .tag-rejected { background:#e74c3c; color:#fff; }
         .tag-owner { background:#8e44ad; color:#fff; }
         .tag-admin { background:#2980b9; color:#fff; }
-        .tag-player { background:var(--badge-bg); color:var(--badge-text); }
-        .rank-badge { font-size:12px; font-weight:700; padding:2px 10px; border-radius:12px; background:var(--accent); color:#1a1a1a; }
-        .share-btn { background:transparent; border:1px solid var(--accent); color:var(--accent); padding:6px 14px; border-radius:20px; font-size:12px; font-weight:600; cursor:pointer; transition:background 0.2s,color 0.2s; font-family:var(--font); display:inline-flex; align-items:center; gap:4px; }
-        .share-btn:active { background:var(--accent); color:#1a1a1a; }
-        @media (max-width:400px) { .dashboard-grid { gap:8px; } .dash-card { padding:14px 10px; min-height:80px; } .dash-card .icon { font-size:22px; } .dash-card .label { font-size:12px; } .header-brand { font-size:17px; } .header-user .role-badge { display:none; } .card-item { flex-wrap:wrap; } .card-item .actions { width:100%; justify-content:flex-end; } .modal-box { padding:16px; } }
-        @media (min-width:481px) { #app { border-left:1px solid var(--border-color); border-right:1px solid var(--border-color); box-shadow:0 0 40px rgba(0,0,0,0.08); } .main-content { padding:20px 24px 100px 24px; } }
-        @media (max-width:360px) { .dashboard-grid { grid-template-columns:1fr 1fr; gap:6px; } .dash-card { padding:10px 8px; min-height:70px; } .dash-card .icon { font-size:18px; } .dash-card .label { font-size:11px; } .header-brand { font-size:15px; } .header-user { font-size:11px; padding:2px 8px 2px 4px; } .header-user .avatar { width:22px; height:22px; font-size:10px; } .btn { font-size:13px; padding:10px 16px; min-height:40px; } }
+        .tag-player { background:var(--bg2); color:var(--text2); }
+        .rank-badge { background:var(--accent); color:#1a1a1a; padding:2px 10px; border-radius:12px; font-size:12px; font-weight:700; }
+        .back-btn { background:none; border:none; color:var(--text2); font-size:14px; cursor:pointer; padding:6px 0; }
+        .back-btn:hover { color:var(--accent); }
+        .section-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; flex-wrap:wrap; gap:8px; }
+        .section-header h2 { font-size:20px; font-weight:700; }
+        .toast { position:fixed; bottom:80px; left:50%; transform:translateX(-50%); background:#1a1a1a; color:#fff; padding:12px 20px; border-radius:8px; font-size:14px; font-weight:500; box-shadow:0 4px 20px rgba(0,0,0,0.3); opacity:0; transition:0.3s; pointer-events:none; z-index:999; }
+        .toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+        .toast.success { border-left:4px solid #27ae60; }
+        .toast.error { border-left:4px solid #e74c3c; }
+        .spinner { display:inline-block; width:24px; height:24px; border:3px solid var(--bg2); border-top-color:var(--accent); border-radius:50%; animation:spin 0.8s linear infinite; }
+        @keyframes spin { to { transform:rotate(360deg); } }
+        .loading-center { display:flex; justify-content:center; padding:40px 0; }
+        .tabs { display:flex; gap:4px; background:var(--bg2); padding:4px; border-radius:8px; overflow-x:auto; margin-bottom:14px; }
+        .tabs .tab { flex:1; padding:8px 12px; text-align:center; border-radius:6px; font-size:13px; font-weight:600; color:var(--text2); cursor:pointer; background:transparent; border:none; white-space:nowrap; }
+        .tabs .tab.active { background:var(--card); color:var(--text); box-shadow:var(--shadow); }
+        .tab-content { display:none; animation:fade .25s; }
+        .tab-content.active { display:block; }
+        @media (max-width:400px){ .grid{ gap:8px; } .card{ padding:12px; } .brand{ font-size:17px; } }
     </style>
 </head>
 <body>
 
 <div id="app">
-    <header class="app-header">
-        <div class="header-brand">✦ BOUNTY TEAM</div>
+    <!-- Хедер -->
+    <header class="header">
+        <div class="brand">✦ BOUNTY TEAM</div>
         <div class="header-actions">
-            <button class="theme-toggle" id="themeToggle" aria-label="Переключить тему">🌓</button>
-            <div class="header-user" id="headerUser">
-                <span class="avatar" id="userAvatar">?</span>
-                <span id="userName">Гость</span>
-                <span class="role-badge" id="userRoleBadge">—</span>
+            <button class="theme-btn" id="themeToggle">🌓</button>
+            <div class="user-badge" id="userBadge">
+                <span class="avatar" id="avatar">?</span>
+                <span id="username">Гость</span>
+                <span class="role" id="roleBadge">—</span>
             </div>
         </div>
     </header>
 
-    <div class="main-content" id="mainContent">
+    <!-- Контент -->
+    <div class="content" id="content">
 
         <!-- Страница авторизации -->
         <div class="page active" id="page-auth">
-            <div class="auth-container" id="authContainer">
-                <div class="auth-title">✦ BOUNTY TEAM</div>
-                <div class="auth-sub">Добро пожаловать в команду!</div>
+            <div style="max-width:400px;margin:20px auto;background:var(--card);border-radius:var(--radius);padding:24px;border:1px solid var(--border);">
+                <div class="brand" style="font-size:24px;text-align:center;display:block;margin-bottom:6px;">✦ BOUNTY TEAM</div>
+                <p style="text-align:center;color:var(--text2);margin-bottom:20px;">Добро пожаловать в команду!</p>
                 <div id="authContent"></div>
             </div>
         </div>
 
-        <!-- Страница дашборда -->
+        <!-- Дашборд -->
         <div class="page" id="page-dashboard">
-            <div class="dashboard-grid" id="dashboardGrid"></div>
+            <div class="grid" id="dashboardGrid"></div>
         </div>
 
-        <!-- Остальные страницы (voice, admin, shooters, bs, tasks, rules, news) -->
+        <!-- Войс Штаб -->
         <div class="page" id="page-voice">
             <div class="section-header">
                 <button class="back-btn" data-page="dashboard">‹ Назад</button>
                 <h2>🎙 Войс Штаб</h2>
             </div>
             <div style="text-align:center;padding:30px 0;">
-                <p style="color:var(--text-secondary);margin-bottom:20px;">Перейти в голосовой штаб команды</p>
-                <button class="btn btn-primary" id="voiceBtn" style="max-width:280px;margin:0 auto;">🚀 Перейти в Войс Штаб</button>
+                <p style="color:var(--text2);margin-bottom:20px;">Перейти в голосовой штаб</p>
+                <button class="btn btn-primary" id="voiceBtn" style="max-width:280px;margin:0 auto;">🚀 Перейти</button>
             </div>
         </div>
 
+        <!-- Администрация -->
         <div class="page" id="page-admin">
             <div class="section-header">
                 <button class="back-btn" data-page="dashboard">‹ Назад</button>
@@ -166,6 +157,7 @@
             <div id="adminContent"></div>
         </div>
 
+        <!-- Стрелки -->
         <div class="page" id="page-shooters">
             <div class="section-header">
                 <button class="back-btn" data-page="dashboard">‹ Назад</button>
@@ -175,6 +167,7 @@
             <div id="shootersContent"></div>
         </div>
 
+        <!-- БС Состав -->
         <div class="page" id="page-bs">
             <div class="section-header">
                 <button class="back-btn" data-page="dashboard">‹ Назад</button>
@@ -184,6 +177,7 @@
             <div id="bsContent"></div>
         </div>
 
+        <!-- Задачи -->
         <div class="page" id="page-tasks">
             <div class="section-header">
                 <button class="back-btn" data-page="dashboard">‹ Назад</button>
@@ -193,6 +187,7 @@
             <div id="tasksContent"></div>
         </div>
 
+        <!-- Устав -->
         <div class="page" id="page-rules">
             <div class="section-header">
                 <button class="back-btn" data-page="dashboard">‹ Назад</button>
@@ -202,6 +197,7 @@
             <div id="rulesContent"></div>
         </div>
 
+        <!-- Новости -->
         <div class="page" id="page-news">
             <div class="section-header">
                 <button class="back-btn" data-page="dashboard">‹ Назад</button>
@@ -213,26 +209,27 @@
 
     </div>
 
-    <div class="toast-container" id="toastContainer">
-        <div class="toast" id="toast"></div>
-    </div>
+    <!-- Toast -->
+    <div class="toast" id="toast"></div>
 </div>
 
 <script>
     // ============================================================
-    //  SUPABASE CONFIG – ВСЕ КЛЮЧИ ВСТАВЛЕНЫ ПРАВИЛЬНО
+    // 1. КОНФИГУРАЦИЯ SUPABASE
     // ============================================================
     const SUPABASE_URL = 'https://hhsyhblhqjjsvuumaovg.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imhoc3loYmxocWpqc3Z1dW1hb3ZnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg4NjA0MzgsImV4cCI6MjEwNDQzNjQzOH0.3AvM5HGAIP4PnT1pEIWLuuIvvnPxV2v7bSU4x57rlx8';
+
     const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    console.log('Supabase initialized');
 
     const MANAGER_TG = 'bounqy31';
     const VOICE_LINK = 'https://vk.me/join/QwCqYDLM9KG9TjYsaRP8uQ5oIonjcOa0xIc=';
 
     // ============================================================
-    //  STATE
+    // 2. СОСТОЯНИЕ
     // ============================================================
-    const state = {
+    let state = {
         user: null,
         permissions: null,
         theme: localStorage.getItem('bounty_theme') || 'light',
@@ -240,47 +237,44 @@
     };
 
     // ============================================================
-    //  DOM HELPERS
+    // 3. ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ
     // ============================================================
     const $ = (s) => document.querySelector(s);
     const $$ = (s) => document.querySelectorAll(s);
 
-    // ============================================================
-    //  TOAST
-    // ============================================================
-    let toastTimer = null;
     function showToast(msg, type = 'info', duration = 2500) {
         const el = $('#toast');
         el.textContent = msg;
         el.className = 'toast ' + type;
-        clearTimeout(toastTimer);
+        clearTimeout(el._timer);
         void el.offsetWidth;
         el.classList.add('show');
-        toastTimer = setTimeout(() => el.classList.remove('show'), duration);
+        el._timer = setTimeout(() => el.classList.remove('show'), duration);
     }
 
-    // ============================================================
-    //  THEME
-    // ============================================================
     function applyTheme(theme) {
         state.theme = theme;
         document.documentElement.setAttribute('data-theme', theme);
         localStorage.setItem('bounty_theme', theme);
-        const btn = $('#themeToggle');
-        if (btn) btn.textContent = theme === 'dark' ? '☀️' : '🌓';
+        $('#themeToggle').textContent = theme === 'dark' ? '☀️' : '🌓';
     }
-    function toggleTheme() { applyTheme(state.theme === 'dark' ? 'light' : 'dark'); }
-    $('#themeToggle').addEventListener('click', toggleTheme);
+    $('#themeToggle').addEventListener('click', () => {
+        applyTheme(state.theme === 'dark' ? 'light' : 'dark');
+    });
 
-    // ============================================================
-    //  NAVIGATION
-    // ============================================================
     function navigate(page) {
         $$('.page').forEach(p => p.classList.remove('active'));
         const target = $('#page-' + page);
         if (target) target.classList.add('active');
         state.currentPage = page;
-        $('#mainContent').scrollTop = 0;
+        $('#content').scrollTop = 0;
+        // Обновляем кнопку назад в Telegram
+        const tg = window.Telegram?.WebApp;
+        if (tg && tg.BackButton) {
+            const show = page !== 'dashboard' && page !== 'auth';
+            if (show) tg.BackButton.show(); else tg.BackButton.hide();
+        }
+        // Рендерим страницы
         switch (page) {
             case 'dashboard': renderDashboard(); break;
             case 'voice': renderVoice(); break;
@@ -292,14 +286,44 @@
             case 'news': renderNews(); break;
             case 'auth': renderAuth(); break;
         }
+        updateHeader();
+    }
+
+    function updateHeader() {
+        const u = state.user;
+        const avatar = $('#avatar');
+        const name = $('#username');
+        const role = $('#roleBadge');
+        if (u) {
+            avatar.textContent = u.nickname ? u.nickname.charAt(0).toUpperCase() : '?';
+            name.textContent = u.nickname || 'Игрок';
+            const map = { owner: 'Владелец', admin: 'Админ', player: 'Игрок' };
+            role.textContent = map[u.role] || u.role;
+            role.style.display = 'inline';
+        } else {
+            avatar.textContent = '?';
+            name.textContent = 'Гость';
+            role.textContent = '—';
+            role.style.display = 'none';
+        }
+    }
+
+    function isAdmin() { return state.user && (state.user.role === 'admin' || state.user.role === 'owner'); }
+    function isOwner() { return state.user && state.user.role === 'owner'; }
+    function hasPerm(perm) {
+        if (!state.user) return false;
+        if (isOwner()) return true;
+        if (state.user.role !== 'admin') return false;
+        return state.permissions?.[perm] === true;
     }
 
     // ============================================================
-    //  AUTH
+    // 4. АВТОРИЗАЦИЯ
     // ============================================================
     async function renderAuth() {
         const container = $('#authContent');
         if (!container) return;
+
         const tg = window.Telegram?.WebApp;
         let tgUser = tg?.initDataUnsafe?.user;
         if (!tgUser) tgUser = { id: 12345, username: 'testuser', first_name: 'Тест' };
@@ -322,30 +346,28 @@
                     return;
                 } else if (user.status === 'pending') {
                     container.innerHTML = `
-                        <div class="auth-status">
-                            <span class="big-icon">⏳</span>
-                            <strong>Заявка на рассмотрении</strong>
-                            <p style="margin-top:8px;font-size:13px;">Ваша заявка ожидает одобрения администрацией.</p>
-                            <p style="font-size:12px;color:var(--text-muted);margin-top:4px;">Ник: ${user.nickname}</p>
+                        <div style="text-align:center;padding:20px;">
+                            <span style="font-size:48px;">⏳</span>
+                            <h3>Заявка на рассмотрении</h3>
+                            <p style="color:var(--text2);">Ожидайте одобрения администрацией.</p>
+                            <p style="font-size:12px;color:var(--muted);">Ник: ${user.nickname}</p>
                         </div>
                     `;
                     return;
                 } else if (user.status === 'rejected') {
                     container.innerHTML = `
-                        <div class="auth-status" style="border-left:4px solid #e74c3c;">
-                            <span class="big-icon">❌</span>
-                            <strong>Заявка отклонена</strong>
-                            <p style="margin-top:8px;font-size:13px;">К сожалению, ваша заявка не прошла.</p>
+                        <div style="text-align:center;padding:20px;border-left:4px solid #e74c3c;">
+                            <span style="font-size:48px;">❌</span>
+                            <h3>Заявка отклонена</h3>
                             <button class="btn btn-primary mt-16" onclick="window.location.reload()">Попробовать снова</button>
                         </div>
                     `;
                     return;
                 } else if (user.is_blocked) {
                     container.innerHTML = `
-                        <div class="auth-status" style="border-left:4px solid #e74c3c;">
-                            <span class="big-icon">🚫</span>
-                            <strong>Доступ заблокирован</strong>
-                            <p style="margin-top:8px;font-size:13px;">Ваш аккаунт был заблокирован.</p>
+                        <div style="text-align:center;padding:20px;border-left:4px solid #e74c3c;">
+                            <span style="font-size:48px;">🚫</span>
+                            <h3>Доступ заблокирован</h3>
                         </div>
                     `;
                     return;
@@ -354,28 +376,26 @@
 
             // Форма регистрации
             container.innerHTML = `
-                <form id="registerForm" autocomplete="off">
+                <form id="registerForm">
                     <div class="form-group">
                         <label>Телеграм ID</label>
                         <input type="text" value="${telegramId}" disabled style="opacity:0.6;" />
                     </div>
                     <div class="form-group">
                         <label>Игровой ник *</label>
-                        <input type="text" id="regNick" placeholder="Ваш ник в игре" required />
+                        <input type="text" id="regNick" placeholder="Ваш ник" required />
                     </div>
                     <div class="form-group">
                         <label>Пароль *</label>
-                        <input type="password" id="regPass" placeholder="Придумайте пароль" required minlength="4" />
+                        <input type="password" id="regPass" placeholder="Пароль" required minlength="4" />
                     </div>
                     <div class="form-group">
                         <label>Ссылка на скрин / видео *</label>
-                        <input type="url" id="regProof" placeholder="https://... (подтверждение в семье)" required />
+                        <input type="url" id="regProof" placeholder="https://..." required />
                     </div>
-                    <button type="submit" class="btn btn-primary" id="regSubmit">📩 Отправить заявку</button>
+                    <button type="submit" class="btn btn-primary">📩 Отправить заявку</button>
                 </form>
-                <p style="font-size:12px;color:var(--text-muted);text-align:center;margin-top:12px;">
-                    После отправки дождитесь одобрения администрацией.
-                </p>
+                <p style="font-size:12px;color:var(--muted);text-align:center;margin-top:12px;">После отправки дождитесь одобрения.</p>
             `;
 
             const form = $('#registerForm');
@@ -385,8 +405,14 @@
                 const password = $('#regPass').value.trim();
                 const proof = $('#regProof').value.trim();
 
-                if (!nickname || !password || !proof) { showToast('Заполните все поля', 'error'); return; }
-                if (password.length < 4) { showToast('Пароль минимум 4 символа', 'error'); return; }
+                if (!nickname || !password || !proof) {
+                    showToast('Заполните все поля', 'error');
+                    return;
+                }
+                if (password.length < 4) {
+                    showToast('Пароль минимум 4 символа', 'error');
+                    return;
+                }
                 if (!proof.startsWith('http://') && !proof.startsWith('https://')) {
                     showToast('Введите корректную ссылку', 'error');
                     return;
@@ -401,7 +427,7 @@
                     return;
                 }
 
-                const { error: insertError } = await supabase
+                const { error } = await supabase
                     .from('users')
                     .insert({
                         telegram_id: telegramId,
@@ -413,20 +439,20 @@
                         is_blocked: false,
                     });
 
-                if (insertError) {
-                    showToast('Ошибка: ' + insertError.message, 'error');
+                if (error) {
+                    showToast('Ошибка: ' + error.message, 'error');
                     return;
                 }
-                showToast('✅ Заявка отправлена! Ожидайте одобрения.', 'success');
+                showToast('✅ Заявка отправлена!', 'success');
                 setTimeout(() => renderAuth(), 1500);
             });
 
         } catch (err) {
             console.error(err);
             container.innerHTML = `
-                <div class="auth-status" style="border-left:4px solid #e74c3c;">
+                <div style="text-align:center;padding:20px;border-left:4px solid #e74c3c;">
                     <strong>❌ Ошибка</strong>
-                    <p style="margin-top:8px;">${err.message}</p>
+                    <p>${err.message}</p>
                     <button class="btn btn-primary mt-16" onclick="window.location.reload()">Обновить</button>
                 </div>
             `;
@@ -434,7 +460,7 @@
     }
 
     // ============================================================
-    //  PERMISSIONS
+    // 5. ПРАВА
     // ============================================================
     async function loadPermissions(userId) {
         const { data, error } = await supabase
@@ -442,7 +468,9 @@
             .select('*')
             .eq('user_id', userId)
             .maybeSingle();
+
         if (error && error.code !== 'PGRST116') console.error('Perms error:', error);
+
         if (data) {
             state.permissions = data;
         } else {
@@ -455,27 +483,18 @@
                 can_manage_news: false,
                 can_manage_admins: false,
             };
-            if (state.user?.role === 'owner') Object.keys(defaults).forEach(k => defaults[k] = true);
+            if (isOwner()) Object.keys(defaults).forEach(k => defaults[k] = true);
             state.permissions = { ...defaults, user_id: userId };
         }
+        console.log('Permissions loaded:', state.permissions);
     }
-
-    function hasPerm(perm) {
-        if (!state.user) return false;
-        if (state.user.role === 'owner') return true;
-        if (state.user.role !== 'admin') return false;
-        return state.permissions?.[perm] === true;
-    }
-    function isAdmin() { return state.user && (state.user.role === 'admin' || state.user.role === 'owner'); }
-    function isOwner() { return state.user && state.user.role === 'owner'; }
 
     // ============================================================
-    //  DASHBOARD
+    // 6. ДАШБОРД
     // ============================================================
     function renderDashboard() {
         const grid = $('#dashboardGrid');
         if (!grid) return;
-        updateHeader();
         const items = [
             { id: 'voice', icon: '🎙', label: 'Войс Штаб', desc: 'Голосовой канал' },
             { id: 'admin', icon: '⚙️', label: 'Администрация', desc: 'Управление', admin: true },
@@ -487,14 +506,15 @@
         ];
         const filtered = items.filter(it => !it.admin || isAdmin());
         grid.innerHTML = filtered.map(it => `
-            <div class="dash-card" data-page="${it.id}">
+            <div class="card" data-page="${it.id}">
                 ${it.admin ? '<span class="badge">ADMIN</span>' : ''}
                 <div class="icon">${it.icon}</div>
                 <div class="label">${it.label}</div>
                 <div class="sub">${it.desc}</div>
             </div>
         `).join('');
-        grid.querySelectorAll('.dash-card').forEach(el => {
+
+        grid.querySelectorAll('.card').forEach(el => {
             el.addEventListener('click', () => {
                 const page = el.dataset.page;
                 if (page === 'voice') { window.open(VOICE_LINK, '_blank'); return; }
@@ -508,93 +528,149 @@
     }
 
     // ============================================================
-    //  ADMIN PANEL (сокращённо, но функционально)
+    // 7. АДМИНКА
     // ============================================================
     function renderAdmin() {
         const container = $('#adminContent');
         if (!container) return;
         if (!isAdmin()) {
-            container.innerHTML = `<div class="empty-state"><div class="icon">🔒</div><h3>Нет доступа</h3></div>`;
+            container.innerHTML = '<div class="empty"><div class="icon">🔒</div><h3>Нет доступа</h3></div>';
             return;
         }
-        // Просто показываем ссылку на управление (все функции уже есть в админке)
-        container.innerHTML = `
-            <p style="margin-bottom:16px;">Выберите раздел для управления:</p>
-            <div style="display:flex;flex-wrap:wrap;gap:8px;">
-                ${hasPerm('can_manage_applications')||isOwner()? '<button class="btn btn-sm btn-primary" onclick="loadAdminPanel(\'apps\')">📩 Заявки</button>' : ''}
-                ${isOwner()? '<button class="btn btn-sm btn-primary" onclick="loadAdminPanel(\'players\')">👥 Игроки</button>' : ''}
-                ${isOwner()? '<button class="btn btn-sm btn-primary" onclick="loadAdminPanel(\'admins\')">👑 Админы</button>' : ''}
-                ${hasPerm('can_manage_tasks')||isOwner()? '<button class="btn btn-sm btn-primary" onclick="loadAdminPanel(\'tasks_mgmt\')">📋 Задачи</button>' : ''}
-                ${hasPerm('can_manage_shooters')||isOwner()? '<button class="btn btn-sm btn-primary" onclick="loadAdminPanel(\'shooters_mgmt\')">🎯 Стрелки</button>' : ''}
-                ${hasPerm('can_manage_bs')||isOwner()? '<button class="btn btn-sm btn-primary" onclick="loadAdminPanel(\'bs_mgmt\')">🛡 БС</button>' : ''}
-                ${hasPerm('can_manage_rules')||isOwner()? '<button class="btn btn-sm btn-primary" onclick="loadAdminPanel(\'rules_mgmt\')">📜 Устав</button>' : ''}
-                ${hasPerm('can_manage_news')||isOwner()? '<button class="btn btn-sm btn-primary" onclick="loadAdminPanel(\'news_mgmt\')">📰 Новости</button>' : ''}
-            </div>
-            <div id="adminPanelDetail" style="margin-top:16px;"></div>
-        `;
+
+        // Список доступных разделов
+        const sections = [];
+        if (hasPerm('can_manage_applications') || isOwner()) sections.push({ id: 'apps', label: '📩 Заявки' });
+        if (isOwner()) sections.push({ id: 'players', label: '👥 Игроки' });
+        if (isOwner()) sections.push({ id: 'admins', label: '👑 Админы' });
+        if (hasPerm('can_manage_tasks') || isOwner()) sections.push({ id: 'tasks_mgmt', label: '📋 Задачи' });
+        if (hasPerm('can_manage_shooters') || isOwner()) sections.push({ id: 'shooters_mgmt', label: '🎯 Стрелки' });
+        if (hasPerm('can_manage_bs') || isOwner()) sections.push({ id: 'bs_mgmt', label: '🛡 БС' });
+        if (hasPerm('can_manage_rules') || isOwner()) sections.push({ id: 'rules_mgmt', label: '📜 Устав' });
+        if (hasPerm('can_manage_news') || isOwner()) sections.push({ id: 'news_mgmt', label: '📰 Новости' });
+
+        let html = `<div class="tabs">`;
+        sections.forEach((s, i) => {
+            html += `<button class="tab ${i===0?'active':''}" data-tab="${s.id}">${s.label}</button>`;
+        });
+        html += `</div><div id="adminTabContent">`;
+        sections.forEach((s, i) => {
+            html += `<div class="tab-content ${i===0?'active':''}" data-tab="${s.id}"><div id="adminPanel_${s.id}">Загрузка...</div></div>`;
+        });
+        html += `</div>`;
+        container.innerHTML = html;
+
+        // Переключение табов
+        container.querySelectorAll('.tab').forEach(btn => {
+            btn.addEventListener('click', () => {
+                container.querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                const id = btn.dataset.tab;
+                container.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                const target = container.querySelector(`.tab-content[data-tab="${id}"]`);
+                if (target) target.classList.add('active');
+                loadAdminPanel(id);
+            });
+        });
+
+        // Загружаем первую
+        const firstTab = container.querySelector('.tab');
+        if (firstTab) loadAdminPanel(firstTab.dataset.tab);
     }
 
-    // Функции загрузки админ-панелей (упрощённо, но работают)
-    window.loadAdminPanel = async function(tabId) {
-        const detail = document.getElementById('adminPanelDetail');
-        if (!detail) return;
-        detail.innerHTML = '<div class="loading-center"><div class="spinner"></div></div>';
+    async function loadAdminPanel(tabId) {
+        const panel = document.getElementById('adminPanel_' + tabId);
+        if (!panel) return;
         switch (tabId) {
-            case 'apps': await renderAdminApplications(detail); break;
-            case 'players': await renderAdminPlayers(detail); break;
-            case 'admins': await renderAdminAdmins(detail); break;
-            case 'tasks_mgmt': await renderAdminTasks(detail); break;
-            case 'shooters_mgmt': await renderAdminShooters(detail); break;
-            case 'bs_mgmt': await renderAdminBS(detail); break;
-            case 'rules_mgmt': await renderAdminRules(detail); break;
-            case 'news_mgmt': await renderAdminNews(detail); break;
-            default: detail.innerHTML = '<div class="empty-state">Раздел в разработке</div>';
+            case 'apps': await renderAdminApplications(panel); break;
+            case 'players': await renderAdminPlayers(panel); break;
+            case 'admins': await renderAdminAdmins(panel); break;
+            case 'tasks_mgmt': await renderAdminTasks(panel); break;
+            case 'shooters_mgmt': await renderAdminShooters(panel); break;
+            case 'bs_mgmt': await renderAdminBS(panel); break;
+            case 'rules_mgmt': await renderAdminRules(panel); break;
+            case 'news_mgmt': await renderAdminNews(panel); break;
+            default: panel.innerHTML = '<div class="empty">Раздел в разработке</div>';
         }
-    };
+    }
 
     // ---------- Заявки ----------
     async function renderAdminApplications(panel) {
-        if (!hasPerm('can_manage_applications') && !isOwner()) { panel.innerHTML = '<div class="empty-state">Нет прав</div>'; return; }
-        const { data, error } = await supabase.from('users').select('*').eq('status', 'pending').order('created_at', { ascending: false });
+        if (!hasPerm('can_manage_applications') && !isOwner()) {
+            panel.innerHTML = '<div class="empty">Нет прав</div>';
+            return;
+        }
+        panel.innerHTML = '<div class="loading-center"><div class="spinner"></div></div>';
+        const { data, error } = await supabase
+            .from('users')
+            .select('*')
+            .eq('status', 'pending')
+            .order('created_at', { ascending: false });
         if (error) { panel.innerHTML = '<p>Ошибка</p>'; return; }
-        if (!data || data.length === 0) { panel.innerHTML = '<div class="empty-state"><div class="icon">✅</div><h3>Нет заявок</h3></div>'; return; }
-        panel.innerHTML = `<div class="card-list">${data.map(u => `
-            <div class="card-item" data-id="${u.id}">
-                <div class="info"><div class="title">${u.nickname}</div><div class="desc">${u.proof_link || 'Нет ссылки'}</div><div class="meta">ID: ${u.telegram_id}</div></div>
-                <div class="actions">
-                    <button class="btn btn-success btn-sm approve-app">✅</button>
-                    <button class="btn btn-danger btn-sm reject-app">❌</button>
+        if (!data || data.length === 0) {
+            panel.innerHTML = '<div class="empty"><div class="icon">✅</div><h3>Нет заявок</h3></div>';
+            return;
+        }
+        let html = `<div class="list">`;
+        data.forEach(u => {
+            html += `
+                <div class="list-item" data-id="${u.id}">
+                    <div class="info">
+                        <div class="title">${u.nickname}</div>
+                        <div class="desc">${u.proof_link || 'Нет ссылки'}</div>
+                        <div class="meta">ID: ${u.telegram_id}</div>
+                    </div>
+                    <div class="actions">
+                        <button class="btn btn-success btn-sm approve-app">✅</button>
+                        <button class="btn btn-danger btn-sm reject-app">❌</button>
+                    </div>
                 </div>
-            </div>
-        `).join('')}</div>`;
-        panel.querySelectorAll('.approve-app').forEach(btn => btn.addEventListener('click', async () => {
-            const id = btn.closest('.card-item').dataset.id;
-            await supabase.from('users').update({ status: 'approved' }).eq('id', id);
-            showToast('✅ Одобрено', 'success');
-            await renderAdminApplications(panel);
-        }));
-        panel.querySelectorAll('.reject-app').forEach(btn => btn.addEventListener('click', async () => {
-            const id = btn.closest('.card-item').dataset.id;
-            await supabase.from('users').update({ status: 'rejected' }).eq('id', id);
-            showToast('❌ Отклонено', 'error');
-            await renderAdminApplications(panel);
-        }));
+            `;
+        });
+        html += `</div>`;
+        panel.innerHTML = html;
+
+        panel.querySelectorAll('.approve-app').forEach(btn => {
+            btn.addEventListener('click', async () => {
+                const id = btn.closest('.list-item').dataset.id;
+                await supabase.from('users').update({ status: 'approved' }).eq('id', id);
+                showToast('✅ Одобрено', 'success');
+                await renderAdminApplications(panel);
+            });
+        });
+        panel.querySelectorAll('.reject-app').forEach(btn => {
+            btn.addEventListener('click', async () => {
+                const id = btn.closest('.list-item').dataset.id;
+                await supabase.from('users').update({ status: 'rejected' }).eq('id', id);
+                showToast('❌ Отклонено', 'error');
+                await renderAdminApplications(panel);
+            });
+        });
     }
 
-    // ---------- Игроки (owner) ----------
+    // ---------- Игроки (только владелец) ----------
     async function renderAdminPlayers(panel) {
-        if (!isOwner()) { panel.innerHTML = '<div class="empty-state">Только для владельца</div>'; return; }
-        const { data, error } = await supabase.from('users').select('*').order('created_at', { ascending: false });
+        if (!isOwner()) { panel.innerHTML = '<div class="empty">Только для владельца</div>'; return; }
+        panel.innerHTML = '<div class="loading-center"><div class="spinner"></div></div>';
+        const { data, error } = await supabase
+            .from('users')
+            .select('*')
+            .order('created_at', { ascending: false });
         if (error) { panel.innerHTML = '<p>Ошибка</p>'; return; }
-        let html = `<button class="btn btn-primary" onclick="showCreatePlayerModal()">➕ Создать игрока</button><div class="card-list" style="margin-top:12px;">`;
-        if (!data || data.length === 0) html += `<div class="empty-state">Нет игроков</div>`;
+
+        let html = `<button class="btn btn-primary" onclick="showCreatePlayerModal()">➕ Создать игрока</button><div class="list" style="margin-top:12px;">`;
+        if (!data || data.length === 0) html += `<div class="empty">Нет игроков</div>`;
         else {
             data.forEach(u => {
                 const statusTag = u.status === 'approved' ? 'tag-approved' : u.status === 'pending' ? 'tag-pending' : 'tag-rejected';
                 const roleTag = u.role === 'owner' ? 'tag-owner' : u.role === 'admin' ? 'tag-admin' : 'tag-player';
                 html += `
-                    <div class="card-item" data-id="${u.id}">
-                        <div class="info"><div class="title">${u.nickname} <span class="tag ${roleTag}">${u.role}</span> ${u.is_blocked ? '🚫' : ''}</div><div class="desc">ID: ${u.telegram_id}</div><div class="meta">Статус: <span class="tag ${statusTag}">${u.status}</span></div></div>
+                    <div class="list-item" data-id="${u.id}">
+                        <div class="info">
+                            <div class="title">${u.nickname} <span class="tag ${roleTag}">${u.role}</span> ${u.is_blocked ? '🚫' : ''}</div>
+                            <div class="desc">ID: ${u.telegram_id}</div>
+                            <div class="meta">Статус: <span class="tag ${statusTag}">${u.status}</span></div>
+                        </div>
                         <div class="actions">
                             <button class="btn btn-warning btn-sm toggle-block" data-id="${u.id}" data-blocked="${u.is_blocked}">${u.is_blocked ? '🔓' : '🔒'}</button>
                             ${u.role !== 'owner' ? `<button class="btn btn-danger btn-sm delete-user" data-id="${u.id}">🗑</button>` : ''}
@@ -605,21 +681,26 @@
         }
         html += `</div>`;
         panel.innerHTML = html;
-        // Обработчики
-        panel.querySelectorAll('.toggle-block').forEach(btn => btn.addEventListener('click', async () => {
-            const id = btn.dataset.id;
-            const blocked = btn.dataset.blocked === 'true';
-            await supabase.from('users').update({ is_blocked: !blocked }).eq('id', id);
-            showToast(blocked ? '🔓 Разблокирован' : '🔒 Заблокирован', 'success');
-            await renderAdminPlayers(panel);
-        }));
-        panel.querySelectorAll('.delete-user').forEach(btn => btn.addEventListener('click', async () => {
-            if (!confirm('Удалить игрока?')) return;
-            await supabase.from('users').delete().eq('id', btn.dataset.id);
-            showToast('Удалено', 'success');
-            await renderAdminPlayers(panel);
-        }));
+
+        panel.querySelectorAll('.toggle-block').forEach(btn => {
+            btn.addEventListener('click', async () => {
+                const id = btn.dataset.id;
+                const blocked = btn.dataset.blocked === 'true';
+                await supabase.from('users').update({ is_blocked: !blocked }).eq('id', id);
+                showToast(blocked ? '🔓 Разблокирован' : '🔒 Заблокирован', 'success');
+                await renderAdminPlayers(panel);
+            });
+        });
+        panel.querySelectorAll('.delete-user').forEach(btn => {
+            btn.addEventListener('click', async () => {
+                if (!confirm('Удалить игрока?')) return;
+                await supabase.from('users').delete().eq('id', btn.dataset.id);
+                showToast('Удалено', 'success');
+                await renderAdminPlayers(panel);
+            });
+        });
     }
+
     window.showCreatePlayerModal = function() {
         const overlay = document.createElement('div');
         overlay.className = 'modal-overlay';
@@ -642,23 +723,33 @@
             const pass = overlay.querySelector('#newPlayerPass').value.trim();
             const tgId = overlay.querySelector('#newPlayerTg').value.trim() || 'manual_' + Date.now();
             if (!nick || !pass) { showToast('Заполните ник и пароль', 'error'); return; }
-            const { error } = await supabase.from('users').insert({ telegram_id: tgId, nickname: nick, password: pass, status: 'approved', role: 'player', is_blocked: false });
+            const { error } = await supabase.from('users').insert({
+                telegram_id: tgId,
+                nickname: nick,
+                password: pass,
+                status: 'approved',
+                role: 'player',
+                is_blocked: false,
+            });
             if (error) { showToast('Ошибка: ' + error.message, 'error'); return; }
             showToast('✅ Игрок создан', 'success');
             overlay.remove();
-            const panel = document.getElementById('adminPanelDetail');
+            const panel = document.getElementById('adminPanel_players');
             if (panel) await renderAdminPlayers(panel);
         };
     };
 
-    // ---------- Админы (owner) ----------
+    // ---------- Управление админами (только владелец) ----------
     async function renderAdminAdmins(panel) {
-        if (!isOwner()) { panel.innerHTML = '<div class="empty-state">Только для владельца</div>'; return; }
+        if (!isOwner()) { panel.innerHTML = '<div class="empty">Только для владельца</div>'; return; }
+        panel.innerHTML = '<div class="loading-center"><div class="spinner"></div></div>';
         const { data: admins } = await supabase.from('users').select('*').in('role', ['admin', 'owner']).order('created_at');
         const { data: perms } = await supabase.from('admin_permissions').select('*');
-        const permMap = {}; if (perms) perms.forEach(p => permMap[p.user_id] = p);
-        let html = `<button class="btn btn-primary" onclick="showAddAdminModal()">➕ Добавить админа</button><div class="card-list" style="margin-top:12px;">`;
-        if (!admins || admins.length === 0) html += `<div class="empty-state">Нет админов</div>`;
+        const permMap = {};
+        if (perms) perms.forEach(p => permMap[p.user_id] = p);
+
+        let html = `<button class="btn btn-primary" onclick="showAddAdminModal()">➕ Добавить админа</button><div class="list" style="margin-top:12px;">`;
+        if (!admins || admins.length === 0) html += `<div class="empty">Нет админов</div>`;
         else {
             admins.forEach(u => {
                 const p = permMap[u.id] || {};
@@ -672,8 +763,11 @@
                 if (p.can_manage_admins) permList.push('Админы');
                 const permStr = permList.length ? permList.join(', ') : 'Нет прав';
                 html += `
-                    <div class="card-item" data-id="${u.id}">
-                        <div class="info"><div class="title">${u.nickname} <span class="tag ${u.role === 'owner' ? 'tag-owner' : 'tag-admin'}">${u.role}</span></div><div class="desc">${permStr}</div></div>
+                    <div class="list-item" data-id="${u.id}">
+                        <div class="info">
+                            <div class="title">${u.nickname} <span class="tag ${u.role === 'owner' ? 'tag-owner' : 'tag-admin'}">${u.role}</span></div>
+                            <div class="desc">${permStr}</div>
+                        </div>
                         <div class="actions">
                             ${u.role !== 'owner' ? `
                                 <button class="btn btn-sm btn-secondary edit-admin" data-id="${u.id}">✏️</button>
@@ -686,16 +780,22 @@
         }
         html += `</div>`;
         panel.innerHTML = html;
-        panel.querySelectorAll('.edit-admin').forEach(btn => btn.addEventListener('click', () => showEditAdminModal(btn.dataset.id)));
-        panel.querySelectorAll('.remove-admin').forEach(btn => btn.addEventListener('click', async () => {
-            if (!confirm('Снять права админа?')) return;
-            const id = btn.dataset.id;
-            await supabase.from('users').update({ role: 'player' }).eq('id', id);
-            await supabase.from('admin_permissions').delete().eq('user_id', id);
-            showToast('✅ Админ удалён', 'success');
-            await renderAdminAdmins(panel);
-        }));
+
+        panel.querySelectorAll('.edit-admin').forEach(btn => {
+            btn.addEventListener('click', () => showEditAdminModal(btn.dataset.id));
+        });
+        panel.querySelectorAll('.remove-admin').forEach(btn => {
+            btn.addEventListener('click', async () => {
+                if (!confirm('Снять права админа?')) return;
+                const id = btn.dataset.id;
+                await supabase.from('users').update({ role: 'player' }).eq('id', id);
+                await supabase.from('admin_permissions').delete().eq('user_id', id);
+                showToast('✅ Админ удалён', 'success');
+                await renderAdminAdmins(panel);
+            });
+        });
     }
+
     window.showAddAdminModal = async function() {
         const { data: players } = await supabase.from('users').select('id, nickname').neq('role', 'owner').eq('status', 'approved');
         if (!players || players.length === 0) { showToast('Нет доступных игроков', 'error'); return; }
@@ -737,10 +837,11 @@
             await supabase.from('admin_permissions').upsert({ user_id: userId, ...perms }, { onConflict: 'user_id' });
             showToast('✅ Админ назначен', 'success');
             overlay.remove();
-            const panel = document.getElementById('adminPanelDetail');
+            const panel = document.getElementById('adminPanel_admins');
             if (panel) await renderAdminAdmins(panel);
         };
     };
+
     window.showEditAdminModal = async function(userId) {
         const { data: permData } = await supabase.from('admin_permissions').select('*').eq('user_id', userId).maybeSingle();
         const p = permData || {};
@@ -778,22 +879,27 @@
             await supabase.from('admin_permissions').upsert({ user_id: userId, ...perms }, { onConflict: 'user_id' });
             showToast('✅ Права обновлены', 'success');
             overlay.remove();
-            const panel = document.getElementById('adminPanelDetail');
+            const panel = document.getElementById('adminPanel_admins');
             if (panel) await renderAdminAdmins(panel);
         };
     };
 
     // ---------- Управление задачами ----------
     async function renderAdminTasks(panel) {
-        if (!hasPerm('can_manage_tasks') && !isOwner()) { panel.innerHTML = '<div class="empty-state">Нет прав</div>'; return; }
+        if (!hasPerm('can_manage_tasks') && !isOwner()) {
+            panel.innerHTML = '<div class="empty">Нет прав</div>';
+            return;
+        }
+        panel.innerHTML = '<div class="loading-center"><div class="spinner"></div></div>';
         const { data, error } = await supabase.from('tasks').select('*').order('created_at', { ascending: false });
         if (error) { panel.innerHTML = '<p>Ошибка</p>'; return; }
-        let html = `<button class="btn btn-primary" onclick="showEditTaskModal(null)">➕ Добавить задачу</button><div class="card-list" style="margin-top:12px;">`;
-        if (!data || data.length === 0) html += `<div class="empty-state">Нет задач</div>`;
+
+        let html = `<button class="btn btn-primary" onclick="showEditTaskModal(null)">➕ Добавить задачу</button><div class="list" style="margin-top:12px;">`;
+        if (!data || data.length === 0) html += `<div class="empty">Нет задач</div>`;
         else {
             data.forEach(t => {
                 html += `
-                    <div class="card-item" data-id="${t.id}">
+                    <div class="list-item" data-id="${t.id}">
                         <div class="info">
                             <div class="title">${t.title}</div>
                             <div class="desc">${t.description || ''}</div>
@@ -810,14 +916,20 @@
         }
         html += `</div>`;
         panel.innerHTML = html;
-        panel.querySelectorAll('.edit-task').forEach(btn => btn.addEventListener('click', () => showEditTaskModal(btn.dataset.id)));
-        panel.querySelectorAll('.delete-task').forEach(btn => btn.addEventListener('click', async () => {
-            if (!confirm('Удалить задачу?')) return;
-            await supabase.from('tasks').delete().eq('id', btn.dataset.id);
-            showToast('Удалено', 'success');
-            await renderAdminTasks(panel);
-        }));
+
+        panel.querySelectorAll('.edit-task').forEach(btn => {
+            btn.addEventListener('click', () => showEditTaskModal(btn.dataset.id));
+        });
+        panel.querySelectorAll('.delete-task').forEach(btn => {
+            btn.addEventListener('click', async () => {
+                if (!confirm('Удалить задачу?')) return;
+                await supabase.from('tasks').delete().eq('id', btn.dataset.id);
+                showToast('Удалено', 'success');
+                await renderAdminTasks(panel);
+            });
+        });
     }
+
     window.showEditTaskModal = async function(taskId) {
         let task = null;
         if (taskId) {
@@ -860,22 +972,26 @@
             }
             showToast('✅ Сохранено', 'success');
             overlay.remove();
-            const panel = document.getElementById('adminPanelDetail');
+            const panel = document.getElementById('adminPanel_tasks_mgmt');
             if (panel) await renderAdminTasks(panel);
         };
     };
 
     // ---------- Управление стрелками ----------
     async function renderAdminShooters(panel) {
-        if (!hasPerm('can_manage_shooters') && !isOwner()) { panel.innerHTML = '<div class="empty-state">Нет прав</div>'; return; }
+        if (!hasPerm('can_manage_shooters') && !isOwner()) {
+            panel.innerHTML = '<div class="empty">Нет прав</div>';
+            return;
+        }
+        panel.innerHTML = '<div class="loading-center"><div class="spinner"></div></div>';
         const { data: shooters } = await supabase.from('shooters').select('*, users(nickname)').order('rank', { ascending: true });
-        let html = `<button class="btn btn-primary" onclick="showAddShooterModal()">➕ Добавить стрелка</button><div class="card-list" style="margin-top:12px;">`;
-        if (!shooters || shooters.length === 0) html += `<div class="empty-state">Нет стрелков</div>`;
+        let html = `<button class="btn btn-primary" onclick="showAddShooterModal()">➕ Добавить стрелка</button><div class="list" style="margin-top:12px;">`;
+        if (!shooters || shooters.length === 0) html += `<div class="empty">Нет стрелков</div>`;
         else {
             shooters.forEach(s => {
                 const name = s.users?.nickname || 'Неизвестно';
                 html += `
-                    <div class="card-item" data-id="${s.id}">
+                    <div class="list-item" data-id="${s.id}">
                         <div class="info"><div class="title">${name} <span class="rank-badge">${s.rank}-й ранг</span></div></div>
                         <div class="actions"><button class="btn btn-sm btn-danger delete-shooter" data-id="${s.id}">🗑</button></div>
                     </div>
@@ -884,13 +1000,17 @@
         }
         html += `</div>`;
         panel.innerHTML = html;
-        panel.querySelectorAll('.delete-shooter').forEach(btn => btn.addEventListener('click', async () => {
-            if (!confirm('Удалить стрелка?')) return;
-            await supabase.from('shooters').delete().eq('id', btn.dataset.id);
-            showToast('Удалено', 'success');
-            await renderAdminShooters(panel);
-        }));
+
+        panel.querySelectorAll('.delete-shooter').forEach(btn => {
+            btn.addEventListener('click', async () => {
+                if (!confirm('Удалить стрелка?')) return;
+                await supabase.from('shooters').delete().eq('id', btn.dataset.id);
+                showToast('Удалено', 'success');
+                await renderAdminShooters(panel);
+            });
+        });
     }
+
     window.showAddShooterModal = async function() {
         const { data: players } = await supabase.from('users').select('id, nickname').eq('status', 'approved').order('nickname');
         if (!players || players.length === 0) { showToast('Нет игроков', 'error'); return; }
@@ -915,22 +1035,26 @@
             await supabase.from('shooters').insert({ user_id: userId, rank, added_by: state.user.id });
             showToast('✅ Стрелок добавлен', 'success');
             overlay.remove();
-            const panel = document.getElementById('adminPanelDetail');
+            const panel = document.getElementById('adminPanel_shooters_mgmt');
             if (panel) await renderAdminShooters(panel);
         };
     };
 
     // ---------- Управление БС ----------
     async function renderAdminBS(panel) {
-        if (!hasPerm('can_manage_bs') && !isOwner()) { panel.innerHTML = '<div class="empty-state">Нет прав</div>'; return; }
+        if (!hasPerm('can_manage_bs') && !isOwner()) {
+            panel.innerHTML = '<div class="empty">Нет прав</div>';
+            return;
+        }
+        panel.innerHTML = '<div class="loading-center"><div class="spinner"></div></div>';
         const { data } = await supabase.from('bs_members').select('*, users(nickname)').order('created_at', { ascending: false });
-        let html = `<button class="btn btn-primary" onclick="showAddBsModal()">➕ Добавить в БС</button><div class="card-list" style="margin-top:12px;">`;
-        if (!data || data.length === 0) html += `<div class="empty-state">БС состав пуст</div>`;
+        let html = `<button class="btn btn-primary" onclick="showAddBsModal()">➕ Добавить в БС</button><div class="list" style="margin-top:12px;">`;
+        if (!data || data.length === 0) html += `<div class="empty">БС состав пуст</div>`;
         else {
             data.forEach(item => {
                 const name = item.users?.nickname || item.name || 'Неизвестно';
                 html += `
-                    <div class="card-item" data-id="${item.id}">
+                    <div class="list-item" data-id="${item.id}">
                         <div class="info"><div class="title">${name}</div></div>
                         <div class="actions"><button class="btn btn-sm btn-danger delete-bs" data-id="${item.id}">🗑</button></div>
                     </div>
@@ -939,13 +1063,17 @@
         }
         html += `</div>`;
         panel.innerHTML = html;
-        panel.querySelectorAll('.delete-bs').forEach(btn => btn.addEventListener('click', async () => {
-            if (!confirm('Удалить из БС?')) return;
-            await supabase.from('bs_members').delete().eq('id', btn.dataset.id);
-            showToast('Удалено', 'success');
-            await renderAdminBS(panel);
-        }));
+
+        panel.querySelectorAll('.delete-bs').forEach(btn => {
+            btn.addEventListener('click', async () => {
+                if (!confirm('Удалить из БС?')) return;
+                await supabase.from('bs_members').delete().eq('id', btn.dataset.id);
+                showToast('Удалено', 'success');
+                await renderAdminBS(panel);
+            });
+        });
     }
+
     window.showAddBsModal = async function() {
         const { data: players } = await supabase.from('users').select('id, nickname').eq('status', 'approved').order('nickname');
         if (!players || players.length === 0) { showToast('Нет игроков', 'error'); return; }
@@ -968,20 +1096,24 @@
             await supabase.from('bs_members').insert({ user_id: userId, added_by: state.user.id });
             showToast('✅ Добавлен в БС', 'success');
             overlay.remove();
-            const panel = document.getElementById('adminPanelDetail');
+            const panel = document.getElementById('adminPanel_bs_mgmt');
             if (panel) await renderAdminBS(panel);
         };
     };
 
     // ---------- Управление уставом ----------
     async function renderAdminRules(panel) {
-        if (!hasPerm('can_manage_rules') && !isOwner()) { panel.innerHTML = '<div class="empty-state">Нет прав</div>'; return; }
+        if (!hasPerm('can_manage_rules') && !isOwner()) {
+            panel.innerHTML = '<div class="empty">Нет прав</div>';
+            return;
+        }
+        panel.innerHTML = '<div class="loading-center"><div class="spinner"></div></div>';
         const { data } = await supabase.from('rules').select('*').order('updated_at', { ascending: false }).limit(1).maybeSingle();
         const content = data?.content || '';
         panel.innerHTML = `
             <div class="form-group"><label>Текст устава</label><textarea id="rulesEditor" rows="8">${content}</textarea></div>
             <button class="btn btn-primary" id="saveRulesBtn">💾 Сохранить устав</button>
-            <button class="btn btn-danger mt-8" id="clearRulesBtn">🗑 Очистить</button>
+            <button class="btn btn-danger mt-16" id="clearRulesBtn">🗑 Очистить</button>
         `;
         $('#saveRulesBtn').onclick = async () => {
             const text = $('#rulesEditor').value;
@@ -998,16 +1130,24 @@
 
     // ---------- Управление новостями ----------
     async function renderAdminNews(panel) {
-        if (!hasPerm('can_manage_news') && !isOwner()) { panel.innerHTML = '<div class="empty-state">Нет прав</div>'; return; }
+        if (!hasPerm('can_manage_news') && !isOwner()) {
+            panel.innerHTML = '<div class="empty">Нет прав</div>';
+            return;
+        }
+        panel.innerHTML = '<div class="loading-center"><div class="spinner"></div></div>';
         const { data } = await supabase.from('news').select('*, users(nickname)').order('created_at', { ascending: false });
-        let html = `<button class="btn btn-primary" onclick="showAddNewsModal()">➕ Добавить новость</button><div class="card-list" style="margin-top:12px;">`;
-        if (!data || data.length === 0) html += `<div class="empty-state">Нет новостей</div>`;
+        let html = `<button class="btn btn-primary" onclick="showAddNewsModal()">➕ Добавить новость</button><div class="list" style="margin-top:12px;">`;
+        if (!data || data.length === 0) html += `<div class="empty">Нет новостей</div>`;
         else {
             data.forEach(n => {
                 const author = n.users?.nickname || 'Админ';
                 html += `
-                    <div class="card-item" data-id="${n.id}">
-                        <div class="info"><div class="title">${n.title}</div><div class="desc">${n.content}</div><div class="meta">${author} • ${new Date(n.created_at).toLocaleDateString()}</div></div>
+                    <div class="list-item" data-id="${n.id}">
+                        <div class="info">
+                            <div class="title">${n.title}</div>
+                            <div class="desc">${n.content}</div>
+                            <div class="meta">${author} • ${new Date(n.created_at).toLocaleDateString()}</div>
+                        </div>
                         <div class="actions"><button class="btn btn-sm btn-danger delete-news" data-id="${n.id}">🗑</button></div>
                     </div>
                 `;
@@ -1015,13 +1155,17 @@
         }
         html += `</div>`;
         panel.innerHTML = html;
-        panel.querySelectorAll('.delete-news').forEach(btn => btn.addEventListener('click', async () => {
-            if (!confirm('Удалить новость?')) return;
-            await supabase.from('news').delete().eq('id', btn.dataset.id);
-            showToast('Удалено', 'success');
-            await renderAdminNews(panel);
-        }));
+
+        panel.querySelectorAll('.delete-news').forEach(btn => {
+            btn.addEventListener('click', async () => {
+                if (!confirm('Удалить новость?')) return;
+                await supabase.from('news').delete().eq('id', btn.dataset.id);
+                showToast('Удалено', 'success');
+                await renderAdminNews(panel);
+            });
+        });
     }
+
     window.showAddNewsModal = function() {
         const overlay = document.createElement('div');
         overlay.className = 'modal-overlay';
@@ -1045,14 +1189,16 @@
             await supabase.from('news').insert({ title, content, author_id: state.user.id });
             showToast('✅ Новость опубликована', 'success');
             overlay.remove();
-            const panel = document.getElementById('adminPanelDetail');
+            const panel = document.getElementById('adminPanel_news_mgmt');
             if (panel) await renderAdminNews(panel);
         };
     };
 
     // ============================================================
-    //  ПУБЛИЧНЫЕ СТРАНИЦЫ (shooters, bs, tasks, rules, news)
+    // 8. ПУБЛИЧНЫЕ СТРАНИЦЫ
     // ============================================================
+
+    // Стрелки
     async function renderShooters() {
         const container = $('#shootersContent');
         const actions = $('#shootersActions');
@@ -1061,20 +1207,24 @@
         } else actions.innerHTML = '';
         container.innerHTML = '<div class="loading-center"><div class="spinner"></div></div>';
         const { data } = await supabase.from('shooters').select('*, users(nickname)').order('rank', { ascending: true });
-        if (!data || data.length === 0) { container.innerHTML = '<div class="empty-state"><div class="icon">🎯</div><h3>Нет стрелков</h3></div>'; return; }
+        if (!data || data.length === 0) {
+            container.innerHTML = '<div class="empty"><div class="icon">🎯</div><h3>Нет стрелков</h3></div>';
+            return;
+        }
         const groups = { 1: [], 2: [], 3: [] };
         data.forEach(s => { const r = s.rank || 1; if (groups[r]) groups[r].push(s); });
         let html = '';
-        [1, 2, 3].forEach(rank => {
+        [1,2,3].forEach(rank => {
             const items = groups[rank] || [];
-            html += `<div style="margin-bottom:16px;"><h3 style="font-size:16px;color:var(--text-secondary);margin-bottom:8px;">${rank}-й ранг</h3><div class="card-list">`;
-            if (items.length === 0) html += '<div style="color:var(--text-muted);font-size:13px;padding:4px 0;">—</div>';
-            else items.forEach(s => html += `<div class="card-item"><div class="info"><div class="title">${s.users?.nickname || 'Неизвестно'}</div></div></div>`);
+            html += `<div style="margin-bottom:16px;"><h3 style="font-size:16px;color:var(--text2);margin-bottom:8px;">${rank}-й ранг</h3><div class="list">`;
+            if (items.length === 0) html += '<div style="color:var(--muted);padding:4px 0;">—</div>';
+            else items.forEach(s => html += `<div class="list-item"><div class="info"><div class="title">${s.users?.nickname || 'Неизвестно'}</div></div></div>`);
             html += `</div></div>`;
         });
         container.innerHTML = html;
     }
 
+    // БС
     async function renderBS() {
         const container = $('#bsContent');
         const actions = $('#bsActions');
@@ -1083,12 +1233,15 @@
         } else actions.innerHTML = '';
         container.innerHTML = '<div class="loading-center"><div class="spinner"></div></div>';
         const { data } = await supabase.from('bs_members').select('*, users(nickname)').order('created_at', { ascending: false });
-        if (!data || data.length === 0) { container.innerHTML = '<div class="empty-state"><div class="icon">🛡</div><h3>БС состав пуст</h3></div>'; return; }
-        let html = `<div class="card-list">`;
+        if (!data || data.length === 0) {
+            container.innerHTML = '<div class="empty"><div class="icon">🛡</div><h3>БС состав пуст</h3></div>';
+            return;
+        }
+        let html = `<div class="list">`;
         data.forEach(item => {
             const name = item.users?.nickname || item.name || 'Неизвестно';
             html += `
-                <div class="card-item">
+                <div class="list-item">
                     <div class="info"><div class="title">${name}</div></div>
                     ${isOwner() ? `<div class="actions"><button class="btn btn-sm btn-danger bs-delete" data-id="${item.id}">🗑</button></div>` : ''}
                 </div>
@@ -1097,15 +1250,18 @@
         html += `</div>`;
         container.innerHTML = html;
         if (isOwner()) {
-            container.querySelectorAll('.bs-delete').forEach(btn => btn.addEventListener('click', async () => {
-                if (!confirm('Удалить из БС?')) return;
-                await supabase.from('bs_members').delete().eq('id', btn.dataset.id);
-                showToast('Удалено', 'success');
-                await renderBS();
-            }));
+            container.querySelectorAll('.bs-delete').forEach(btn => {
+                btn.addEventListener('click', async () => {
+                    if (!confirm('Удалить из БС?')) return;
+                    await supabase.from('bs_members').delete().eq('id', btn.dataset.id);
+                    showToast('Удалено', 'success');
+                    await renderBS();
+                });
+            });
         }
     }
 
+    // Задачи
     async function renderTasks() {
         const container = $('#tasksContent');
         const actions = $('#tasksActions');
@@ -1114,11 +1270,14 @@
         } else actions.innerHTML = '';
         container.innerHTML = '<div class="loading-center"><div class="spinner"></div></div>';
         const { data } = await supabase.from('tasks').select('*').order('created_at', { ascending: false });
-        if (!data || data.length === 0) { container.innerHTML = '<div class="empty-state"><div class="icon">📋</div><h3>Нет задач</h3></div>'; return; }
-        let html = `<div class="card-list">`;
+        if (!data || data.length === 0) {
+            container.innerHTML = '<div class="empty"><div class="icon">📋</div><h3>Нет задач</h3></div>';
+            return;
+        }
+        let html = `<div class="list">`;
         data.forEach(t => {
             html += `
-                <div class="card-item" data-id="${t.id}">
+                <div class="list-item" data-id="${t.id}">
                     <div class="info">
                         <div class="title">${t.title}</div>
                         <div class="desc">${t.description || ''}</div>
@@ -1137,34 +1296,42 @@
         });
         html += `</div>`;
         container.innerHTML = html;
-        container.querySelectorAll('.share-btn').forEach(btn => btn.addEventListener('click', () => {
-            const task = btn.dataset.task;
-            const msg = `📋 Задача: ${task}\nХочу поделиться идеей или прогрессом!`;
-            window.open(`https://t.me/${MANAGER_TG}?text=${encodeURIComponent(msg)}`, '_blank');
-        }));
+        container.querySelectorAll('.share-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const task = btn.dataset.task;
+                const msg = `📋 Задача: ${task}\nХочу поделиться идеей или прогрессом!`;
+                window.open(`https://t.me/${MANAGER_TG}?text=${encodeURIComponent(msg)}`, '_blank');
+            });
+        });
         if (hasPerm('can_manage_tasks') || isOwner()) {
-            container.querySelectorAll('.task-edit').forEach(btn => btn.addEventListener('click', () => showEditTaskModal(btn.dataset.id)));
-            container.querySelectorAll('.task-delete').forEach(btn => btn.addEventListener('click', async () => {
-                if (!confirm('Удалить задачу?')) return;
-                await supabase.from('tasks').delete().eq('id', btn.dataset.id);
-                showToast('Удалено', 'success');
-                await renderTasks();
-            }));
+            container.querySelectorAll('.task-edit').forEach(btn => {
+                btn.addEventListener('click', () => showEditTaskModal(btn.dataset.id));
+            });
+            container.querySelectorAll('.task-delete').forEach(btn => {
+                btn.addEventListener('click', async () => {
+                    if (!confirm('Удалить задачу?')) return;
+                    await supabase.from('tasks').delete().eq('id', btn.dataset.id);
+                    showToast('Удалено', 'success');
+                    await renderTasks();
+                });
+            });
         }
     }
 
+    // Устав
     async function renderRules() {
         const container = $('#rulesContent');
         const actions = $('#rulesActions');
         if (hasPerm('can_manage_rules') || isOwner()) {
-            actions.innerHTML = `<button class="btn btn-primary btn-sm" onclick="navigate('admin'); setTimeout(()=>document.querySelector('[onclick*=\\'rules_mgmt\\']')?.click(),300)">✏️ Редактировать</button>`;
+            actions.innerHTML = `<button class="btn btn-primary btn-sm" onclick="navigate('admin'); setTimeout(()=>document.querySelector('[data-tab=\\'rules_mgmt\\']')?.click(),300)">✏️ Редактировать</button>`;
         } else actions.innerHTML = '';
         container.innerHTML = '<div class="loading-center"><div class="spinner"></div></div>';
         const { data } = await supabase.from('rules').select('*').order('updated_at', { ascending: false }).limit(1).maybeSingle();
         const content = data?.content || 'Устав ещё не загружен.';
-        container.innerHTML = `<div style="background:var(--bg-card);border-radius:var(--radius-sm);padding:20px;border:1px solid var(--border-color);white-space:pre-wrap;word-break:break-word;line-height:1.7;">${content}</div>`;
+        container.innerHTML = `<div style="background:var(--card);border-radius:8px;padding:20px;border:1px solid var(--border);white-space:pre-wrap;line-height:1.7;">${content}</div>`;
     }
 
+    // Новости
     async function renderNews() {
         const container = $('#newsContent');
         const actions = $('#newsActions');
@@ -1173,12 +1340,15 @@
         } else actions.innerHTML = '';
         container.innerHTML = '<div class="loading-center"><div class="spinner"></div></div>';
         const { data } = await supabase.from('news').select('*, users(nickname)').order('created_at', { ascending: false });
-        if (!data || data.length === 0) { container.innerHTML = '<div class="empty-state"><div class="icon">📰</div><h3>Нет новостей</h3></div>'; return; }
-        let html = `<div class="card-list">`;
+        if (!data || data.length === 0) {
+            container.innerHTML = '<div class="empty"><div class="icon">📰</div><h3>Нет новостей</h3></div>';
+            return;
+        }
+        let html = `<div class="list">`;
         data.forEach(n => {
             const author = n.users?.nickname || 'Админ';
             html += `
-                <div class="card-item" data-id="${n.id}">
+                <div class="list-item" data-id="${n.id}">
                     <div class="info">
                         <div class="title">${n.title}</div>
                         <div class="desc">${n.content}</div>
@@ -1193,45 +1363,27 @@
         });
         html += `</div>`;
         container.innerHTML = html;
-        container.querySelectorAll('.share-btn').forEach(btn => btn.addEventListener('click', () => {
-            const title = btn.dataset.news;
-            const msg = `📰 Новость: ${title}\nХочу обсудить или поделиться идеей!`;
-            window.open(`https://t.me/${MANAGER_TG}?text=${encodeURIComponent(msg)}`, '_blank');
-        }));
+        container.querySelectorAll('.share-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const title = btn.dataset.news;
+                const msg = `📰 Новость: ${title}\nХочу обсудить или поделиться идеей!`;
+                window.open(`https://t.me/${MANAGER_TG}?text=${encodeURIComponent(msg)}`, '_blank');
+            });
+        });
         if (hasPerm('can_manage_news') || isOwner()) {
-            container.querySelectorAll('.news-delete').forEach(btn => btn.addEventListener('click', async () => {
-                if (!confirm('Удалить новость?')) return;
-                await supabase.from('news').delete().eq('id', btn.dataset.id);
-                showToast('Удалено', 'success');
-                await renderNews();
-            }));
+            container.querySelectorAll('.news-delete').forEach(btn => {
+                btn.addEventListener('click', async () => {
+                    if (!confirm('Удалить новость?')) return;
+                    await supabase.from('news').delete().eq('id', btn.dataset.id);
+                    showToast('Удалено', 'success');
+                    await renderNews();
+                });
+            });
         }
     }
 
     // ============================================================
-    //  HEADER
-    // ============================================================
-    function updateHeader() {
-        const user = state.user;
-        const avatar = $('#userAvatar');
-        const name = $('#userName');
-        const badge = $('#userRoleBadge');
-        if (user) {
-            avatar.textContent = user.nickname ? user.nickname.charAt(0).toUpperCase() : '?';
-            name.textContent = user.nickname || 'Игрок';
-            const roleMap = { owner: 'Владелец', admin: 'Админ', player: 'Игрок' };
-            badge.textContent = roleMap[user.role] || user.role;
-            badge.style.display = 'inline-block';
-        } else {
-            avatar.textContent = '?';
-            name.textContent = 'Гость';
-            badge.textContent = '—';
-            badge.style.display = 'none';
-        }
-    }
-
-    // ============================================================
-    //  BACK BUTTONS
+    // 9. ОБРАБОТЧИК КНОПКИ НАЗАД
     // ============================================================
     document.addEventListener('click', (e) => {
         const btn = e.target.closest('.back-btn');
@@ -1239,33 +1391,46 @@
     });
 
     // ============================================================
-    //  INIT
+    // 10. ЗАКРЫТИЕ МОДАЛОК ПО КЛИКУ НА ФОН
+    // ============================================================
+    document.addEventListener('click', (e) => {
+        if (e.target.classList.contains('modal-overlay')) e.target.remove();
+    });
+
+    // ============================================================
+    // 11. ИНИЦИАЛИЗАЦИЯ
     // ============================================================
     (async function init() {
         applyTheme(state.theme);
-        navigate('auth');
 
+        // Обработка Telegram BackButton
         const tg = window.Telegram?.WebApp;
         if (tg) {
             tg.ready();
             tg.expand();
             tg.BackButton.onClick(() => {
-                if (state.currentPage !== 'dashboard' && state.currentPage !== 'auth') navigate('dashboard');
+                if (state.currentPage !== 'dashboard' && state.currentPage !== 'auth') {
+                    navigate('dashboard');
+                }
             });
+            // Показываем/скрываем при переключении страниц
             const observer = new MutationObserver(() => {
                 if (tg.BackButton) {
                     const show = state.currentPage !== 'dashboard' && state.currentPage !== 'auth';
-                    tg.BackButton[show ? 'show' : 'hide']();
+                    if (show) tg.BackButton.show(); else tg.BackButton.hide();
                 }
             });
-            observer.observe(document.querySelector('.page.active') || document.body, { attributes: true, attributeFilter: ['class'], subtree: true });
+            observer.observe(document.querySelector('.page.active') || document.body, {
+                attributes: true,
+                attributeFilter: ['class'],
+                subtree: true
+            });
         }
 
-        document.addEventListener('click', (e) => {
-            if (e.target.classList.contains('modal-overlay')) e.target.remove();
-        });
+        // Запускаем авторизацию
+        await renderAuth();
 
-        console.log('🚀 BOUNTY TEAM Mini App запущен');
+        console.log('🚀 BOUNTY TEAM запущен');
     })();
 </script>
 </body>
