@@ -1,1 +1,2934 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>BOUNTY TEAM</title>
 
+    <!-- Telegram WebApp SDK -->
+    <script src="https://telegram.org/js/telegram-web-app.js?56">
+    </script>
+    <!-- Supabase JS Client -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
+    </script>
+
+    <style>
+        /* ===== RESET & BASE ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        :root {
+            /* Светлая тема */
+            --bg-primary: #ffffff;
+            --bg-secondary: #f5f5f5;
+            --bg-card: #ffffff;
+            --bg-input: #f0f0f0;
+            --text-primary: #1a1a1a;
+            --text-secondary: #555555;
+            --text-muted: #888888;
+            --border-color: #e0e0e0;
+            --shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            --shadow-hover: 0 8px 30px rgba(0, 0, 0, 0.15);
+            --accent: #FFCC00;
+            --accent-dark: #e6b800;
+            --accent-rgb: 255, 204, 0;
+            --radius: 16px;
+            --radius-sm: 10px;
+            --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --header-height: 64px;
+            --font: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            --toast-bg: #1a1a1a;
+            --toast-text: #ffffff;
+            --scrollbar-bg: #e0e0e0;
+            --scrollbar-thumb: #bbbbbb;
+            --badge-bg: #f0f0f0;
+            --badge-text: #333;
+        }
+
+        [data-theme="dark"] {
+            --bg-primary: #0d0d0d;
+            --bg-secondary: #1a1a1a;
+            --bg-card: #222222;
+            --bg-input: #2a2a2a;
+            --text-primary: #f0f0f0;
+            --text-secondary: #aaaaaa;
+            --text-muted: #777777;
+            --border-color: #333333;
+            --shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+            --shadow-hover: 0 8px 30px rgba(0, 0, 0, 0.6);
+            --accent: #CC9900;
+            --accent-dark: #b38800;
+            --accent-rgb: 204, 153, 0;
+            --toast-bg: #2a2a2a;
+            --toast-text: #f0f0f0;
+            --scrollbar-bg: #2a2a2a;
+            --scrollbar-thumb: #444444;
+            --badge-bg: #2a2a2a;
+            --badge-text: #cccccc;
+        }
+
+        html,
+        body {
+            height: 100%;
+            font-family: var(--font);
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            transition: background var(--transition), color var(--transition);
+            overflow: hidden;
+            touch-action: manipulation;
+        }
+
+        /* ===== SCROLLBAR ===== */
+        ::-webkit-scrollbar {
+            width: 4px;
+            height: 4px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--scrollbar-bg);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--scrollbar-thumb);
+            border-radius: 4px;
+        }
+
+        /* ===== APP WRAPPER ===== */
+        #app {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            height: 100dvh;
+            max-width: 480px;
+            margin: 0 auto;
+            position: relative;
+            background: var(--bg-primary);
+            overflow: hidden;
+            transition: background var(--transition);
+        }
+
+        /* ===== HEADER ===== */
+        .app-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 16px;
+            height: var(--header-height);
+            min-height: var(--header-height);
+            background: var(--bg-primary);
+            border-bottom: 1px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            transition: background var(--transition), border-color var(--transition);
+        }
+
+        .header-brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 20px;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+            cursor: default;
+            user-select: none;
+            background: linear-gradient(90deg, var(--accent), #ffffff, var(--accent));
+            background-size: 300% 100%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: shimmerText 4s ease-in-out infinite;
+            white-space: nowrap;
+        }
+        @keyframes shimmerText {
+            0%,
+            100% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .theme-toggle {
+            background: var(--bg-secondary);
+            border: none;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            font-size: 18px;
+            cursor: pointer;
+            transition: background var(--transition), transform 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-primary);
+        }
+        .theme-toggle:active {
+            transform: scale(0.92);
+        }
+
+        .header-user {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            padding: 4px 12px 4px 8px;
+            background: var(--bg-secondary);
+            border-radius: 20px;
+            cursor: default;
+            transition: background var(--transition);
+        }
+        .header-user .avatar {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: var(--accent);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 700;
+            color: #1a1a1a;
+            text-transform: uppercase;
+        }
+        .header-user .role-badge {
+            font-size: 9px;
+            text-transform: uppercase;
+            padding: 2px 6px;
+            border-radius: 10px;
+            background: var(--accent);
+            color: #1a1a1a;
+            font-weight: 700;
+            letter-spacing: 0.3px;
+        }
+
+        /* ===== MAIN CONTENT ===== */
+        .main-content {
+            flex: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+            padding: 16px 16px 90px 16px;
+            background: var(--bg-primary);
+            transition: background var(--transition);
+            -webkit-overflow-scrolling: touch;
+        }
+
+        /* ===== PAGE SYSTEM ===== */
+        .page {
+            display: none;
+            animation: fadeSlideIn 0.3s ease;
+        }
+        .page.active {
+            display: block;
+        }
+
+        @keyframes fadeSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(12px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* ===== DASHBOARD ===== */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            padding-top: 4px;
+        }
+
+        .dash-card {
+            background: var(--bg-card);
+            border-radius: var(--radius);
+            padding: 20px 14px;
+            box-shadow: var(--shadow);
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.3s, background var(--transition);
+            border: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            gap: 8px;
+            position: relative;
+            min-height: 100px;
+            justify-content: center;
+        }
+        .dash-card:active {
+            transform: scale(0.96);
+            box-shadow: var(--shadow-hover);
+        }
+        .dash-card .icon {
+            font-size: 28px;
+            line-height: 1;
+        }
+        .dash-card .label {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+            transition: color var(--transition);
+            line-height: 1.3;
+        }
+        .dash-card .badge {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            font-size: 9px;
+            padding: 2px 8px;
+            border-radius: 10px;
+            background: var(--accent);
+            color: #1a1a1a;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+        .dash-card .sub {
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+
+        /* ===== FORM ELEMENTS ===== */
+        .form-group {
+            margin-bottom: 16px;
+        }
+        .form-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: var(--text-secondary);
+            transition: color var(--transition);
+        }
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 12px 14px;
+            border-radius: var(--radius-sm);
+            border: 2px solid var(--border-color);
+            background: var(--bg-input);
+            color: var(--text-primary);
+            font-size: 15px;
+            font-family: var(--font);
+            transition: border-color 0.2s, background var(--transition), color var(--transition);
+            outline: none;
+            -webkit-appearance: none;
+        }
+        .form-group input:focus,
+        .form-group textarea:focus {
+            border-color: var(--accent);
+        }
+        .form-group textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 12px 24px;
+            border: none;
+            border-radius: var(--radius-sm);
+            font-size: 15px;
+            font-weight: 600;
+            font-family: var(--font);
+            cursor: pointer;
+            transition: transform 0.15s, box-shadow 0.2s, background 0.2s;
+            touch-action: manipulation;
+            min-height: 48px;
+            width: 100%;
+            color: #1a1a1a;
+        }
+        .btn:active {
+            transform: scale(0.97);
+        }
+        .btn-primary {
+            background: var(--accent);
+            color: #1a1a1a;
+        }
+        .btn-primary:active {
+            background: var(--accent-dark);
+        }
+        .btn-secondary {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+        }
+        .btn-danger {
+            background: #e74c3c;
+            color: #fff;
+        }
+        .btn-success {
+            background: #27ae60;
+            color: #fff;
+        }
+        .btn-warning {
+            background: #f39c12;
+            color: #fff;
+        }
+        .btn-outline {
+            background: transparent;
+            border: 2px solid var(--accent);
+            color: var(--accent);
+        }
+        .btn-sm {
+            padding: 8px 14px;
+            font-size: 13px;
+            min-height: 36px;
+            width: auto;
+        }
+        .btn-block {
+            width: 100%;
+        }
+        .btn:disabled {
+            opacity: 0.5;
+            pointer-events: none;
+        }
+
+        /* ===== CARDS / LISTS ===== */
+        .card-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .card-item {
+            background: var(--bg-card);
+            border-radius: var(--radius-sm);
+            padding: 14px 16px;
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow);
+            transition: background var(--transition), border-color var(--transition);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+        }
+        .card-item .info {
+            flex: 1;
+            min-width: 0;
+        }
+        .card-item .info .title {
+            font-weight: 600;
+            font-size: 14px;
+            color: var(--text-primary);
+            transition: color var(--transition);
+        }
+        .card-item .info .desc {
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-top: 2px;
+            transition: color var(--transition);
+            word-break: break-word;
+        }
+        .card-item .info .meta {
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+        .card-item .actions {
+            display: flex;
+            gap: 6px;
+            flex-shrink: 0;
+            flex-wrap: wrap;
+        }
+        .card-item .actions .btn-sm {
+            min-height: 32px;
+            padding: 6px 12px;
+            font-size: 12px;
+        }
+
+        /* ===== PROGRESS BAR ===== */
+        .progress-wrap {
+            width: 100%;
+            height: 8px;
+            background: var(--bg-secondary);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 6px;
+            transition: background var(--transition);
+        }
+        .progress-wrap .bar {
+            height: 100%;
+            background: var(--accent);
+            border-radius: 4px;
+            transition: width 0.4s ease;
+        }
+
+        /* ===== SECTION HEADER ===== */
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 14px;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .section-header h2 {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--text-primary);
+            transition: color var(--transition);
+        }
+        .section-header .actions {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--text-secondary);
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            padding: 6px 0;
+            transition: color 0.2s;
+            background: none;
+            border: none;
+            font-family: var(--font);
+        }
+        .back-btn:hover {
+            color: var(--accent);
+        }
+
+        /* ===== AUTH / REGISTER ===== */
+        .auth-container {
+            max-width: 400px;
+            margin: 20px auto;
+            padding: 24px 20px;
+            background: var(--bg-card);
+            border-radius: var(--radius);
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow);
+            transition: background var(--transition), border-color var(--transition);
+        }
+        .auth-container .auth-title {
+            font-size: 24px;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 6px;
+            background: linear-gradient(90deg, var(--accent), #ffffff, var(--accent));
+            background-size: 300% 100%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: shimmerText 4s ease-in-out infinite;
+        }
+        .auth-container .auth-sub {
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 14px;
+            margin-bottom: 20px;
+            transition: color var(--transition);
+        }
+        .auth-container .auth-status {
+            text-align: center;
+            padding: 16px;
+            border-radius: var(--radius-sm);
+            background: var(--bg-secondary);
+            color: var(--text-secondary);
+            font-size: 14px;
+            transition: background var(--transition), color var(--transition);
+        }
+        .auth-container .auth-status .big-icon {
+            font-size: 48px;
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        /* ===== TABS ===== */
+        .tabs {
+            display: flex;
+            gap: 4px;
+            background: var(--bg-secondary);
+            padding: 4px;
+            border-radius: var(--radius-sm);
+            margin-bottom: 16px;
+            overflow-x: auto;
+            transition: background var(--transition);
+        }
+        .tabs .tab {
+            flex: 1;
+            min-width: 60px;
+            padding: 8px 12px;
+            text-align: center;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: background 0.2s, color 0.2s;
+            border: none;
+            background: transparent;
+            font-family: var(--font);
+            white-space: nowrap;
+        }
+        .tabs .tab.active {
+            background: var(--bg-card);
+            color: var(--text-primary);
+            box-shadow: var(--shadow);
+        }
+        .tabs .tab:active {
+            transform: scale(0.96);
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeSlideIn 0.25s ease;
+        }
+        .tab-content.active {
+            display: block;
+        }
+
+        /* ===== TOAST ===== */
+        .toast-container {
+            position: fixed;
+            bottom: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 999;
+            max-width: 90%;
+            pointer-events: none;
+        }
+        .toast {
+            background: var(--toast-bg);
+            color: var(--toast-text);
+            padding: 12px 20px;
+            border-radius: var(--radius-sm);
+            font-size: 14px;
+            font-weight: 500;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.3s, transform 0.3s;
+            pointer-events: auto;
+            text-align: center;
+            min-width: 200px;
+        }
+        .toast.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .toast.success {
+            border-left: 4px solid #27ae60;
+        }
+        .toast.error {
+            border-left: 4px solid #e74c3c;
+        }
+        .toast.warning {
+            border-left: 4px solid #f39c12;
+        }
+
+        /* ===== EMPTY STATE ===== */
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--text-muted);
+            transition: color var(--transition);
+        }
+        .empty-state .icon {
+            font-size: 48px;
+            margin-bottom: 12px;
+        }
+        .empty-state h3 {
+            font-size: 18px;
+            color: var(--text-secondary);
+            margin-bottom: 4px;
+            transition: color var(--transition);
+        }
+        .empty-state p {
+            font-size: 14px;
+        }
+
+        /* ===== MODAL ===== */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 200;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+            animation: fadeIn 0.2s ease;
+            backdrop-filter: blur(4px);
+        }
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+        .modal-box {
+            background: var(--bg-card);
+            border-radius: var(--radius);
+            max-width: 420px;
+            width: 100%;
+            padding: 24px 20px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+            animation: slideUp 0.25s ease;
+            transition: background var(--transition);
+        }
+        @keyframes slideUp {
+            from {
+                transform: translateY(30px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+        .modal-box h3 {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            color: var(--text-primary);
+            transition: color var(--transition);
+        }
+        .modal-box .modal-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 16px;
+            flex-wrap: wrap;
+        }
+        .modal-box .modal-actions .btn {
+            flex: 1;
+            min-width: 80px;
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 400px) {
+            .dashboard-grid {
+                gap: 8px;
+            }
+            .dash-card {
+                padding: 14px 10px;
+                min-height: 80px;
+            }
+            .dash-card .icon {
+                font-size: 22px;
+            }
+            .dash-card .label {
+                font-size: 12px;
+            }
+            .header-brand {
+                font-size: 17px;
+            }
+            .header-user .role-badge {
+                display: none;
+            }
+            .card-item {
+                flex-wrap: wrap;
+            }
+            .card-item .actions {
+                width: 100%;
+                justify-content: flex-end;
+            }
+            .modal-box {
+                padding: 16px;
+            }
+        }
+
+        @media (min-width: 481px) {
+            #app {
+                border-left: 1px solid var(--border-color);
+                border-right: 1px solid var(--border-color);
+                box-shadow: 0 0 40px rgba(0, 0, 0, 0.08);
+            }
+            .main-content {
+                padding: 20px 24px 100px 24px;
+            }
+        }
+
+        @media (max-width: 360px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr 1fr;
+                gap: 6px;
+            }
+            .dash-card {
+                padding: 10px 8px;
+                min-height: 70px;
+            }
+            .dash-card .icon {
+                font-size: 18px;
+            }
+            .dash-card .label {
+                font-size: 11px;
+            }
+            .header-brand {
+                font-size: 15px;
+            }
+            .header-user {
+                font-size: 11px;
+                padding: 2px 8px 2px 4px;
+            }
+            .header-user .avatar {
+                width: 22px;
+                height: 22px;
+                font-size: 10px;
+            }
+            .btn {
+                font-size: 13px;
+                padding: 10px 16px;
+                min-height: 40px;
+            }
+        }
+
+        /* ===== LOADING SPINNER ===== */
+        .spinner {
+            display: inline-block;
+            width: 24px;
+            height: 24px;
+            border: 3px solid var(--bg-secondary);
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+        }
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .loading-center {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 40px 0;
+        }
+
+        /* ===== MISC ===== */
+        .text-center {
+            text-align: center;
+        }
+        .mt-8 {
+            margin-top: 8px;
+        }
+        .mt-16 {
+            margin-top: 16px;
+        }
+        .gap-8 {
+            gap: 8px;
+        }
+        .flex {
+            display: flex;
+        }
+        .flex-center {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .flex-between {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .flex-col {
+            display: flex;
+            flex-direction: column;
+        }
+        .w-full {
+            width: 100%;
+        }
+
+        .tag {
+            display: inline-block;
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            background: var(--badge-bg);
+            color: var(--badge-text);
+            transition: background var(--transition), color var(--transition);
+        }
+
+        .tag-pending {
+            background: #f39c12;
+            color: #fff;
+        }
+        .tag-approved {
+            background: #27ae60;
+            color: #fff;
+        }
+        .tag-rejected {
+            background: #e74c3c;
+            color: #fff;
+        }
+        .tag-owner {
+            background: #8e44ad;
+            color: #fff;
+        }
+        .tag-admin {
+            background: #2980b9;
+            color: #fff;
+        }
+        .tag-player {
+            background: var(--badge-bg);
+            color: var(--badge-text);
+        }
+
+        .rank-badge {
+            font-size: 12px;
+            font-weight: 700;
+            padding: 2px 10px;
+            border-radius: 12px;
+            background: var(--accent);
+            color: #1a1a1a;
+        }
+
+        /* Кнопка "Поделиться" в задачах */
+        .share-btn {
+            background: transparent;
+            border: 1px solid var(--accent);
+            color: var(--accent);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s, color 0.2s;
+            font-family: var(--font);
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .share-btn:active {
+            background: var(--accent);
+            color: #1a1a1a;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="app">
+        <!-- ===== HEADER ===== -->
+        <header class="app-header">
+            <div class="header-brand">✦ BOUNTY TEAM</div>
+            <div class="header-actions">
+                <button class="theme-toggle" id="themeToggle" aria-label="Переключить тему">🌓</button>
+                <div class="header-user" id="headerUser">
+                    <span class="avatar" id="userAvatar">?</span>
+                    <span id="userName">Гость</span>
+                    <span class="role-badge" id="userRoleBadge">—</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- ===== MAIN ===== -->
+        <div class="main-content" id="mainContent">
+
+            <!-- ==================== PAGE: AUTH / REGISTER ==================== -->
+            <div class="page active" id="page-auth">
+                <div class="auth-container" id="authContainer">
+                    <div class="auth-title">✦ BOUNTY TEAM</div>
+                    <div class="auth-sub">Добро пожаловать в команду!</div>
+
+                    <div id="authContent">
+                        <!-- будет заполнено js: регистрация или статус ожидания -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- ==================== PAGE: DASHBOARD ==================== -->
+            <div class="page" id="page-dashboard">
+                <div class="dashboard-grid" id="dashboardGrid">
+                    <!-- Генерируется JS -->
+                </div>
+            </div>
+
+            <!-- ==================== PAGE: VOICE ==================== -->
+            <div class="page" id="page-voice">
+                <div class="section-header">
+                    <button class="back-btn" data-page="dashboard">‹ Назад</button>
+                    <h2>🎙 Войс Штаб</h2>
+                </div>
+                <div style="text-align:center;padding:30px 0;">
+                    <p style="color:var(--text-secondary);margin-bottom:20px;">Перейти в голосовой штаб команды</p>
+                    <button class="btn btn-primary" id="voiceBtn" style="max-width:280px;margin:0 auto;">
+                        🚀 Перейти в Войс Штаб
+                    </button>
+                </div>
+            </div>
+
+            <!-- ==================== PAGE: ADMIN ==================== -->
+            <div class="page" id="page-admin">
+                <div class="section-header">
+                    <button class="back-btn" data-page="dashboard">‹ Назад</button>
+                    <h2>⚙️ Администрация</h2>
+                </div>
+                <div id="adminContent">
+                    <!-- Табы и контент генерируются JS -->
+                </div>
+            </div>
+
+            <!-- ==================== PAGE: SHOOTERS ==================== -->
+            <div class="page" id="page-shooters">
+                <div class="section-header">
+                    <button class="back-btn" data-page="dashboard">‹ Назад</button>
+                    <h2>🎯 Стрелки</h2>
+                    <div id="shootersActions"></div>
+                </div>
+                <div id="shootersContent">
+                    <!-- Ранги и список -->
+                </div>
+            </div>
+
+            <!-- ==================== PAGE: BS ==================== -->
+            <div class="page" id="page-bs">
+                <div class="section-header">
+                    <button class="back-btn" data-page="dashboard">‹ Назад</button>
+                    <h2>🛡 БС Состав</h2>
+                    <div id="bsActions"></div>
+                </div>
+                <div id="bsContent">
+                    <!-- Список -->
+                </div>
+            </div>
+
+            <!-- ==================== PAGE: TASKS ==================== -->
+            <div class="page" id="page-tasks">
+                <div class="section-header">
+                    <button class="back-btn" data-page="dashboard">‹ Назад</button>
+                    <h2>📋 Задачи &amp; Цели</h2>
+                    <div id="tasksActions"></div>
+                </div>
+                <div id="tasksContent">
+                    <!-- Список задач -->
+                </div>
+            </div>
+
+            <!-- ==================== PAGE: RULES ==================== -->
+            <div class="page" id="page-rules">
+                <div class="section-header">
+                    <button class="back-btn" data-page="dashboard">‹ Назад</button>
+                    <h2>📜 Устав &amp; Правила</h2>
+                    <div id="rulesActions"></div>
+                </div>
+                <div id="rulesContent">
+                    <!-- Текст устава -->
+                </div>
+            </div>
+
+            <!-- ==================== PAGE: NEWS ==================== -->
+            <div class="page" id="page-news">
+                <div class="section-header">
+                    <button class="back-btn" data-page="dashboard">‹ Назад</button>
+                    <h2>📰 Новости</h2>
+                    <div id="newsActions"></div>
+                </div>
+                <div id="newsContent">
+                    <!-- Лента новостей -->
+                </div>
+            </div>
+
+        </div><!-- /main-content -->
+
+        <!-- ===== TOAST ===== -->
+        <div class="toast-container" id="toastContainer">
+            <div class="toast" id="toast"></div>
+        </div>
+    </div>
+
+    <script>
+        // ============================================================
+        //  1.  CONFIG & SUPABASE  (🔑 ВАШИ ДАННЫЕ ВСТАВЛЕНЫ)
+        // ============================================================
+        // ⚠️ ЗАМЕНИТЕ URL НА СВОЙ (из настроек Supabase → API → URL)
+        const SUPABASE_URL = 'https://hhsyhblhqjjsvuumXXXX.supabase.co'; // ← замените XXXX на ваш код
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imhoc3loYmxocWpqc3Z1dW1hb3ZnIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc4ODg2MDQzOCwiZXhwIjoyMTA0NDM2NDM4fQ.eU1Uf9AyqLaoVdP3984edPJ6nsAZVH-hTVHiDQ9Kx6Y';
+
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        const MANAGER_TG = 'bounqy31';
+        const VOICE_LINK = 'https://vk.me/join/QwCqYDLM9KG9TjYsaRP8uQ5oIonjcOa0xIc=';
+
+        // ============================================================
+        //  2.  STATE
+        // ============================================================
+        const state = {
+            user: null, // { id, telegram_id, nickname, role, status, is_blocked, ... }
+            permissions: null, // { can_manage_applications, can_manage_shooters, ... }
+            theme: localStorage.getItem('bounty_theme') || 'light',
+            currentPage: 'auth',
+            loading: false,
+        };
+
+        // ============================================================
+        //  3.  DOM REFS
+        // ============================================================
+        const $ = (s) => document.querySelector(s);
+        const $$ = (s) => document.querySelectorAll(s);
+
+        const app = $('#app');
+        const mainContent = $('#mainContent');
+        const toastEl = $('#toast');
+        const toastContainer = $('#toastContainer');
+
+        // ============================================================
+        //  4.  TOAST
+        // ============================================================
+        let toastTimer = null;
+
+        function showToast(msg, type = 'info', duration = 2500) {
+            toastEl.textContent = msg;
+            toastEl.className = 'toast ' + type;
+            clearTimeout(toastTimer);
+            // принудительный reflow
+            void toastEl.offsetWidth;
+            toastEl.classList.add('show');
+            toastTimer = setTimeout(() => {
+                toastEl.classList.remove('show');
+            }, duration);
+        }
+
+        // ============================================================
+        //  5.  THEME
+        // ============================================================
+        function applyTheme(theme) {
+            state.theme = theme;
+            document.documentElement.setAttribute('data-theme', theme);
+            localStorage.setItem('bounty_theme', theme);
+            const btn = $('#themeToggle');
+            if (btn) btn.textContent = theme === 'dark' ? '☀️' : '🌓';
+        }
+
+        function toggleTheme() {
+            applyTheme(state.theme === 'dark' ? 'light' : 'dark');
+        }
+
+        // ============================================================
+        //  6.  NAVIGATION
+        // ============================================================
+        function navigate(page, data) {
+            // скрыть все страницы
+            $$('.page').forEach(p => p.classList.remove('active'));
+            const target = $('#page-' + page);
+            if (target) target.classList.add('active');
+            state.currentPage = page;
+            // прокрутка вверх
+            mainContent.scrollTop = 0;
+
+            // рендеринг страниц
+            switch (page) {
+                case 'dashboard':
+                    renderDashboard();
+                    break;
+                case 'voice':
+                    renderVoice();
+                    break;
+                case 'admin':
+                    renderAdmin();
+                    break;
+                case 'shooters':
+                    renderShooters();
+                    break;
+                case 'bs':
+                    renderBS();
+                    break;
+                case 'tasks':
+                    renderTasks();
+                    break;
+                case 'rules':
+                    renderRules();
+                    break;
+                case 'news':
+                    renderNews();
+                    break;
+                case 'auth':
+                    renderAuth();
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        // ============================================================
+        //  7.  AUTH / REGISTRATION
+        // ============================================================
+        async function renderAuth() {
+            const container = $('#authContent');
+            if (!container) return;
+
+            const tg = window.Telegram?.WebApp;
+            let tgUser = tg?.initDataUnsafe?.user;
+            if (!tgUser) {
+                // Для тестирования вне Telegram
+                tgUser = { id: 12345, username: 'testuser', first_name: 'Тест' };
+            }
+
+            const telegramId = String(tgUser.id);
+
+            try {
+                // Ищем пользователя
+                const { data: users, error } = await supabase
+                    .from('users')
+                    .select('*')
+                    .eq('telegram_id', telegramId);
+
+                if (error) throw error;
+
+                const user = users && users.length > 0 ? users[0] : null;
+
+                if (user) {
+                    // Пользователь существует
+                    if (user.status === 'approved' && !user.is_blocked) {
+                        // Вход выполнен
+                        state.user = user;
+                        await loadPermissions(user.id);
+                        navigate('dashboard');
+                        return;
+                    } else if (user.status === 'pending') {
+                        container.innerHTML = `
+                            <div class="auth-status">
+                                <span class="big-icon">⏳</span>
+                                <strong>Заявка на рассмотрении</strong>
+                                <p style="margin-top:8px;font-size:13px;">Ваша заявка ожидает одобрения администрацией.</p>
+                                <p style="font-size:12px;color:var(--text-muted);margin-top:4px;">Ник: ${user.nickname}</p>
+                            </div>
+                        `;
+                        return;
+                    } else if (user.status === 'rejected') {
+                        container.innerHTML = `
+                            <div class="auth-status" style="border-left:4px solid #e74c3c;">
+                                <span class="big-icon">❌</span>
+                                <strong>Заявка отклонена</strong>
+                                <p style="margin-top:8px;font-size:13px;">К сожалению, ваша заявка не прошла.</p>
+                                <button class="btn btn-primary mt-16" onclick="window.location.reload()">Попробовать снова</button>
+                            </div>
+                        `;
+                        return;
+                    } else if (user.is_blocked) {
+                        container.innerHTML = `
+                            <div class="auth-status" style="border-left:4px solid #e74c3c;">
+                                <span class="big-icon">🚫</span>
+                                <strong>Доступ заблокирован</strong>
+                                <p style="margin-top:8px;font-size:13px;">Ваш аккаунт был заблокирован.</p>
+                            </div>
+                        `;
+                        return;
+                    }
+                }
+
+                // Нет пользователя → форма регистрации
+                container.innerHTML = `
+                    <form id="registerForm" autocomplete="off">
+                        <div class="form-group">
+                            <label>Телеграм ID</label>
+                            <input type="text" value="${telegramId}" disabled style="opacity:0.6;" />
+                        </div>
+                        <div class="form-group">
+                            <label>Игровой ник *</label>
+                            <input type="text" id="regNick" placeholder="Ваш ник в игре" required />
+                        </div>
+                        <div class="form-group">
+                            <label>Пароль *</label>
+                            <input type="password" id="regPass" placeholder="Придумайте пароль" required minlength="4" />
+                        </div>
+                        <div class="form-group">
+                            <label>Ссылка на скрин / видео *</label>
+                            <input type="url" id="regProof" placeholder="https://... (подтверждение в семье)" required />
+                        </div>
+                        <button type="submit" class="btn btn-primary" id="regSubmit">📩 Отправить заявку</button>
+                    </form>
+                    <p style="font-size:12px;color:var(--text-muted);text-align:center;margin-top:12px;">
+                        После отправки дождитесь одобрения администрацией.
+                    </p>
+                `;
+
+                const form = $('#registerForm');
+                form.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    const nickname = $('#regNick').value.trim();
+                    const password = $('#regPass').value.trim();
+                    const proof = $('#regProof').value.trim();
+
+                    if (!nickname || !password || !proof) {
+                        showToast('Заполните все поля', 'error');
+                        return;
+                    }
+                    if (password.length < 4) {
+                        showToast('Пароль должен быть минимум 4 символа', 'error');
+                        return;
+                    }
+                    if (!proof.startsWith('http://') && !proof.startsWith('https://')) {
+                        showToast('Введите корректную ссылку', 'error');
+                        return;
+                    }
+
+                    // Проверка на уникальность ника
+                    const { data: existing } = await supabase
+                        .from('users')
+                        .select('nickname')
+                        .eq('nickname', nickname);
+
+                    if (existing && existing.length > 0) {
+                        showToast('Этот ник уже занят', 'error');
+                        return;
+                    }
+
+                    // Создаём заявку
+                    const { error: insertError } = await supabase
+                        .from('users')
+                        .insert({
+                            telegram_id: telegramId,
+                            nickname: nickname,
+                            password: password,
+                            proof_link: proof,
+                            status: 'pending',
+                            role: 'player',
+                            is_blocked: false,
+                        });
+
+                    if (insertError) {
+                        showToast('Ошибка: ' + insertError.message, 'error');
+                        return;
+                    }
+
+                    showToast('✅ Заявка отправлена! Ожидайте одобрения.', 'success');
+                    // Обновляем страницу
+                    setTimeout(() => renderAuth(), 1500);
+                });
+
+            } catch (err) {
+                console.error(err);
+                container.innerHTML = `
+                    <div class="auth-status" style="border-left:4px solid #e74c3c;">
+                        <strong>❌ Ошибка</strong>
+                        <p style="margin-top:8px;">${err.message}</p>
+                        <button class="btn btn-primary mt-16" onclick="window.location.reload()">Обновить</button>
+                    </div>
+                `;
+            }
+        }
+
+        // ============================================================
+        //  8.  PERMISSIONS
+        // ============================================================
+        async function loadPermissions(userId) {
+            const { data, error } = await supabase
+                .from('admin_permissions')
+                .select('*')
+                .eq('user_id', userId)
+                .maybeSingle();
+
+            if (error && error.code !== 'PGRST116') {
+                console.error('Perms error:', error);
+            }
+
+            if (data) {
+                state.permissions = data;
+            } else {
+                // По умолчанию все права false, если owner то все true
+                const defaults = {
+                    can_manage_applications: false,
+                    can_manage_shooters: false,
+                    can_manage_bs: false,
+                    can_manage_tasks: false,
+                    can_manage_rules: false,
+                    can_manage_news: false,
+                    can_manage_admins: false,
+                };
+                if (state.user?.role === 'owner') {
+                    Object.keys(defaults).forEach(k => defaults[k] = true);
+                }
+                state.permissions = { ...defaults, user_id: userId };
+            }
+        }
+
+        function hasPerm(perm) {
+            if (!state.user) return false;
+            if (state.user.role === 'owner') return true;
+            if (state.user.role !== 'admin') return false;
+            return state.permissions?.[perm] === true;
+        }
+
+        function isAdmin() {
+            return state.user && (state.user.role === 'admin' || state.user.role === 'owner');
+        }
+
+        function isOwner() {
+            return state.user && state.user.role === 'owner';
+        }
+
+        // ============================================================
+        //  9.  DASHBOARD
+        // ============================================================
+        function renderDashboard() {
+            const grid = $('#dashboardGrid');
+            if (!grid) return;
+            // Обновляем хедер
+            updateHeader();
+
+            const items = [
+                { id: 'voice', icon: '🎙', label: 'Войс Штаб', desc: 'Голосовой канал' },
+                { id: 'admin', icon: '⚙️', label: 'Администрация', desc: 'Управление', admin: true },
+                { id: 'shooters', icon: '🎯', label: 'Стрелки', desc: 'Рейтинг' },
+                { id: 'bs', icon: '🛡', label: 'БС Состав', desc: 'Боевой состав' },
+                { id: 'tasks', icon: '📋', label: 'Задачи & Цели', desc: 'Прогресс' },
+                { id: 'rules', icon: '📜', label: 'Устав & Правила', desc: 'Документы' },
+                { id: 'news', icon: '📰', label: 'Новости', desc: 'Лента' },
+            ];
+
+            const filtered = items.filter(it => {
+                if (it.admin) return isAdmin();
+                return true;
+            });
+
+            grid.innerHTML = filtered.map(it => `
+                <div class="dash-card" data-page="${it.id}">
+                    ${it.admin ? '<span class="badge">ADMIN</span>' : ''}
+                    <div class="icon">${it.icon}</div>
+                    <div class="label">${it.label}</div>
+                    <div class="sub">${it.desc}</div>
+                </div>
+            `).join('');
+
+            grid.querySelectorAll('.dash-card').forEach(el => {
+                el.addEventListener('click', () => {
+                    const page = el.dataset.page;
+                    if (page === 'voice') {
+                        // Открываем ссылку
+                        window.open(VOICE_LINK, '_blank');
+                        return;
+                    }
+                    navigate(page);
+                });
+            });
+        }
+
+        // ============================================================
+        //  10. VOICE
+        // ============================================================
+        function renderVoice() {
+            const btn = $('#voiceBtn');
+            if (btn) {
+                btn.onclick = () => window.open(VOICE_LINK, '_blank');
+            }
+        }
+
+        // ============================================================
+        //  11. ADMIN PANEL
+        // ============================================================
+        function renderAdmin() {
+            const container = $('#adminContent');
+            if (!container) return;
+            if (!isAdmin()) {
+                container.innerHTML = `<div class="empty-state"><div class="icon">🔒</div><h3>Нет доступа</h3></div>`;
+                return;
+            }
+
+            // Доступные вкладки
+            const tabs = [];
+            if (hasPerm('can_manage_applications') || isOwner()) tabs.push({ id: 'apps', label: '📩 Заявки' });
+            if (isOwner()) tabs.push({ id: 'players', label: '👥 Игроки' });
+            if (isOwner()) tabs.push({ id: 'admins', label: '👑 Админы' });
+            if (hasPerm('can_manage_tasks') || isOwner()) tabs.push({ id: 'tasks_mgmt', label: '📋 Задачи' });
+            if (hasPerm('can_manage_shooters') || isOwner()) tabs.push({ id: 'shooters_mgmt', label: '🎯 Стрелки' });
+            if (hasPerm('can_manage_bs') || isOwner()) tabs.push({ id: 'bs_mgmt', label: '🛡 БС' });
+            if (hasPerm('can_manage_rules') || isOwner()) tabs.push({ id: 'rules_mgmt', label: '📜 Устав' });
+            if (hasPerm('can_manage_news') || isOwner()) tabs.push({ id: 'news_mgmt', label: '📰 Новости' });
+
+            let tabsHtml = `<div class="tabs">`;
+            tabsHtml += tabs.map((t, i) =>
+                `<button class="tab ${i===0?'active':''}" data-tab="${t.id}">${t.label}</button>`
+            ).join('');
+            tabsHtml += `</div>`;
+
+            let contentHtml = `<div id="adminTabContent">`;
+            tabs.forEach((t, i) => {
+                contentHtml += `<div class="tab-content ${i===0?'active':''}" data-tab="${t.id}">`;
+                contentHtml += `<div id="adminPanel_${t.id}">Загрузка...</div>`;
+                contentHtml += `</div>`;
+            });
+            contentHtml += `</div>`;
+
+            container.innerHTML = tabsHtml + contentHtml;
+
+            // Переключение табов
+            container.querySelectorAll('.tab').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    container.querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    const id = btn.dataset.tab;
+                    container.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                    const target = container.querySelector(`.tab-content[data-tab="${id}"]`);
+                    if (target) target.classList.add('active');
+                    // Загружаем контент
+                    loadAdminPanel(id);
+                });
+            });
+
+            // Загружаем первую вкладку
+            const firstTab = container.querySelector('.tab');
+            if (firstTab) loadAdminPanel(firstTab.dataset.tab);
+        }
+
+        async function loadAdminPanel(tabId) {
+            const panel = document.getElementById('adminPanel_' + tabId);
+            if (!panel) return;
+
+            switch (tabId) {
+                case 'apps':
+                    await renderAdminApplications(panel);
+                    break;
+                case 'players':
+                    await renderAdminPlayers(panel);
+                    break;
+                case 'admins':
+                    await renderAdminAdmins(panel);
+                    break;
+                case 'tasks_mgmt':
+                    await renderAdminTasks(panel);
+                    break;
+                case 'shooters_mgmt':
+                    await renderAdminShooters(panel);
+                    break;
+                case 'bs_mgmt':
+                    await renderAdminBS(panel);
+                    break;
+                case 'rules_mgmt':
+                    await renderAdminRules(panel);
+                    break;
+                case 'news_mgmt':
+                    await renderAdminNews(panel);
+                    break;
+                default:
+                    panel.innerHTML = '<div class="empty-state">Раздел в разработке</div>';
+            }
+        }
+
+        // ---------- Заявки ----------
+        async function renderAdminApplications(panel) {
+            if (!hasPerm('can_manage_applications') && !isOwner()) {
+                panel.innerHTML = '<div class="empty-state">Нет прав</div>';
+                return;
+            }
+            panel.innerHTML = '<div class="loading-center"><div class="spinner"></div></div>';
+
+            const { data, error } = await supabase
+                .from('users')
+                .select('*')
+                .eq('status', 'pending')
+                .order('created_at', { ascending: false });
+
+            if (error) { panel.innerHTML = '<p>Ошибка</p>'; return; }
+
+            if (!data || data.length === 0) {
+                panel.innerHTML = '<div class="empty-state"><div class="icon">✅</div><h3>Нет заявок</h3></div>';
+                return;
+            }
+
+            panel.innerHTML = `<div class="card-list">` +
+                data.map(u => `
+                    <div class="card-item" data-id="${u.id}">
+                        <div class="info">
+                            <div class="title">${u.nickname}</div>
+                            <div class="desc">${u.proof_link || 'Нет ссылки'}</div>
+                            <div class="meta">ID: ${u.telegram_id} • ${new Date(u.created_at).toLocaleDateString()}</div>
+                        </div>
+                        <div class="actions">
+                            <button class="btn btn-success btn-sm approve-app">✅</button>
+                            <button class="btn btn-danger btn-sm reject-app">❌</button>
+                        </div>
+                    </div>
+                `).join('') + `</div>`;
+
+            panel.querySelectorAll('.approve-app').forEach(btn => {
+                btn.addEventListener('click', async () => {
+                    const id = btn.closest('.card-item').dataset.id;
+                    await approveApplication(id, true);
+                    await renderAdminApplications(panel);
+                });
+            });
+            panel.querySelectorAll('.reject-app').forEach(btn => {
+                btn.addEventListener('click', async () => {
+                    const id = btn.closest('.card-item').dataset.id;
+                    await approveApplication(id, false);
+                    await renderAdminApplications(panel);
+                });
+            });
+        }
+
+        async function approveApplication(userId, approve) {
+            const status = approve ? 'approved' : 'rejected';
+            const { error } = await supabase
+                .from('users')
+                .update({ status: status })
+                .eq('id', userId);
+            if (error) {
+                showToast('Ошибка: ' + error.message, 'error');
+            } else {
+                showToast(approve ? '✅ Заявка одобрена' : '❌ Заявка отклонена', approve ? 'success' : 'error');
+            }
+        }
+
+        // ---------- Игроки (owner only) ----------
+        async function renderAdminPlayers(panel) {
+            if (!isOwner()) { panel.innerHTML = '<div class="empty-state">Только для владельца</div>'; return; }
+            panel.innerHTML = '<div class="loading-center"><div class="spinner"></div></div>';
+
+            const { data, error } = await supabase
+                .from('users')
+                .select('*')
+                .order('created_at', { ascending: false });
+
+            if (error) { panel.innerHTML = '<p>Ошибка</p>'; return; }
+
+            let html = `
+                <div style="margin-bottom:16px;">
+                    <button class="btn btn-primary" id="createPlayerBtn">➕ Создать игрока</button>
+                </div>
+                <div class="card-list">
+            `;
+
+            if (!data || data.length === 0) {
+                html += `<div class="empty-state">Нет игроков</div>`;
+            } else {
+                data.forEach(u => {
+                    const statusTag = u.status === 'approved' ? 'tag-approved' : u.status === 'pending' ? 'tag-pending' :
+                        'tag-rejected';
+                    const roleTag = u.role === 'owner' ? 'tag-owner' : u.role === 'admin' ? 'tag-admin' : 'tag-player';
+                    html += `
+                        <div class="card-item" data-id="${u.id}">
+                            <div class="info">
+                                <div class="title">${u.nickname} <span class="tag ${roleTag}">${u.role}</span> ${u.is_blocked ? '🚫' : ''}</div>
+                                <div class="desc">ID: ${u.telegram_id}</div>
+                                <div class="meta">Статус: <span class="tag ${statusTag}">${u.status}</span></div>
+                            </div>
+                            <div class="actions">
+                                <button class="btn btn-warning btn-sm toggle-block" data-id="${u.id}" data-blocked="${u.is_blocked}">${u.is_blocked ? '🔓' : '🔒'}</button>
+                                ${u.role !== 'owner' ? `<button class="btn btn-danger btn-sm delete-user" data-id="${u.id}">🗑</button>` : ''}
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+            html += `</div>`;
+            panel.innerHTML = html;
+
+            // Блокировка
+            panel.querySelectorAll('.toggle-block').forEach(btn => {
+                btn.addEventListener('click', async () => {
+                    const id = btn.dataset.id;
+                    const blocked = btn.dataset.blocked === 'true';
+                    const { error } = await supabase
+                        .from('users')
+                        .update({ is_blocked: !blocked })
+                        .eq('id', id);
+                    if (error) showToast('Ошибка', 'error');
+                    else {
+                        showToast(blocked ? '🔓 Разблокирован' : '🔒 Заблокирован', 'success');
+                        await renderAdminPlayers(panel);
+                    }
+                });
+            });
+
+            // Удаление
+            panel.querySelectorAll('.delete-user').forEach(btn => {
+                btn.addEventListener('click', async () => {
+                    if (!confirm('Удалить игрока?')) return;
+                    const id = btn.dataset.id;
+                    const { error } = await supabase
+                        .from('users')
+                        .delete()
+                        .eq('id', id);
+                    if (error) showToast('Ошибка', 'error');
+                    else {
+                        showToast('Удалено', 'success');
+                        await renderAdminPlayers(panel);
+                    }
+                });
+            });
+
+            // Создать игрока
+            const createBtn = $('#createPlayerBtn');
+            if (createBtn) {
+                createBtn.addEventListener('click', () => {
+                    showCreatePlayerModal();
+                });
+            }
+        }
+
+        function showCreatePlayerModal() {
+            const overlay = document.createElement('div');
+            overlay.className = 'modal-overlay';
+            overlay.innerHTML = `
+                <div class="modal-box">
+                    <h3>➕ Создать игрока</h3>
+                    <div class="form-group">
+                        <label>Ник *</label>
+                        <input type="text" id="newPlayerNick" placeholder="Никнейм" />
+                    </div>
+                    <div class="form-group">
+                        <label>Пароль *</label>
+                        <input type="password" id="newPlayerPass" placeholder="Пароль" />
+                    </div>
+                    <div class="form-group">
+                        <label>Telegram ID</label>
+                        <input type="text" id="newPlayerTg" placeholder="ID (опционально)" />
+                    </div>
+                    <div class="modal-actions">
+                        <button class="btn btn-secondary" id="modalCancel">Отмена</button>
+                        <button class="btn btn-primary" id="modalCreate">Создать</button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(overlay);
+
+            overlay.querySelector('#modalCancel').addEventListener('click', () => overlay.remove());
+            overlay.querySelector('#modalCreate').addEventListener('click', async () => {
+                const nick = overlay.querySelector('#newPlayerNick').value.trim();
+                const pass = overlay.querySelector('#newPlayerPass').value.trim();
+                const tgId = overlay.querySelector('#newPlayerTg').value.trim() || 'manual_' + Date.now();
+
+                if (!nick || !pass) {
+                    showToast('Заполните ник и пароль', 'error');
+                    return;
+                }
+
+                const { error } = await supabase
+                    .from('users')
+                    .insert({
+                        telegram_id: tgId,
+                        nickname: nick,
+                        password: pass,
+                        status: 'approved',
+                        role: 'player',
+                        is_blocked: false,
+                    });
+
+                if (error) {
+                    showToast('Ошибка: ' + error.message, 'error');
+                } else {
+                    showToast('✅ Игрок создан', 'success');
+                    overlay.remove();
+                    // перезагрузить панель
+                    const panel = document.getElementById('adminPanel_players');
+                    if (panel) await renderAdminPlayers(panel);
+                }
+            });
+        }
+
+        // ---------- Управление админами (owner) ----------
+        async function renderAdminAdmins(panel) {
+            if (!isOwner()) { panel.innerHTML = '<div class="empty-state">Только для владельца</div>'; return; }
+            panel.innerHTML = '<div class="loading-center"><div class="spinner"></div></div>';
+
+            // Все пользователи с ролью admin или owner
+            const { data: admins, error } = await supabase
+                .from('users')
+                .select('*')
+                .in('role', ['admin', 'owner'])
+                .order('created_at');
+
+            if (error) { panel.innerHTML = '<p>Ошибка</p>'; return; }
+
+            // Права админов
+            const { data: perms, error: permsError } = await supabase
+                .from('admin_permissions')
+                .select('*');
+
+            if (permsError) console.error(permsError);
+
+            const permMap = {};
+            if (perms) {
+                perms.forEach(p => { permMap[p.user_id] = p; });
+            }
+
+            let html = `
+                <div style="margin-bottom:16px;">
+                    <button class="btn btn-primary" id="addAdminBtn">➕ Добавить админа</button>
+                </div>
+                <div class="card-list">
+            `;
+
+            if (!admins || admins.length === 0) {
+                html += `<div class="empty-state">Нет админов</div>`;
+            } else {
+                admins.forEach(u => {
+                    const p = permMap[u.id] || {};
+                    const permList = [];
+                    if (p.can_manage_applications) permList.push('Заявки');
+                    if (p.can_manage_shooters) permList.push('Стрелки');
+                    if (p.can_manage_bs) permList.push('БС');
+                    if (p.can_manage_tasks) permList.push('Задачи');
+                    if (p.can_manage_rules) permList.push('Устав');
+                    if (p.can_manage_news) permList.push('Новости');
+                    if (p.can_manage_admins) permList.push('Админы');
+                    const permStr = permList.length ? permList.join(', ') : 'Нет прав';
+
+                    html += `
+                        <div class="card-item" data-id="${u.id}">
+                            <div class="info">
+                                <div class="title">${u.nickname} <span class="tag ${u.role === 'owner' ? 'tag-owner' : 'tag-admin'}">${u.role}</span></div>
+                                <div class="desc">${permStr}</div>
+                            </div>
+                            <div class="actions">
+                                ${u.role !== 'owner' ? `
+                                    <button class="btn btn-sm btn-secondary edit-admin" data-id="${u.id}">✏️</button>
+                                    <button class="btn btn-sm btn-danger remove-admin" data-id="${u.id}">🗑</button>
+                                ` : ''}
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+            html += `</div>`;
+            panel.innerHTML = html;
+
+            // Редактировать права
+            panel.querySelectorAll('.edit-admin').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const id = btn.dataset.id;
+                    showEditAdminModal(id);
+                });
+            });
+
+            // Удалить админа
+            panel.querySelectorAll('.remove-admin').forEach(btn => {
+                btn.addEventListener('click', async () => {
+                    if (!confirm('Снять права админа?')) return;
+                    const id = btn.dataset.id;
+                    const { error } = await supabase
+                        .from('users')
+                        .update({ role: 'player' })
+                        .eq('id', id);
+                    if (error) showToast('Ошибка', 'error');
+                    else {
+                        // Удаляем запись прав
+                        await supabase.from('admin_permissions').delete().eq('user_id', id);
+                        showToast('✅ Админ удалён', 'success');
+                        await renderAdminAdmins(panel);
+                    }
+                });
+            });
+
+            // Добавить админа
+            const addBtn = $('#addAdminBtn');
+            if (addBtn) {
+                addBtn.addEventListener('click', showAddAdminModal);
+            }
+        }
+
+        async function showAddAdminModal() {
+            // Список игроков
+            const { data: players, error } = await supabase
+                .from('users')
+                .select('id, nickname')
+                .neq('role', 'owner')
+                .eq('status', 'approved');
+
+            if (error) { showToast('Ошибка', 'error'); return; }
+
+            const overlay = document.createElement('div');
+            overlay.className = 'modal-overlay';
+            overlay.innerHTML = `
+                <div class="modal-box">
+                    <h3>👑 Назначить админа</h3>
+                    <div class="form-group">
+                        <label>Игрок</label>
+                        <select id="adminSelect">
+                            ${players.map(p => `<option value="${p.id}">${p.nickname}</option>`).join('')}
+                        </select>
+                    </div>
+                    <div style="margin:12px 0;">
+                        <label style="font-weight:600;">Права:</label>
+                        ${['applications','shooters','bs','tasks','rules','news','admins'].map(k => `
+                            <div style="display:flex;align-items:center;gap:8px;margin:4px 0;">
+                                <input type="checkbox" id="perm_${k}" />
+                                <label for="perm_${k}" style="font-size:14px;font-weight:400;">${k.charAt(0).toUpperCase()+k.slice(1)}</label>
+                            </div>
+                        `).join('')}
+                    </div>
+                    <div class="modal-actions">
+                        <button class="btn btn-secondary" id="modalCancel">Отмена</button>
+                        <button class="btn btn-primary" id="modalSave">Назначить</button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(overlay);
+
+            overlay.querySelector('#modalCancel').addEventListener('click', () => overlay.remove());
+            overlay.querySelector('#modalSave').addEventListener('click', async () => {
+                const userId = overlay.querySelector('#adminSelect').value;
+                const perms = {
+                    can_manage_applications: overlay.querySelector('#perm_applications').checked,
+                    can_manage_shooters: overlay.querySelector('#perm_shooters').checked,
+                    can_manage_bs: overlay.querySelector('#perm_bs').checked,
+                    can_manage_tasks: overlay.querySelector('#perm_tasks').checked,
+                    can_manage_rules: overlay.querySelector('#perm_rules').checked,
+                    can_manage_news: overlay.querySelector('#perm_news').checked,
+                    can_manage_admins: overlay.querySelector('#perm_admins').checked,
+                };
+
+                // Обновляем роль
+                const { error: roleErr } = await supabase
+                    .from('users')
+                    .update({ role: 'admin' })
+                    .eq('id', userId);
+
+                if (roleErr) { showToast('Ошибка: ' + roleErr.message, 'error'); return; }
+
+                // Вставляем права
+                const { error: permErr } = await supabase
+                    .from('admin_permissions')
+                    .upsert({ user_id: userId, ...perms }, { onConflict: 'user_id' });
+
+                if (permErr) { showToast('Ошибка: ' + permErr.message, 'error'); return; }
+
+                showToast('✅ Админ назначен', 'success');
+                overlay.remove();
+                const panel = document.getElementById('adminPanel_admins');
+                if (panel) await renderAdminAdmins(panel);
+            });
+        }
+
+        async function showEditAdminModal(userId) {
+            const { data: permData, error } = await supabase
+                .from('admin_permissions')
+                .select('*')
+                .eq('user_id', userId)
+                .maybeSingle();
+
+            if (error) { showToast('Ошибка', 'error'); return; }
+
+            const p = permData || {};
+
+            const overlay = document.createElement('div');
+            overlay.className = 'modal-overlay';
+            overlay.innerHTML = `
+                <div class="modal-box">
+                    <h3>✏️ Редактировать права</h3>
+                    <div style="margin:12px 0;">
+                        ${['applications','shooters','bs','tasks','rules','news','admins'].map(k => `
+                            <div style="display:flex;align-items:center;gap:8px;margin:4px 0;">
+                                <input type="checkbox" id="edit_perm_${k}" ${p['can_manage_'+k] ? 'checked' : ''} />
+                                <label for="edit_perm_${k}" style="font-size:14px;font-weight:400;">${k.charAt(0).toUpperCase()+k.slice(1)}</label>
+                            </div>
+                        `).join('')}
+                    </div>
+                    <div class="modal-actions">
+                        <button class="btn btn-secondary" id="modalCancel">Отмена</button>
+                        <button class="btn btn-primary" id="modalSave">Сохранить</button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(overlay);
+
+            overlay.querySelector('#modalCancel').addEventListener('click', () => overlay.remove());
+            overlay.querySelector('#modalSave').addEventListener('click', async () => {
+                const perms = {
+                    can_manage_applications: overlay.querySelector('#edit_perm_applications').checked,
+                    can_manage_shooters: overlay.querySelector('#edit_perm_shooters').checked,
+                    can_manage_bs: overlay.querySelector('#edit_perm_bs').checked,
+                    can_manage_tasks: overlay.querySelector('#edit_perm_tasks').checked,
+                    can_manage_rules: overlay.querySelector('#edit_perm_rules').checked,
+                    can_manage_news: overlay.querySelector('#edit_perm_news').checked,
+                    can_manage_admins: overlay.querySelector('#edit_perm_admins').checked,
+                };
+
+                const { error: permErr } = await supabase
+                    .from('admin_permissions')
+                    .upsert({ user_id: userId, ...perms }, { onConflict: 'user_id' });
+
+                if (permErr) { showToast('Ошибка: ' + permErr.message, 'error'); return; }
+
+                showToast('✅ Права обновлены', 'success');
+                overlay.remove();
+                const panel = document.getElementById('adminPanel_admins');
+                if (panel) await renderAdminAdmins(panel);
+            });
+        }
+
+        // ---------- Управление задачами (админ) ----------
+        async function renderAdminTasks(panel) {
+            if (!hasPerm('can_manage_tasks') && !isOwner()) {
+                panel.innerHTML = '<div class="empty-state">Нет прав</div>';
+                return;
+            }
+            panel.innerHTML = '<div class="loading-center"><div class="spinner"></div></div>';
+
+            const { data, error } = await supabase
+                .from('tasks')
+                .select('*')
+                .order('created_at', { ascending: false });
+
+            if (error) { panel.innerHTML = '<p>Ошибка</p>'; return; }
+
+            let html = `
+                <div style="margin-bottom:16px;">
+                    <button class="btn btn-primary" id="adminAddTaskBtn">➕ Добавить задачу</button>
+                </div>
+                <div class="card-list">
+            `;
+
+            if (!data || data.length === 0) {
+                html += `<div class="empty-state">Нет задач</div>`;
+            } else {
+                data.forEach(t => {
+                    html += `
+                        <div class="card-item" data-id="${t.id}">
+                            <div class="info">
+                                <div class="title">${t.title}</div>
+                                <div class="desc">${t.description || ''}</div>
+                                <div class="meta">Прогресс: ${t.progress}%</div>
+                                <div class="progress-wrap"><div class="bar" style="width:${t.progress}%"></div></div>
+                            </div>
+                            <div class="actions">
+                                <button class="btn btn-sm btn-secondary edit-task" data-id="${t.id}">✏️</button>
+                                <button class="btn btn-sm btn-danger delete-task" data-id="${t.id}">🗑</button>
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+            html += `</div>`;
+            panel.innerHTML = html;
+
+            panel.querySelectorAll('.edit-task').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const id = btn.dataset.id;
+                    showEditTaskModal(id);
+                });
+            });
+
+            panel.querySelectorAll('.delete-task').forEach(btn => {
+                btn.addEventListener('click', async () => {
+                    if (!confirm('Удалить задачу?')) return;
+                    const id = btn.dataset.id;
+                    const { error } = await supabase.from('tasks').delete().eq('id', id);
+                    if (error) showToast('Ошибка', 'error');
+                    else {
+                        showToast('Удалено', 'success');
+                        await renderAdminTasks(panel);
+                    }
+                });
+            });
+
+            const addBtn = $('#adminAddTaskBtn');
+            if (addBtn) {
+                addBtn.addEventListener('click', () => showEditTaskModal(null));
+            }
+        }
+
+        async function showEditTaskModal(taskId) {
+            let task = null;
+            if (taskId) {
+                const { data, error } = await supabase
+                    .from('tasks')
+                    .select('*')
+                    .eq('id', taskId)
+                    .maybeSingle();
+                if (!error && data) task = data;
+            }
+
+            const overlay = document.createElement('div');
+            overlay.className = 'modal-overlay';
+            overlay.innerHTML = `
+                <div class="modal-box">
+                    <h3>${task ? '✏️ Редактировать задачу' : '➕ Новая задача'}</h3>
+                    <div class="form-group">
+                        <label>Название *</label>
+                        <input type="text" id="taskTitle" value="${task ? task.title : ''}" />
+                    </div>
+                    <div class="form-group">
+                        <label>Описание</label>
+                        <textarea id="taskDesc" rows="3">${task ? task.description || '' : ''}</textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Прогресс: <span id="progressLabel">${task ? task.progress : 0}%</span></label>
+                        <input type="range" id="taskProgress" min="0" max="100" value="${task ? task.progress : 0}" />
+                    </div>
+                    <div class="modal-actions">
+                        <button class="btn btn-secondary" id="modalCancel">Отмена</button>
+                        <button class="btn btn-primary" id="modalSave">${task ? 'Сохранить' : 'Создать'}</button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(overlay);
+
+            const range = overlay.querySelector('#taskProgress');
+            const label = overlay.querySelector('#progressLabel');
+            range.addEventListener('input', () => {
+                label.textContent = range.value + '%';
+            });
+
+            overlay.querySelector('#modalCancel').addEventListener('click', () => overlay.remove());
+            overlay.querySelector('#modalSave').addEventListener('click', async () => {
+                const title = overlay.querySelector('#taskTitle').value.trim();
+                const desc = overlay.querySelector('#taskDesc').value.trim();
+                const progress = parseInt(range.value) || 0;
+
+                if (!title) { showToast('Введите название', 'error'); return; }
+
+                const payload = { title, description: desc, progress };
+
+                let err;
+                if (task) {
+                    const { error } = await supabase
+                        .from('tasks')
+                        .update(payload)
+                        .eq('id', task.id);
+                    err = error;
+                } else {
+                    payload.created_by = state.user.id;
+                    const { error } = await supabase
+                        .from('tasks')
+                        .insert(payload);
+                    err = error;
+                }
+
+                if (err) { showToast('Ошибка: ' + err.message, 'error'); return; }
+
+                showToast('✅ Сохранено', 'success');
+                overlay.remove();
+                const panel = document.getElementById('adminPanel_tasks_mgmt');
+                if (panel) await renderAdminTasks(panel);
+            });
+        }
+
+        // ---------- Управление стрелками (админ) ----------
+        async function renderAdminShooters(panel) {
+            if (!hasPerm('can_manage_shooters') && !isOwner()) {
+                panel.innerHTML = '<div class="empty-state">Нет прав</div>';
+                return;
+            }
+            panel.innerHTML = '<div class="loading-center"><div class="spinner"></div></div>';
+
+            const { data: shooters, error } = await supabase
+                .from('shooters')
+                .select('*, users(nickname)')
+                .order('rank', { ascending: true });
+
+            if (error) { panel.innerHTML = '<p>Ошибка</p>'; return; }
+
+            let html = `
+                <div style="margin-bottom:16px;">
+                    <button class="btn btn-primary" id="adminAddShooterBtn">➕ Добавить стрелка</button>
+                </div>
+                <div class="card-list">
+            `;
+
+            if (!shooters || shooters.length === 0) {
+                html += `<div class="empty-state">Нет стрелков</div>`;
+            } else {
+                shooters.forEach(s => {
+                    const name = s.users?.nickname || 'Неизвестно';
+                    html += `
+                        <div class="card-item" data-id="${s.id}">
+                            <div class="info">
+                                <div class="title">${name} <span class="rank-badge">${s.rank}-й ранг</span></div>
+                            </div>
+                            <div class="actions">
+                                <button class="btn btn-sm btn-danger delete-shooter" data-id="${s.id}">🗑</button>
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+            html += `</div>`;
+            panel.innerHTML = html;
+
+            panel.querySelectorAll('.delete-shooter').forEach(btn => {
+                btn.addEventListener('click', async () => {
+                    if (!confirm('Удалить стрелка?')) return;
+                    const id = btn.dataset.id;
+                    const { error } = await supabase.from('shooters').delete().eq('id', id);
+                    if (error) showToast('Ошибка', 'error');
+                    else {
+                        showToast('Удалено', 'success');
+                        await renderAdminShooters(panel);
+                    }
+                });
+            });
+
+            const addBtn = $('#adminAddShooterBtn');
+            if (addBtn) {
+                addBtn.addEventListener('click', showAddShooterModal);
+            }
+        }
+
+        async function showAddShooterModal() {
+            const { data: players, error } = await supabase
+                .from('users')
+                .select('id, nickname')
+                .eq('status', 'approved')
+                .order('nickname');
+
+            if (error) { showToast('Ошибка', 'error'); return; }
+
+            const overlay = document.createElement('div');
+            overlay.className = 'modal-overlay';
+            overlay.innerHTML = `
+                <div class="modal-box">
+                    <h3>🎯 Добавить стрелка</h3>
+                    <div class="form-group">
+                        <label>Игрок</label>
+                        <select id="shooterSelect">
+                            ${players.map(p => `<option value="${p.id}">${p.nickname}</option>`).join('')}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Ранг</label>
+                        <select id="shooterRank">
+                            <option value="1">1-й ранг</option>
+                            <option value="2">2-й ранг</option>
+                            <option value="3">3-й ранг</option>
+                        </select>
+                    </div>
+                    <div class="modal-actions">
+                        <button class="btn btn-secondary" id="modalCancel">Отмена</button>
+                        <button class="btn btn-primary" id="modalSave">Добавить</button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(overlay);
+
+            overlay.querySelector('#modalCancel').addEventListener('click', () => overlay.remove());
+            overlay.querySelector('#modalSave').addEventListener('click', async () => {
+                const userId = overlay.querySelector('#shooterSelect').value;
+                const rank = parseInt(overlay.querySelector('#shooterRank').value);
+
+                const { error } = await supabase
+                    .from('shooters')
+                    .insert({ user_id: userId, rank, added_by: state.user.id });
+
+                if (error) { showToast('Ошибка: ' + error.message, 'error'); return; }
+
+                showToast('✅ Стрелок добавлен', 'success');
+                overlay.remove();
+                const panel = document.getElementById('adminPanel_shooters_mgmt');
+                if (panel) await renderAdminShooters(panel);
+            });
+        }
+
+        // ---------- Управление БС (админ) ----------
+        async function renderAdminBS(panel) {
+            if (!hasPerm('can_manage_bs') && !isOwner()) {
+                panel.innerHTML = '<div class="empty-state">Нет прав</div>';
+                return;
+            }
+            panel.innerHTML = '<div class="loading-center"><div class="spinner"></div></div>';
+
+            const { data, error } = await supabase
+                .from('bs_members')
+                .select('*, users(nickname)')
+                .order('created_at', { ascending: false });
+
+            if (error) { panel.innerHTML = '<p>Ошибка</p>'; return; }
+
+            let html = `
+                <div style="margin-bottom:16px;">
+                    <button class="btn btn-primary" id="adminAddBsBtn">➕ Добавить в БС</button>
+                </div>
+                <div class="card-list">
+            `;
+
+            if (!data || data.length === 0) {
+                html += `<div class="empty-state">БС состав пуст</div>`;
+            } else {
+                data.forEach(item => {
+                    const name = item.users?.nickname || item.name || 'Неизвестно';
+                    html += `
+                        <div class="card-item" data-id="${item.id}">
+                            <div class="info">
+                                <div class="title">${name}</div>
+                            </div>
+                            <div class="actions">
+                                <button class="btn btn-sm btn-danger delete-bs" data-id="${item.id}">🗑</button>
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+            html += `</div>`;
+            panel.innerHTML = html;
+
+            panel.querySelectorAll('.delete-bs').forEach(btn => {
+                btn.addEventListener('click', async () => {
+                    if (!confirm('Удалить из БС?')) return;
+                    const id = btn.dataset.id;
+                    const { error } = await supabase.from('bs_members').delete().eq('id', id);
+                    if (error) showToast('Ошибка', 'error');
+                    else {
+                        showToast('Удалено', 'success');
+                        await renderAdminBS(panel);
+                    }
+                });
+            });
+
+            const addBtn = $('#adminAddBsBtn');
+            if (addBtn) {
+                addBtn.addEventListener('click', showAddBsModal);
+            }
+        }
+
+        async function showAddBsModal() {
+            const { data: players, error } = await supabase
+                .from('users')
+                .select('id, nickname')
+                .eq('status', 'approved')
+                .order('nickname');
+
+            if (error) { showToast('Ошибка', 'error'); return; }
+
+            const overlay = document.createElement('div');
+            overlay.className = 'modal-overlay';
+            overlay.innerHTML = `
+                <div class="modal-box">
+                    <h3>🛡 Добавить в БС состав</h3>
+                    <div class="form-group">
+                        <label>Игрок</label>
+                        <select id="bsSelect">
+                            ${players.map(p => `<option value="${p.id}">${p.nickname}</option>`).join('')}
+                        </select>
+                    </div>
+                    <div class="modal-actions">
+                        <button class="btn btn-secondary" id="modalCancel">Отмена</button>
+                        <button class="btn btn-primary" id="modalSave">Добавить</button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(overlay);
+
+            overlay.querySelector('#modalCancel').addEventListener('click', () => overlay.remove());
+            overlay.querySelector('#modalSave').addEventListener('click', async () => {
+                const userId = overlay.querySelector('#bsSelect').value;
+
+                const { error } = await supabase
+                    .from('bs_members')
+                    .insert({ user_id: userId, added_by: state.user.id });
+
+                if (error) { showToast('Ошибка: ' + error.message, 'error'); return; }
+
+                showToast('✅ Добавлен в БС', 'success');
+                overlay.remove();
+                const panel = document.getElementById('adminPanel_bs_mgmt');
+                if (panel) await renderAdminBS(panel);
+            });
+        }
+
+        // ---------- Управление уставом (админ) ----------
+        async function renderAdminRules(panel) {
+            if (!hasPerm('can_manage_rules') && !isOwner()) {
+                panel.innerHTML = '<div class="empty-state">Нет прав</div>';
+                return;
+            }
+            panel.innerHTML = '<div class="loading-center"><div class="spinner"></div></div>';
+
+            const { data, error } = await supabase
+                .from('rules')
+                .select('*')
+                .order('updated_at', { ascending: false })
+                .limit(1)
+                .maybeSingle();
+
+            if (error) { panel.innerHTML = '<p>Ошибка</p>'; return; }
+
+            const content = data?.content || '';
+
+            panel.innerHTML = `
+                <div class="form-group">
+                    <label>Текст устава</label>
+                    <textarea id="rulesEditor" rows="8">${content}</textarea>
+                </div>
+                <button class="btn btn-primary" id="saveRulesBtn">💾 Сохранить устав</button>
+                <button class="btn btn-danger mt-8" id="clearRulesBtn">🗑 Очистить</button>
+            `;
+
+            const saveBtn = $('#saveRulesBtn');
+            saveBtn.addEventListener('click', async () => {
+                const text = $('#rulesEditor').value;
+                const { error } = await supabase
+                    .from('rules')
+                    .upsert({ content: text, updated_by: state.user.id, updated_at: new Date().toISOString() }, {
+                        onConflict: 'id'
+                    });
+
+                if (error) { showToast('Ошибка: ' + error.message, 'error'); return; }
+                showToast('✅ Устав сохранён', 'success');
+            });
+
+            const clearBtn = $('#clearRulesBtn');
+            clearBtn.addEventListener('click', async () => {
+                if (!confirm('Очистить устав?')) return;
+                const { error } = await supabase
+                    .from('rules')
+                    .upsert({ content: '', updated_by: state.user.id, updated_at: new Date().toISOString() }, {
+                        onConflict: 'id'
+                    });
+                if (error) { showToast('Ошибка', 'error'); return; }
+                $('#rulesEditor').value = '';
+                showToast('Очищено', 'success');
+            });
+        }
+
+        // ---------- Управление новостями (админ) ----------
+        async function renderAdminNews(panel) {
+            if (!hasPerm('can_manage_news') && !isOwner()) {
+                panel.innerHTML = '<div class="empty-state">Нет прав</div>';
+                return;
+            }
+            panel.innerHTML = '<div class="loading-center"><div class="spinner"></div></div>';
+
+            const { data, error } = await supabase
+                .from('news')
+                .select('*, users(nickname)')
+                .order('created_at', { ascending: false });
+
+            if (error) { panel.innerHTML = '<p>Ошибка</p>'; return; }
+
+            let html = `
+                <div style="margin-bottom:16px;">
+                    <button class="btn btn-primary" id="adminAddNewsBtn">➕ Добавить новость</button>
+                </div>
+                <div class="card-list">
+            `;
+
+            if (!data || data.length === 0) {
+                html += `<div class="empty-state">Нет новостей</div>`;
+            } else {
+                data.forEach(n => {
+                    const author = n.users?.nickname || 'Админ';
+                    html += `
+                        <div class="card-item" data-id="${n.id}">
+                            <div class="info">
+                                <div class="title">${n.title}</div>
+                                <div class="desc">${n.content}</div>
+                                <div class="meta">${author} • ${new Date(n.created_at).toLocaleDateString()}</div>
+                            </div>
+                            <div class="actions">
+                                <button class="btn btn-sm btn-danger delete-news" data-id="${n.id}">🗑</button>
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+            html += `</div>`;
+            panel.innerHTML = html;
+
+            panel.querySelectorAll('.delete-news').forEach(btn => {
+                btn.addEventListener('click', async () => {
+                    if (!confirm('Удалить новость?')) return;
+                    const id = btn.dataset.id;
+                    const { error } = await supabase.from('news').delete().eq('id', id);
+                    if (error) showToast('Ошибка', 'error');
+                    else {
+                        showToast('Удалено', 'success');
+                        await renderAdminNews(panel);
+                    }
+                });
+            });
+
+            const addBtn = $('#adminAddNewsBtn');
+            if (addBtn) {
+                addBtn.addEventListener('click', showAddNewsModal);
+            }
+        }
+
+        async function showAddNewsModal() {
+            const overlay = document.createElement('div');
+            overlay.className = 'modal-overlay';
+            overlay.innerHTML = `
+                <div class="modal-box">
+                    <h3>📰 Новая новость</h3>
+                    <div class="form-group">
+                        <label>Заголовок *</label>
+                        <input type="text" id="newsTitle" placeholder="Заголовок" />
+                    </div>
+                    <div class="form-group">
+                        <label>Текст *</label>
+                        <textarea id="newsContent" rows="4" placeholder="Содержание"></textarea>
+                    </div>
+                    <div class="modal-actions">
+                        <button class="btn btn-secondary" id="modalCancel">Отмена</button>
+                        <button class="btn btn-primary" id="modalSave">Опубликовать</button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(overlay);
+
+            overlay.querySelector('#modalCancel').addEventListener('click', () => overlay.remove());
+            overlay.querySelector('#modalSave').addEventListener('click', async () => {
+                const title = overlay.querySelector('#newsTitle').value.trim();
+                const content = overlay.querySelector('#newsContent').value.trim();
+
+                if (!title || !content) { showToast('Заполните все поля', 'error'); return; }
+
+                const { error } = await supabase
+                    .from('news')
+                    .insert({ title, content, author_id: state.user.id });
+
+                if (error) { showToast('Ошибка: ' + error.message, 'error'); return; }
+
+                showToast('✅ Новость опубликована', 'success');
+                overlay.remove();
+                const panel = document.getElementById('adminPanel_news_mgmt');
+                if (panel) await renderAdminNews(panel);
+            });
+        }
+
+        // ============================================================
+        //  12. SHOOTERS (публичный просмотр)
+        // ============================================================
+        async function renderShooters() {
+            const container = $('#shootersContent');
+            const actions = $('#shootersActions');
+            if (!container) return;
+
+            // Кнопка добавления для админов
+            if (hasPerm('can_manage_shooters') || isOwner()) {
+                actions.innerHTML = `<button class="btn btn-primary btn-sm" id="shooterAddBtn">➕ Добавить</button>`;
+                const btn = $('#shooterAddBtn');
+                if (btn) btn.addEventListener('click', showAddShooterModal);
+            } else {
+                actions.innerHTML = '';
+            }
+
+            container.innerHTML = '<div class="loading-center"><div class="spinner"></div></div>';
+
+            const { data, error } = await supabase
+                .from('shooters')
+                .select('*, users(nickname)')
+                .order('rank', { ascending: true });
+
+            if (error) { container.innerHTML = '<p>Ошибка</p>'; return; }
+
+            if (!data || data.length === 0) {
+                container.innerHTML = '<div class="empty-state"><div class="icon">🎯</div><h3>Нет стрелков</h3></div>';
+                return;
+            }
+
+            // Группировка по рангам
+            const groups = { 1: [], 2: [], 3: [] };
+            data.forEach(s => {
+                const r = s.rank || 1;
+                if (!groups[r]) groups[r] = [];
+                groups[r].push(s);
+            });
+
+            let html = '';
+            [1, 2, 3].forEach(rank => {
+                const items = groups[rank] || [];
+                html += `
+                    <div style="margin-bottom:16px;">
+                        <h3 style="font-size:16px;color:var(--text-secondary);margin-bottom:8px;">${rank}-й ранг</h3>
+                        <div class="card-list">
+                            ${items.map(s => `
+                                <div class="card-item">
+                                    <div class="info">
+                                        <div class="title">${s.users?.nickname || 'Неизвестно'}</div>
+                                    </div>
+                                </div>
+                            `).join('')}
+                            ${items.length === 0 ? '<div style="color:var(--text-muted);font-size:13px;padding:4px 0;">—</div>' : ''}
+                        </div>
+                    </div>
+                `;
+            });
+
+            container.innerHTML = html;
+        }
+
+        // ============================================================
+        //  13. BS СОСТАВ (публичный)
+        // ============================================================
+        async function renderBS() {
+            const container = $('#bsContent');
+            const actions = $('#bsActions');
+            if (!container) return;
+
+            if (isOwner()) {
+                actions.innerHTML = `<button class="btn btn-primary btn-sm" id="bsAddBtn">➕ Добавить</button>`;
+                const btn = $('#bsAddBtn');
+                if (btn) btn.addEventListener('click', showAddBsModal);
+            } else {
+                actions.innerHTML = '';
+            }
+
+            container.innerHTML = '<div class="loading-center"><div class="spinner"></div></div>';
+
+            const { data, error } = await supabase
+                .from('bs_members')
+                .select('*, users(nickname)')
+                .order('created_at', { ascending: false });
+
+            if (error) { container.innerHTML = '<p>Ошибка</p>'; return; }
+
+            if (!data || data.length === 0) {
+                container.innerHTML = '<div class="empty-state"><div class="icon">🛡</div><h3>БС состав пуст</h3></div>';
+                return;
+            }
+
+            let html = `<div class="card-list">`;
+            data.forEach(item => {
+                const name = item.users?.nickname || item.name || 'Неизвестно';
+                html += `
+                    <div class="card-item">
+                        <div class="info">
+                            <div class="title">${name}</div>
+                        </div>
+                        ${isOwner() ? `<div class="actions"><button class="btn btn-sm btn-danger bs-delete" data-id="${item.id}">🗑</button></div>` : ''}
+                    </div>
+                `;
+            });
+            html += `</div>`;
+            container.innerHTML = html;
+
+            if (isOwner()) {
+                container.querySelectorAll('.bs-delete').forEach(btn => {
+                    btn.addEventListener('click', async () => {
+                        if (!confirm('Удалить из БС?')) return;
+                        const id = btn.dataset.id;
+                        const { error } = await supabase.from('bs_members').delete().eq('id', id);
+                        if (error) showToast('Ошибка', 'error');
+                        else {
+                            showToast('Удалено', 'success');
+                            await renderBS();
+                        }
+                    });
+                });
+            }
+        }
+
+        // ============================================================
+        //  14. ЗАДАЧИ (публичные)
+        // ============================================================
+        async function renderTasks() {
+            const container = $('#tasksContent');
+            const actions = $('#tasksActions');
+            if (!container) return;
+
+            if (hasPerm('can_manage_tasks') || isOwner()) {
+                actions.innerHTML = `<button class="btn btn-primary btn-sm" id="taskAddBtn">➕ Добавить</button>`;
+                const btn = $('#taskAddBtn');
+                if (btn) btn.addEventListener('click', () => showEditTaskModal(null));
+            } else {
+                actions.innerHTML = '';
+            }
+
+            container.innerHTML = '<div class="loading-center"><div class="spinner"></div></div>';
+
+            const { data, error } = await supabase
+                .from('tasks')
+                .select('*')
+                .order('created_at', { ascending: false });
+
+            if (error) { container.innerHTML = '<p>Ошибка</p>'; return; }
+
+            if (!data || data.length === 0) {
+                container.innerHTML = '<div class="empty-state"><div class="icon">📋</div><h3>Нет задач</h3></div>';
+                return;
+            }
+
+            let html = `<div class="card-list">`;
+            data.forEach(t => {
+                html += `
+                    <div class="card-item" data-id="${t.id}">
+                        <div class="info">
+                            <div class="title">${t.title}</div>
+                            <div class="desc">${t.description || ''}</div>
+                            <div class="meta">Прогресс: ${t.progress}%</div>
+                            <div class="progress-wrap"><div class="bar" style="width:${t.progress}%"></div></div>
+                            <button class="share-btn mt-8" data-task="${t.title}">📤 Поделиться</button>
+                        </div>
+                        ${(hasPerm('can_manage_tasks') || isOwner()) ? `
+                            <div class="actions">
+                                <button class="btn btn-sm btn-secondary task-edit" data-id="${t.id}">✏️</button>
+                                <button class="btn btn-sm btn-danger task-delete" data-id="${t.id}">🗑</button>
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+            });
+            html += `</div>`;
+            container.innerHTML = html;
+
+            // Поделиться
+            container.querySelectorAll('.share-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const task = btn.dataset.task;
+                    const msg = `📋 Задача: ${task}\nХочу поделиться идеей или прогрессом!`;
+                    const url = `https://t.me/${MANAGER_TG}?text=${encodeURIComponent(msg)}`;
+                    window.open(url, '_blank');
+                });
+            });
+
+            // Редактирование/удаление для админов
+            if (hasPerm('can_manage_tasks') || isOwner()) {
+                container.querySelectorAll('.task-edit').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        const id = btn.dataset.id;
+                        showEditTaskModal(id);
+                    });
+                });
+                container.querySelectorAll('.task-delete').forEach(btn => {
+                    btn.addEventListener('click', async () => {
+                        if (!confirm('Удалить задачу?')) return;
+                        const id = btn.dataset.id;
+                        const { error } = await supabase.from('tasks').delete().eq('id', id);
+                        if (error) showToast('Ошибка', 'error');
+                        else {
+                            showToast('Удалено', 'success');
+                            await renderTasks();
+                        }
+                    });
+                });
+            }
+        }
+
+        // ============================================================
+        //  15. УСТАВ (публичный)
+        // ============================================================
+        async function renderRules() {
+            const container = $('#rulesContent');
+            const actions = $('#rulesActions');
+            if (!container) return;
+
+            if (hasPerm('can_manage_rules') || isOwner()) {
+                actions.innerHTML = `
+                    <button class="btn btn-primary btn-sm" id="rulesEditBtn">✏️ Редактировать</button>
+                `;
+                const btn = $('#rulesEditBtn');
+                if (btn) {
+                    btn.addEventListener('click', () => {
+                        // Переход в админку на вкладку устава
+                        navigate('admin');
+                        setTimeout(() => {
+                            const tab = document.querySelector('.tab[data-tab="rules_mgmt"]');
+                            if (tab) tab.click();
+                        }, 300);
+                    });
+                }
+            } else {
+                actions.innerHTML = '';
+            }
+
+            container.innerHTML = '<div class="loading-center"><div class="spinner"></div></div>';
+
+            const { data, error } = await supabase
+                .from('rules')
+                .select('*')
+                .order('updated_at', { ascending: false })
+                .limit(1)
+                .maybeSingle();
+
+            if (error) { container.innerHTML = '<p>Ошибка</p>'; return; }
+
+            const content = data?.content || 'Устав ещё не загружен.';
+
+            container.innerHTML = `
+                <div style="background:var(--bg-card);border-radius:var(--radius-sm);padding:20px;border:1px solid var(--border-color);white-space:pre-wrap;word-break:break-word;line-height:1.7;">
+                    ${content}
+                </div>
+            `;
+        }
+
+        // ============================================================
+        //  16. НОВОСТИ (публичные)
+        // ============================================================
+        async function renderNews() {
+            const container = $('#newsContent');
+            const actions = $('#newsActions');
+            if (!container) return;
+
+            if (hasPerm('can_manage_news') || isOwner()) {
+                actions.innerHTML = `
+                    <button class="btn btn-primary btn-sm" id="newsAddBtn">➕ Добавить</button>
+                `;
+                const btn = $('#newsAddBtn');
+                if (btn) btn.addEventListener('click', showAddNewsModal);
+            } else {
+                actions.innerHTML = '';
+            }
+
+            container.innerHTML = '<div class="loading-center"><div class="spinner"></div></div>';
+
+            const { data, error } = await supabase
+                .from('news')
+                .select('*, users(nickname)')
+                .order('created_at', { ascending: false });
+
+            if (error) { container.innerHTML = '<p>Ошибка</p>'; return; }
+
+            if (!data || data.length === 0) {
+                container.innerHTML = '<div class="empty-state"><div class="icon">📰</div><h3>Нет новостей</h3></div>';
+                return;
+            }
+
+            let html = `<div class="card-list">`;
+            data.forEach(n => {
+                const author = n.users?.nickname || 'Админ';
+                html += `
+                    <div class="card-item" data-id="${n.id}">
+                        <div class="info">
+                            <div class="title">${n.title}</div>
+                            <div class="desc">${n.content}</div>
+                            <div class="meta">${author} • ${new Date(n.created_at).toLocaleDateString()} ${new Date(n.created_at).toLocaleTimeString()}</div>
+                            <button class="share-btn mt-8" data-news="${n.title}">📤 Поделиться</button>
+                        </div>
+                        ${(hasPerm('can_manage_news') || isOwner()) ? `
+                            <div class="actions">
+                                <button class="btn btn-sm btn-danger news-delete" data-id="${n.id}">🗑</button>
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+            });
+            html += `</div>`;
+            container.innerHTML = html;
+
+            // Поделиться
+            container.querySelectorAll('.share-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const title = btn.dataset.news;
+                    const msg = `📰 Новость: ${title}\nХочу обсудить или поделиться идеей!`;
+                    const url = `https://t.me/${MANAGER_TG}?text=${encodeURIComponent(msg)}`;
+                    window.open(url, '_blank');
+                });
+            });
+
+            // Удаление для админов
+            if (hasPerm('can_manage_news') || isOwner()) {
+                container.querySelectorAll('.news-delete').forEach(btn => {
+                    btn.addEventListener('click', async () => {
+                        if (!confirm('Удалить новость?')) return;
+                        const id = btn.dataset.id;
+                        const { error } = await supabase.from('news').delete().eq('id', id);
+                        if (error) showToast('Ошибка', 'error');
+                        else {
+                            showToast('Удалено', 'success');
+                            await renderNews();
+                        }
+                    });
+                });
+            }
+        }
+
+        // ============================================================
+        //  17. HEADER UPDATE
+        // ============================================================
+        function updateHeader() {
+            const user = state.user;
+            const avatar = $('#userAvatar');
+            const name = $('#userName');
+            const badge = $('#userRoleBadge');
+
+            if (user) {
+                avatar.textContent = user.nickname ? user.nickname.charAt(0).toUpperCase() : '?';
+                name.textContent = user.nickname || 'Игрок';
+                const roleMap = { owner: 'Владелец', admin: 'Админ', player: 'Игрок' };
+                badge.textContent = roleMap[user.role] || user.role;
+                badge.style.display = 'inline-block';
+            } else {
+                avatar.textContent = '?';
+                name.textContent = 'Гость';
+                badge.textContent = '—';
+                badge.style.display = 'none';
+            }
+        }
+
+        // ============================================================
+        //  18. BACK BUTTONS
+        // ============================================================
+        document.addEventListener('click', (e) => {
+            const btn = e.target.closest('.back-btn');
+            if (btn) {
+                const page = btn.dataset.page;
+                if (page) navigate(page);
+            }
+        });
+
+        // ============================================================
+        //  19. THEME TOGGLE
+        // ============================================================
+        $('#themeToggle').addEventListener('click', toggleTheme);
+
+        // ============================================================
+        //  20. INIT
+        // ============================================================
+        async function init() {
+            // Применяем тему
+            applyTheme(state.theme);
+
+            // Навигация по умолчанию — авторизация
+            navigate('auth');
+
+            // Обработка кнопки "назад" в Telegram
+            const tg = window.Telegram?.WebApp;
+            if (tg) {
+                tg.ready();
+                tg.expand();
+                tg.BackButton.onClick(() => {
+                    if (state.currentPage !== 'dashboard' && state.currentPage !== 'auth') {
+                        navigate('dashboard');
+                    }
+                });
+                // Показываем кнопку назад когда не на главной
+                const observer = new MutationObserver(() => {
+                    if (tg.BackButton) {
+                        const show = state.currentPage !== 'dashboard' && state.currentPage !== 'auth';
+                        if (show) tg.BackButton.show();
+                        else tg.BackButton.hide();
+                    }
+                });
+                observer.observe(document.querySelector('.page.active') || document.body, {
+                    attributes: true,
+                    attributeFilter: ['class'],
+                    subtree: true
+                });
+            }
+
+            // Закрытие модалок по клику вне
+            document.addEventListener('click', (e) => {
+                if (e.target.classList.contains('modal-overlay')) {
+                    e.target.remove();
+                }
+            });
+
+            console.log('🚀 BOUNTY TEAM Mini App initialized');
+        }
+
+        // Запуск
+        document.addEventListener('DOMContentLoaded', init);
+
+        // Экспортируем функции для глобального доступа (для модалок и перезагрузки)
+        window.navigate = navigate;
+        window.showToast = showToast;
+        window.renderAuth = renderAuth;
+        window.renderAdmin = renderAdmin;
+        window.renderShooters = renderShooters;
+        window.renderBS = renderBS;
+        window.renderTasks = renderTasks;
+        window.renderRules = renderRules;
+        window.renderNews = renderNews;
+
+        console.log('%c✦ BOUNTY TEAM v3.0 ✦', 'font-size:20px;font-weight:bold;color:#FFCC00;');
+        console.log('✅ Supabase Anon Key вставлен. Не забудьте указать правильный URL проекта!');
+    </script>
+</body>
+  </html>
