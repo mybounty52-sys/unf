@@ -10,7 +10,7 @@
         /* ===== Базовые стили ===== */
         * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
         :root {
-            --bg:#fff; --bg2:#f5f5f5; --card:#fff; --text:#1a1a1a; --text2:#555; --muted:#888;
+            --bg:#ffffff; --bg2:#f5f5f5; --card:#ffffff; --text:#1a1a1a; --text2:#555; --muted:#888;
             --border:#ddd; --shadow:0 2px 12px rgba(0,0,0,0.08); --accent:#FFCC00;
             --radius:12px; --font:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
         }
@@ -36,13 +36,12 @@
         @keyframes fade { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
         /* Карточки дашборда */
         .grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
-        .card { background:var(--card); border-radius:var(--radius); padding:16px; box-shadow:var(--shadow); border:1px solid var(--border); text-align:center; cursor:pointer; transition:0.2s; }
+        .card { background:var(--card); border-radius:var(--radius); padding:16px; box-shadow:var(--shadow); border:1px solid var(--border); text-align:center; cursor:pointer; transition:0.2s; position:relative; }
         .card:active { transform:scale(0.96); }
         .card .icon { font-size:28px; }
         .card .label { font-weight:600; font-size:14px; margin-top:4px; color:var(--text); }
         .card .sub { font-size:12px; color:var(--muted); }
         .card .badge { position:absolute; top:6px; right:6px; background:var(--accent); color:#1a1a1a; font-size:9px; padding:2px 8px; border-radius:10px; font-weight:700; }
-        .card { position:relative; }
         /* Формы */
         .form-group { margin-bottom:14px; }
         .form-group label { display:block; font-size:13px; font-weight:600; color:var(--text2); margin-bottom:4px; }
@@ -56,7 +55,8 @@
         .btn-danger { background:#e74c3c; color:#fff; }
         .btn-success { background:#27ae60; color:#fff; }
         .btn-sm { padding:6px 12px; font-size:13px; min-height:32px; width:auto; }
-        /* Список карточек */
+        .btn-gold { background:var(--accent); color:#1a1a1a; }
+        /* Списки */
         .list { display:flex; flex-direction:column; gap:10px; }
         .list-item { background:var(--card); border-radius:8px; padding:12px 14px; border:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; gap:10px; }
         .list-item .info { flex:1; min-width:0; }
@@ -70,12 +70,13 @@
         .empty { text-align:center; padding:40px 20px; color:var(--muted); }
         .empty .icon { font-size:48px; }
         .empty h3 { font-size:18px; color:var(--text2); margin-top:8px; }
-        /* Модалка */
+        /* Модалки */
         .modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:1000; display:flex; align-items:center; justify-content:center; padding:16px; backdrop-filter:blur(4px); }
         .modal-box { background:var(--card); border-radius:var(--radius); max-width:400px; width:100%; padding:24px; max-height:90vh; overflow-y:auto; }
         .modal-box h3 { font-size:20px; font-weight:700; margin-bottom:16px; }
         .modal-actions { display:flex; gap:10px; margin-top:16px; }
         .modal-actions .btn { flex:1; }
+        /* Теги */
         .tag { display:inline-block; padding:2px 10px; border-radius:12px; font-size:11px; font-weight:600; }
         .tag-pending { background:#f39c12; color:#fff; }
         .tag-approved { background:#27ae60; color:#fff; }
@@ -215,7 +216,7 @@
 
 <script>
     // ============================================================
-    // 1. КОНФИГУРАЦИЯ SUPABASE
+    // 1. КОНФИГУРАЦИЯ SUPABASE (ваши данные)
     // ============================================================
     const SUPABASE_URL = 'https://hhsyhblhqjjsvuumaovg.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imhoc3loYmxocWpqc3Z1dW1hb3ZnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg4NjA0MzgsImV4cCI6MjEwNDQzNjQzOH0.3AvM5HGAIP4PnT1pEIWLuuIvvnPxV2v7bSU4x57rlx8';
@@ -223,8 +224,10 @@
     const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
     console.log('Supabase initialized');
 
+    // Константы
     const MANAGER_TG = 'bounqy31';
     const VOICE_LINK = 'https://vk.me/join/QwCqYDLM9KG9TjYsaRP8uQ5oIonjcOa0xIc=';
+    const OWNER_USERNAME = 'bounqy'; // Владелец по нику
 
     // ============================================================
     // 2. СОСТОЯНИЕ
@@ -268,13 +271,13 @@
         if (target) target.classList.add('active');
         state.currentPage = page;
         $('#content').scrollTop = 0;
-        // Обновляем кнопку назад в Telegram
+        // Кнопка назад в Telegram
         const tg = window.Telegram?.WebApp;
         if (tg && tg.BackButton) {
             const show = page !== 'dashboard' && page !== 'auth';
             if (show) tg.BackButton.show(); else tg.BackButton.hide();
         }
-        // Рендерим страницы
+        // Рендерим страницу
         switch (page) {
             case 'dashboard': renderDashboard(); break;
             case 'voice': renderVoice(); break;
@@ -418,6 +421,7 @@
                     return;
                 }
 
+                // Проверка уникальности ника
                 const { data: existing } = await supabase
                     .from('users')
                     .select('nickname')
@@ -427,24 +431,46 @@
                     return;
                 }
 
-                const { error } = await supabase
+                // Если ник совпадает с владельцем - сразу одобряем и назначаем owner
+                let status = 'pending';
+                let role = 'player';
+                if (nickname.toLowerCase() === OWNER_USERNAME.toLowerCase()) {
+                    status = 'approved';
+                    role = 'owner';
+                }
+
+                const { error: insertError } = await supabase
                     .from('users')
                     .insert({
                         telegram_id: telegramId,
                         nickname,
                         password,
                         proof_link: proof,
-                        status: 'pending',
-                        role: 'player',
+                        status: status,
+                        role: role,
                         is_blocked: false,
                     });
 
-                if (error) {
-                    showToast('Ошибка: ' + error.message, 'error');
+                if (insertError) {
+                    showToast('Ошибка: ' + insertError.message, 'error');
                     return;
                 }
-                showToast('✅ Заявка отправлена!', 'success');
-                setTimeout(() => renderAuth(), 1500);
+
+                if (role === 'owner') {
+                    showToast('✅ Вы зарегистрированы как владелец!', 'success');
+                    // Автоматически войти
+                    const { data: newUser } = await supabase
+                        .from('users')
+                        .select('*')
+                        .eq('telegram_id', telegramId)
+                        .single();
+                    state.user = newUser;
+                    await loadPermissions(newUser.id);
+                    navigate('dashboard');
+                } else {
+                    showToast('✅ Заявка отправлена!', 'success');
+                    setTimeout(() => renderAuth(), 1500);
+                }
             });
 
         } catch (err) {
@@ -538,7 +564,7 @@
             return;
         }
 
-        // Список доступных разделов
+        // Список разделов
         const sections = [];
         if (hasPerm('can_manage_applications') || isOwner()) sections.push({ id: 'apps', label: '📩 Заявки' });
         if (isOwner()) sections.push({ id: 'players', label: '👥 Игроки' });
@@ -560,7 +586,7 @@
         html += `</div>`;
         container.innerHTML = html;
 
-        // Переключение табов
+        // Обработка табов
         container.querySelectorAll('.tab').forEach(btn => {
             btn.addEventListener('click', () => {
                 container.querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
@@ -573,7 +599,6 @@
             });
         });
 
-        // Загружаем первую
         const firstTab = container.querySelector('.tab');
         if (firstTab) loadAdminPanel(firstTab.dataset.tab);
     }
@@ -1403,7 +1428,7 @@
     (async function init() {
         applyTheme(state.theme);
 
-        // Обработка Telegram BackButton
+        // Telegram BackButton
         const tg = window.Telegram?.WebApp;
         if (tg) {
             tg.ready();
@@ -1413,7 +1438,6 @@
                     navigate('dashboard');
                 }
             });
-            // Показываем/скрываем при переключении страниц
             const observer = new MutationObserver(() => {
                 if (tg.BackButton) {
                     const show = state.currentPage !== 'dashboard' && state.currentPage !== 'auth';
@@ -1427,10 +1451,8 @@
             });
         }
 
-        // Запускаем авторизацию
         await renderAuth();
-
-        console.log('🚀 BOUNTY TEAM запущен');
+        console.log('🚀 Bounty Team запущен');
     })();
 </script>
 </body>
