@@ -7,7 +7,7 @@
     <script src="https://telegram.org/js/telegram-web-app.js?56"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        /* ===== Базовые стили ===== */
+        /* ===== Базовые стили (светлая/тёмная тема) ===== */
         * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
         :root {
             --bg:#ffffff; --bg2:#f5f5f5; --card:#ffffff; --text:#1a1a1a; --text2:#555; --muted:#888;
@@ -20,7 +20,6 @@
         }
         html,body { height:100%; font-family:var(--font); background:var(--bg); color:var(--text); transition:0.3s; overflow:hidden; }
         #app { display:flex; flex-direction:column; height:100vh; max-width:480px; margin:0 auto; background:var(--bg); overflow:hidden; }
-        /* Хедер */
         .header { display:flex; align-items:center; justify-content:space-between; padding:0 16px; height:60px; background:var(--bg); border-bottom:1px solid var(--border); flex-shrink:0; }
         .brand { font-size:20px; font-weight:800; background:linear-gradient(90deg,var(--accent),#fff,var(--accent)); background-size:300%; -webkit-background-clip:text; -webkit-text-fill-color:transparent; animation:shimmer 4s infinite; }
         @keyframes shimmer { 0%,100%{background-position:0%} 50%{background-position:100%} }
@@ -29,12 +28,10 @@
         .user-badge { display:flex; align-items:center; gap:6px; background:var(--bg2); padding:4px 12px 4px 8px; border-radius:20px; font-size:13px; color:var(--text2); }
         .user-badge .avatar { width:28px; height:28px; border-radius:50%; background:var(--accent); display:flex; align-items:center; justify-content:center; font-weight:700; color:#1a1a1a; text-transform:uppercase; }
         .user-badge .role { font-size:9px; text-transform:uppercase; background:var(--accent); padding:2px 6px; border-radius:10px; color:#1a1a1a; font-weight:700; }
-        /* Контент */
         .content { flex:1; overflow-y:auto; padding:16px; padding-bottom:80px; }
         .page { display:none; animation:fade .3s; }
         .page.active { display:block; }
         @keyframes fade { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
-        /* Карточки дашборда */
         .grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
         .card { background:var(--card); border-radius:var(--radius); padding:16px; box-shadow:var(--shadow); border:1px solid var(--border); text-align:center; cursor:pointer; transition:0.2s; position:relative; }
         .card:active { transform:scale(0.96); }
@@ -42,7 +39,6 @@
         .card .label { font-weight:600; font-size:14px; margin-top:4px; color:var(--text); }
         .card .sub { font-size:12px; color:var(--muted); }
         .card .badge { position:absolute; top:6px; right:6px; background:var(--accent); color:#1a1a1a; font-size:9px; padding:2px 8px; border-radius:10px; font-weight:700; }
-        /* Формы */
         .form-group { margin-bottom:14px; }
         .form-group label { display:block; font-size:13px; font-weight:600; color:var(--text2); margin-bottom:4px; }
         .form-group input, .form-group textarea, .form-group select { width:100%; padding:10px 12px; border:2px solid var(--border); border-radius:8px; background:var(--bg2); color:var(--text); font-size:15px; outline:none; transition:0.2s; }
@@ -56,7 +52,6 @@
         .btn-success { background:#27ae60; color:#fff; }
         .btn-sm { padding:6px 12px; font-size:13px; min-height:32px; width:auto; }
         .btn-gold { background:var(--accent); color:#1a1a1a; }
-        /* Списки */
         .list { display:flex; flex-direction:column; gap:10px; }
         .list-item { background:var(--card); border-radius:8px; padding:12px 14px; border:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; gap:10px; }
         .list-item .info { flex:1; min-width:0; }
@@ -70,13 +65,11 @@
         .empty { text-align:center; padding:40px 20px; color:var(--muted); }
         .empty .icon { font-size:48px; }
         .empty h3 { font-size:18px; color:var(--text2); margin-top:8px; }
-        /* Модалки */
         .modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:1000; display:flex; align-items:center; justify-content:center; padding:16px; backdrop-filter:blur(4px); }
         .modal-box { background:var(--card); border-radius:var(--radius); max-width:400px; width:100%; padding:24px; max-height:90vh; overflow-y:auto; }
         .modal-box h3 { font-size:20px; font-weight:700; margin-bottom:16px; }
         .modal-actions { display:flex; gap:10px; margin-top:16px; }
         .modal-actions .btn { flex:1; }
-        /* Теги */
         .tag { display:inline-block; padding:2px 10px; border-radius:12px; font-size:11px; font-weight:600; }
         .tag-pending { background:#f39c12; color:#fff; }
         .tag-approved { background:#27ae60; color:#fff; }
@@ -216,13 +209,13 @@
 
 <script>
     // ============================================================
-    // 1. КОНФИГУРАЦИЯ SUPABASE (ваши данные)
+    // 1. КОНФИГУРАЦИЯ SUPABASE (ваши данные, уже вставлены)
     // ============================================================
     const SUPABASE_URL = 'https://hhsyhblhqjjsvuumaovg.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imhoc3loYmxocWpqc3Z1dW1hb3ZnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg4NjA0MzgsImV4cCI6MjEwNDQzNjQzOH0.3AvM5HGAIP4PnT1pEIWLuuIvvnPxV2v7bSU4x57rlx8';
 
     const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-    console.log('Supabase initialized');
+    console.log('🔌 Supabase client created');
 
     // Константы
     const MANAGER_TG = 'bounqy31';
@@ -230,7 +223,7 @@
     const OWNER_USERNAME = 'bounqy'; // Владелец по нику
 
     // ============================================================
-    // 2. СОСТОЯНИЕ
+    // 2. ГЛОБАЛЬНОЕ СОСТОЯНИЕ
     // ============================================================
     let state = {
         user: null,
@@ -253,6 +246,14 @@
         void el.offsetWidth;
         el.classList.add('show');
         el._timer = setTimeout(() => el.classList.remove('show'), duration);
+    }
+
+    // Хеширование пароля (SHA-256)
+    async function hashPassword(password) {
+        const enc = new TextEncoder().encode(password);
+        const hashBuffer = await crypto.subtle.digest('SHA-256', enc);
+        const hashArray = Array.from(new Uint8Array(hashBuffer));
+        return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
     }
 
     function applyTheme(theme) {
@@ -321,18 +322,34 @@
     }
 
     // ============================================================
-    // 4. АВТОРИЗАЦИЯ
+    // 4. АВТОРИЗАЦИЯ (с fallback для ручного ввода)
     // ============================================================
     async function renderAuth() {
         const container = $('#authContent');
         if (!container) return;
 
+        // Получаем Telegram ID, если доступен
         const tg = window.Telegram?.WebApp;
-        let tgUser = tg?.initDataUnsafe?.user;
-        if (!tgUser) tgUser = { id: 12345, username: 'testuser', first_name: 'Тест' };
+        let tgUser = null;
+        if (tg && tg.initDataUnsafe && tg.initDataUnsafe.user) {
+            tgUser = tg.initDataUnsafe.user;
+        }
+
+        // Если Telegram нет, пытаемся взять сохранённый ID из localStorage
+        if (!tgUser) {
+            const savedId = localStorage.getItem('bounty_telegram_id');
+            if (savedId) {
+                tgUser = { id: savedId, username: 'player' };
+            } else {
+                // Если ничего нет — показываем форму ручного ввода
+                showManualLoginForm(container);
+                return;
+            }
+        }
         const telegramId = String(tgUser.id);
 
         try {
+            // Загружаем пользователя из Supabase
             const { data: users, error } = await supabase
                 .from('users')
                 .select('*')
@@ -354,6 +371,7 @@
                             <h3>Заявка на рассмотрении</h3>
                             <p style="color:var(--text2);">Ожидайте одобрения администрацией.</p>
                             <p style="font-size:12px;color:var(--muted);">Ник: ${user.nickname}</p>
+                            <button class="btn btn-secondary mt-16" onclick="localStorage.removeItem('bounty_telegram_id'); location.reload();">Сменить аккаунт</button>
                         </div>
                     `;
                     return;
@@ -362,7 +380,7 @@
                         <div style="text-align:center;padding:20px;border-left:4px solid #e74c3c;">
                             <span style="font-size:48px;">❌</span>
                             <h3>Заявка отклонена</h3>
-                            <button class="btn btn-primary mt-16" onclick="window.location.reload()">Попробовать снова</button>
+                            <button class="btn btn-primary mt-16" onclick="localStorage.removeItem('bounty_telegram_id'); location.reload();">Попробовать снова</button>
                         </div>
                     `;
                     return;
@@ -377,12 +395,13 @@
                 }
             }
 
-            // Форма регистрации
+            // Форма регистрации (если пользователь не найден)
             container.innerHTML = `
                 <form id="registerForm">
                     <div class="form-group">
                         <label>Телеграм ID</label>
-                        <input type="text" value="${telegramId}" disabled style="opacity:0.6;" />
+                        <input type="text" id="regTgId" value="${telegramId}" required />
+                        <small style="color:var(--muted);">Вы можете изменить ID, если ошиблись</small>
                     </div>
                     <div class="form-group">
                         <label>Игровой ник *</label>
@@ -390,7 +409,7 @@
                     </div>
                     <div class="form-group">
                         <label>Пароль *</label>
-                        <input type="password" id="regPass" placeholder="Пароль" required minlength="4" />
+                        <input type="password" id="regPass" placeholder="Пароль (мин. 4 символа)" required minlength="4" />
                     </div>
                     <div class="form-group">
                         <label>Ссылка на скрин / видео *</label>
@@ -404,11 +423,12 @@
             const form = $('#registerForm');
             form.addEventListener('submit', async (e) => {
                 e.preventDefault();
+                const tgId = $('#regTgId').value.trim();
                 const nickname = $('#regNick').value.trim();
                 const password = $('#regPass').value.trim();
                 const proof = $('#regProof').value.trim();
 
-                if (!nickname || !password || !proof) {
+                if (!tgId || !nickname || !password || !proof) {
                     showToast('Заполните все поля', 'error');
                     return;
                 }
@@ -431,6 +451,9 @@
                     return;
                 }
 
+                // Хешируем пароль
+                const passwordHash = await hashPassword(password);
+
                 // Если ник совпадает с владельцем - сразу одобряем и назначаем owner
                 let status = 'pending';
                 let role = 'player';
@@ -442,9 +465,9 @@
                 const { error: insertError } = await supabase
                     .from('users')
                     .insert({
-                        telegram_id: telegramId,
+                        telegram_id: tgId,
                         nickname,
-                        password,
+                        password: passwordHash, // сохраняем хеш
                         proof_link: proof,
                         status: status,
                         role: role,
@@ -456,13 +479,16 @@
                     return;
                 }
 
+                // Сохраняем ID в localStorage для быстрого входа
+                localStorage.setItem('bounty_telegram_id', tgId);
+
                 if (role === 'owner') {
                     showToast('✅ Вы зарегистрированы как владелец!', 'success');
                     // Автоматически войти
                     const { data: newUser } = await supabase
                         .from('users')
                         .select('*')
-                        .eq('telegram_id', telegramId)
+                        .eq('telegram_id', tgId)
                         .single();
                     state.user = newUser;
                     await loadPermissions(newUser.id);
@@ -474,15 +500,42 @@
             });
 
         } catch (err) {
-            console.error(err);
+            console.error('Ошибка загрузки пользователя:', err);
             container.innerHTML = `
                 <div style="text-align:center;padding:20px;border-left:4px solid #e74c3c;">
                     <strong>❌ Ошибка</strong>
                     <p>${err.message}</p>
-                    <button class="btn btn-primary mt-16" onclick="window.location.reload()">Обновить</button>
+                    <button class="btn btn-primary mt-16" onclick="location.reload()">Обновить</button>
                 </div>
             `;
         }
+    }
+
+    // Форма ручного ввода, если Telegram недоступен
+    function showManualLoginForm(container) {
+        container.innerHTML = `
+            <h3 style="text-align:center;">Вход без Telegram</h3>
+            <p style="text-align:center;color:var(--text2);margin-bottom:16px;">Введите ваш Telegram ID (число)</p>
+            <form id="manualLoginForm">
+                <div class="form-group">
+                    <label>Telegram ID</label>
+                    <input type="number" id="manualTgId" placeholder="Например: 123456789" required />
+                </div>
+                <button type="submit" class="btn btn-primary">Войти</button>
+            </form>
+            <p style="font-size:12px;color:var(--muted);text-align:center;margin-top:12px;">
+                Если вы ещё не зарегистрированы, после входа ID вы сможете создать заявку.
+            </p>
+        `;
+        const form = $('#manualLoginForm');
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const id = $('#manualTgId').value.trim();
+            if (!id) { showToast('Введите ID', 'error'); return; }
+            localStorage.setItem('bounty_telegram_id', id);
+            // Перезагружаем страницу, чтобы использовать новый ID
+            location.reload();
+        });
     }
 
     // ============================================================
@@ -512,7 +565,7 @@
             if (isOwner()) Object.keys(defaults).forEach(k => defaults[k] = true);
             state.permissions = { ...defaults, user_id: userId };
         }
-        console.log('Permissions loaded:', state.permissions);
+        console.log('✅ Permissions loaded:', state.permissions);
     }
 
     // ============================================================
@@ -554,7 +607,7 @@
     }
 
     // ============================================================
-    // 7. АДМИНКА
+    // 7. АДМИНКА (все функции)
     // ============================================================
     function renderAdmin() {
         const container = $('#adminContent');
@@ -564,7 +617,6 @@
             return;
         }
 
-        // Список разделов
         const sections = [];
         if (hasPerm('can_manage_applications') || isOwner()) sections.push({ id: 'apps', label: '📩 Заявки' });
         if (isOwner()) sections.push({ id: 'players', label: '👥 Игроки' });
@@ -586,7 +638,6 @@
         html += `</div>`;
         container.innerHTML = html;
 
-        // Обработка табов
         container.querySelectorAll('.tab').forEach(btn => {
             btn.addEventListener('click', () => {
                 container.querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
@@ -631,7 +682,7 @@
             .select('*')
             .eq('status', 'pending')
             .order('created_at', { ascending: false });
-        if (error) { panel.innerHTML = '<p>Ошибка</p>'; return; }
+        if (error) { panel.innerHTML = `<p style="color:red;">Ошибка: ${error.message}</p>`; return; }
         if (!data || data.length === 0) {
             panel.innerHTML = '<div class="empty"><div class="icon">✅</div><h3>Нет заявок</h3></div>';
             return;
@@ -681,7 +732,7 @@
             .from('users')
             .select('*')
             .order('created_at', { ascending: false });
-        if (error) { panel.innerHTML = '<p>Ошибка</p>'; return; }
+        if (error) { panel.innerHTML = `<p style="color:red;">Ошибка: ${error.message}</p>`; return; }
 
         let html = `<button class="btn btn-primary" onclick="showCreatePlayerModal()">➕ Создать игрока</button><div class="list" style="margin-top:12px;">`;
         if (!data || data.length === 0) html += `<div class="empty">Нет игроков</div>`;
@@ -718,7 +769,7 @@
         });
         panel.querySelectorAll('.delete-user').forEach(btn => {
             btn.addEventListener('click', async () => {
-                if (!confirm('Удалить игрока?')) return;
+                if (!confirm('Удалить игрока навсегда?')) return;
                 await supabase.from('users').delete().eq('id', btn.dataset.id);
                 showToast('Удалено', 'success');
                 await renderAdminPlayers(panel);
@@ -748,10 +799,11 @@
             const pass = overlay.querySelector('#newPlayerPass').value.trim();
             const tgId = overlay.querySelector('#newPlayerTg').value.trim() || 'manual_' + Date.now();
             if (!nick || !pass) { showToast('Заполните ник и пароль', 'error'); return; }
+            const passwordHash = await hashPassword(pass);
             const { error } = await supabase.from('users').insert({
                 telegram_id: tgId,
                 nickname: nick,
-                password: pass,
+                password: passwordHash,
                 status: 'approved',
                 role: 'player',
                 is_blocked: false,
@@ -917,7 +969,7 @@
         }
         panel.innerHTML = '<div class="loading-center"><div class="spinner"></div></div>';
         const { data, error } = await supabase.from('tasks').select('*').order('created_at', { ascending: false });
-        if (error) { panel.innerHTML = '<p>Ошибка</p>'; return; }
+        if (error) { panel.innerHTML = `<p style="color:red;">Ошибка: ${error.message}</p>`; return; }
 
         let html = `<button class="btn btn-primary" onclick="showEditTaskModal(null)">➕ Добавить задачу</button><div class="list" style="margin-top:12px;">`;
         if (!data || data.length === 0) html += `<div class="empty">Нет задач</div>`;
@@ -1009,7 +1061,8 @@
             return;
         }
         panel.innerHTML = '<div class="loading-center"><div class="spinner"></div></div>';
-        const { data: shooters } = await supabase.from('shooters').select('*, users(nickname)').order('rank', { ascending: true });
+        const { data: shooters, error } = await supabase.from('shooters').select('*, users(nickname)').order('rank', { ascending: true });
+        if (error) { panel.innerHTML = `<p style="color:red;">Ошибка: ${error.message}</p>`; return; }
         let html = `<button class="btn btn-primary" onclick="showAddShooterModal()">➕ Добавить стрелка</button><div class="list" style="margin-top:12px;">`;
         if (!shooters || shooters.length === 0) html += `<div class="empty">Нет стрелков</div>`;
         else {
@@ -1072,7 +1125,8 @@
             return;
         }
         panel.innerHTML = '<div class="loading-center"><div class="spinner"></div></div>';
-        const { data } = await supabase.from('bs_members').select('*, users(nickname)').order('created_at', { ascending: false });
+        const { data, error } = await supabase.from('bs_members').select('*, users(nickname)').order('created_at', { ascending: false });
+        if (error) { panel.innerHTML = `<p style="color:red;">Ошибка: ${error.message}</p>`; return; }
         let html = `<button class="btn btn-primary" onclick="showAddBsModal()">➕ Добавить в БС</button><div class="list" style="margin-top:12px;">`;
         if (!data || data.length === 0) html += `<div class="empty">БС состав пуст</div>`;
         else {
@@ -1133,7 +1187,8 @@
             return;
         }
         panel.innerHTML = '<div class="loading-center"><div class="spinner"></div></div>';
-        const { data } = await supabase.from('rules').select('*').order('updated_at', { ascending: false }).limit(1).maybeSingle();
+        const { data, error } = await supabase.from('rules').select('*').order('updated_at', { ascending: false }).limit(1).maybeSingle();
+        if (error) { panel.innerHTML = `<p style="color:red;">Ошибка: ${error.message}</p>`; return; }
         const content = data?.content || '';
         panel.innerHTML = `
             <div class="form-group"><label>Текст устава</label><textarea id="rulesEditor" rows="8">${content}</textarea></div>
@@ -1160,7 +1215,8 @@
             return;
         }
         panel.innerHTML = '<div class="loading-center"><div class="spinner"></div></div>';
-        const { data } = await supabase.from('news').select('*, users(nickname)').order('created_at', { ascending: false });
+        const { data, error } = await supabase.from('news').select('*, users(nickname)').order('created_at', { ascending: false });
+        if (error) { panel.innerHTML = `<p style="color:red;">Ошибка: ${error.message}</p>`; return; }
         let html = `<button class="btn btn-primary" onclick="showAddNewsModal()">➕ Добавить новость</button><div class="list" style="margin-top:12px;">`;
         if (!data || data.length === 0) html += `<div class="empty">Нет новостей</div>`;
         else {
@@ -1220,10 +1276,10 @@
     };
 
     // ============================================================
-    // 8. ПУБЛИЧНЫЕ СТРАНИЦЫ
+    // 8. ПУБЛИЧНЫЕ СТРАНИЦЫ (для игроков)
     // ============================================================
 
-    // Стрелки
+    // ---------- Стрелки ----------
     async function renderShooters() {
         const container = $('#shootersContent');
         const actions = $('#shootersActions');
@@ -1231,7 +1287,8 @@
             actions.innerHTML = `<button class="btn btn-primary btn-sm" onclick="showAddShooterModal()">➕ Добавить</button>`;
         } else actions.innerHTML = '';
         container.innerHTML = '<div class="loading-center"><div class="spinner"></div></div>';
-        const { data } = await supabase.from('shooters').select('*, users(nickname)').order('rank', { ascending: true });
+        const { data, error } = await supabase.from('shooters').select('*, users(nickname)').order('rank', { ascending: true });
+        if (error) { container.innerHTML = `<p style="color:red;">Ошибка: ${error.message}</p>`; return; }
         if (!data || data.length === 0) {
             container.innerHTML = '<div class="empty"><div class="icon">🎯</div><h3>Нет стрелков</h3></div>';
             return;
@@ -1249,7 +1306,7 @@
         container.innerHTML = html;
     }
 
-    // БС
+    // ---------- БС ----------
     async function renderBS() {
         const container = $('#bsContent');
         const actions = $('#bsActions');
@@ -1257,7 +1314,8 @@
             actions.innerHTML = `<button class="btn btn-primary btn-sm" onclick="showAddBsModal()">➕ Добавить</button>`;
         } else actions.innerHTML = '';
         container.innerHTML = '<div class="loading-center"><div class="spinner"></div></div>';
-        const { data } = await supabase.from('bs_members').select('*, users(nickname)').order('created_at', { ascending: false });
+        const { data, error } = await supabase.from('bs_members').select('*, users(nickname)').order('created_at', { ascending: false });
+        if (error) { container.innerHTML = `<p style="color:red;">Ошибка: ${error.message}</p>`; return; }
         if (!data || data.length === 0) {
             container.innerHTML = '<div class="empty"><div class="icon">🛡</div><h3>БС состав пуст</h3></div>';
             return;
@@ -1286,7 +1344,7 @@
         }
     }
 
-    // Задачи
+    // ---------- Задачи ----------
     async function renderTasks() {
         const container = $('#tasksContent');
         const actions = $('#tasksActions');
@@ -1294,7 +1352,8 @@
             actions.innerHTML = `<button class="btn btn-primary btn-sm" onclick="showEditTaskModal(null)">➕ Добавить</button>`;
         } else actions.innerHTML = '';
         container.innerHTML = '<div class="loading-center"><div class="spinner"></div></div>';
-        const { data } = await supabase.from('tasks').select('*').order('created_at', { ascending: false });
+        const { data, error } = await supabase.from('tasks').select('*').order('created_at', { ascending: false });
+        if (error) { container.innerHTML = `<p style="color:red;">Ошибка: ${error.message}</p>`; return; }
         if (!data || data.length === 0) {
             container.innerHTML = '<div class="empty"><div class="icon">📋</div><h3>Нет задач</h3></div>';
             return;
@@ -1343,7 +1402,7 @@
         }
     }
 
-    // Устав
+    // ---------- Устав ----------
     async function renderRules() {
         const container = $('#rulesContent');
         const actions = $('#rulesActions');
@@ -1351,12 +1410,13 @@
             actions.innerHTML = `<button class="btn btn-primary btn-sm" onclick="navigate('admin'); setTimeout(()=>document.querySelector('[data-tab=\\'rules_mgmt\\']')?.click(),300)">✏️ Редактировать</button>`;
         } else actions.innerHTML = '';
         container.innerHTML = '<div class="loading-center"><div class="spinner"></div></div>';
-        const { data } = await supabase.from('rules').select('*').order('updated_at', { ascending: false }).limit(1).maybeSingle();
+        const { data, error } = await supabase.from('rules').select('*').order('updated_at', { ascending: false }).limit(1).maybeSingle();
+        if (error) { container.innerHTML = `<p style="color:red;">Ошибка: ${error.message}</p>`; return; }
         const content = data?.content || 'Устав ещё не загружен.';
         container.innerHTML = `<div style="background:var(--card);border-radius:8px;padding:20px;border:1px solid var(--border);white-space:pre-wrap;line-height:1.7;">${content}</div>`;
     }
 
-    // Новости
+    // ---------- Новости ----------
     async function renderNews() {
         const container = $('#newsContent');
         const actions = $('#newsActions');
@@ -1364,7 +1424,8 @@
             actions.innerHTML = `<button class="btn btn-primary btn-sm" onclick="showAddNewsModal()">➕ Добавить</button>`;
         } else actions.innerHTML = '';
         container.innerHTML = '<div class="loading-center"><div class="spinner"></div></div>';
-        const { data } = await supabase.from('news').select('*, users(nickname)').order('created_at', { ascending: false });
+        const { data, error } = await supabase.from('news').select('*, users(nickname)').order('created_at', { ascending: false });
+        if (error) { container.innerHTML = `<p style="color:red;">Ошибка: ${error.message}</p>`; return; }
         if (!data || data.length === 0) {
             container.innerHTML = '<div class="empty"><div class="icon">📰</div><h3>Нет новостей</h3></div>';
             return;
@@ -1452,8 +1513,8 @@
         }
 
         await renderAuth();
-        console.log('🚀 Bounty Team запущен');
+        console.log('🚀 Bounty Team запущен. Если видите эту надпись — скрипт работает!');
     })();
 </script>
 </body>
-    </html>
+</html>
