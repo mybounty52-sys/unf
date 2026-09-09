@@ -7,17 +7,9 @@
     <script src="https://telegram.org/js/telegram-web-app.js?56"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        /* ===== Базовые стили (светлая/тёмная тема) ===== */
         * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
-        :root {
-            --bg:#ffffff; --bg2:#f5f5f5; --card:#ffffff; --text:#1a1a1a; --text2:#555; --muted:#888;
-            --border:#ddd; --shadow:0 2px 12px rgba(0,0,0,0.08); --accent:#FFCC00;
-            --radius:12px; --font:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
-        }
-        [data-theme="dark"] {
-            --bg:#0d0d0d; --bg2:#1a1a1a; --card:#222; --text:#f0f0f0; --text2:#aaa; --muted:#777;
-            --border:#333; --accent:#CC9900;
-        }
+        :root { --bg:#fff; --bg2:#f5f5f5; --card:#fff; --text:#1a1a1a; --text2:#555; --muted:#888; --border:#ddd; --shadow:0 2px 12px rgba(0,0,0,0.08); --accent:#FFCC00; --radius:12px; --font:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif; }
+        [data-theme="dark"] { --bg:#0d0d0d; --bg2:#1a1a1a; --card:#222; --text:#f0f0f0; --text2:#aaa; --muted:#777; --border:#333; --accent:#CC9900; }
         html,body { height:100%; font-family:var(--font); background:var(--bg); color:var(--text); transition:0.3s; overflow:hidden; }
         #app { display:flex; flex-direction:column; height:100vh; max-width:480px; margin:0 auto; background:var(--bg); overflow:hidden; }
         .header { display:flex; align-items:center; justify-content:space-between; padding:0 16px; height:60px; background:var(--bg); border-bottom:1px solid var(--border); flex-shrink:0; }
@@ -51,7 +43,6 @@
         .btn-danger { background:#e74c3c; color:#fff; }
         .btn-success { background:#27ae60; color:#fff; }
         .btn-sm { padding:6px 12px; font-size:13px; min-height:32px; width:auto; }
-        .btn-gold { background:var(--accent); color:#1a1a1a; }
         .list { display:flex; flex-direction:column; gap:10px; }
         .list-item { background:var(--card); border-radius:8px; padding:12px 14px; border:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; gap:10px; }
         .list-item .info { flex:1; min-width:0; }
@@ -100,7 +91,6 @@
 <body>
 
 <div id="app">
-    <!-- Хедер -->
     <header class="header">
         <div class="brand">✦ BOUNTY TEAM</div>
         <div class="header-actions">
@@ -113,9 +103,7 @@
         </div>
     </header>
 
-    <!-- Контент -->
     <div class="content" id="content">
-
         <!-- Страница авторизации -->
         <div class="page active" id="page-auth">
             <div style="max-width:400px;margin:20px auto;background:var(--card);border-radius:var(--radius);padding:24px;border:1px solid var(--border);">
@@ -203,27 +191,40 @@
 
     </div>
 
-    <!-- Toast -->
     <div class="toast" id="toast"></div>
 </div>
 
 <script>
     // ============================================================
-    // 1. КОНФИГУРАЦИЯ SUPABASE (ваши данные, уже вставлены)
+    // 1. КОНФИГУРАЦИЯ
     // ============================================================
     const SUPABASE_URL = 'https://hhsyhblhqjjsvuumaovg.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imhoc3loYmxocWpqc3Z1dW1hb3ZnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg4NjA0MzgsImV4cCI6MjEwNDQzNjQzOH0.3AvM5HGAIP4PnT1pEIWLuuIvvnPxV2v7bSU4x57rlx8';
 
+    console.log('🔌 Создаём клиент Supabase с URL:', SUPABASE_URL);
     const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-    console.log('🔌 Supabase client created');
+    console.log('✅ Клиент создан');
 
-    // Константы
+    // Проверка подключения
+    (async function testConnection() {
+        try {
+            const { data, error } = await supabase.from('users').select('count', { count: 'exact', head: true });
+            console.log('📊 Проверка подключения к users:', error ? '❌ Ошибка: ' + error.message : '✅ Успешно, таблица users существует');
+            if (error) {
+                console.error('❌ Ошибка подключения:', error);
+                showToast('Ошибка подключения к Supabase: ' + error.message, 'error');
+            }
+        } catch (e) {
+            console.error('❌ Критическая ошибка:', e);
+        }
+    })();
+
     const MANAGER_TG = 'bounqy31';
     const VOICE_LINK = 'https://vk.me/join/QwCqYDLM9KG9TjYsaRP8uQ5oIonjcOa0xIc=';
-    const OWNER_USERNAME = 'bounqy'; // Владелец по нику
+    const OWNER_USERNAME = 'bounqy';
 
     // ============================================================
-    // 2. ГЛОБАЛЬНОЕ СОСТОЯНИЕ
+    // 2. СОСТОЯНИЕ
     // ============================================================
     let state = {
         user: null,
@@ -238,7 +239,7 @@
     const $ = (s) => document.querySelector(s);
     const $$ = (s) => document.querySelectorAll(s);
 
-    function showToast(msg, type = 'info', duration = 2500) {
+    function showToast(msg, type = 'info', duration = 3000) {
         const el = $('#toast');
         el.textContent = msg;
         el.className = 'toast ' + type;
@@ -248,7 +249,6 @@
         el._timer = setTimeout(() => el.classList.remove('show'), duration);
     }
 
-    // Хеширование пароля (SHA-256)
     async function hashPassword(password) {
         const enc = new TextEncoder().encode(password);
         const hashBuffer = await crypto.subtle.digest('SHA-256', enc);
@@ -262,9 +262,7 @@
         localStorage.setItem('bounty_theme', theme);
         $('#themeToggle').textContent = theme === 'dark' ? '☀️' : '🌓';
     }
-    $('#themeToggle').addEventListener('click', () => {
-        applyTheme(state.theme === 'dark' ? 'light' : 'dark');
-    });
+    $('#themeToggle').addEventListener('click', () => applyTheme(state.theme === 'dark' ? 'light' : 'dark'));
 
     function navigate(page) {
         $$('.page').forEach(p => p.classList.remove('active'));
@@ -272,13 +270,11 @@
         if (target) target.classList.add('active');
         state.currentPage = page;
         $('#content').scrollTop = 0;
-        // Кнопка назад в Telegram
         const tg = window.Telegram?.WebApp;
         if (tg && tg.BackButton) {
             const show = page !== 'dashboard' && page !== 'auth';
             if (show) tg.BackButton.show(); else tg.BackButton.hide();
         }
-        // Рендерим страницу
         switch (page) {
             case 'dashboard': renderDashboard(); break;
             case 'voice': renderVoice(); break;
@@ -322,26 +318,23 @@
     }
 
     // ============================================================
-    // 4. АВТОРИЗАЦИЯ (с fallback для ручного ввода)
+    // 4. АВТОРИЗАЦИЯ
     // ============================================================
     async function renderAuth() {
         const container = $('#authContent');
         if (!container) return;
 
-        // Получаем Telegram ID, если доступен
         const tg = window.Telegram?.WebApp;
         let tgUser = null;
         if (tg && tg.initDataUnsafe && tg.initDataUnsafe.user) {
             tgUser = tg.initDataUnsafe.user;
         }
 
-        // Если Telegram нет, пытаемся взять сохранённый ID из localStorage
         if (!tgUser) {
             const savedId = localStorage.getItem('bounty_telegram_id');
             if (savedId) {
                 tgUser = { id: savedId, username: 'player' };
             } else {
-                // Если ничего нет — показываем форму ручного ввода
                 showManualLoginForm(container);
                 return;
             }
@@ -349,14 +342,27 @@
         const telegramId = String(tgUser.id);
 
         try {
-            // Загружаем пользователя из Supabase
+            console.log('🔍 Ищем пользователя с telegram_id:', telegramId);
             const { data: users, error } = await supabase
                 .from('users')
                 .select('*')
                 .eq('telegram_id', telegramId);
 
-            if (error) throw error;
+            if (error) {
+                console.error('❌ Ошибка запроса к Supabase:', error);
+                container.innerHTML = `
+                    <div style="text-align:center;padding:20px;border-left:4px solid #e74c3c;">
+                        <strong>❌ Ошибка подключения к базе данных</strong>
+                        <p style="color:var(--text2);margin:8px 0;">${error.message}</p>
+                        <p style="font-size:12px;color:var(--muted);">Проверьте настройки Supabase в консоли (F12)</p>
+                        <button class="btn btn-primary mt-16" onclick="location.reload()">Обновить</button>
+                    </div>
+                `;
+                return;
+            }
+
             const user = users && users.length > 0 ? users[0] : null;
+            console.log('📄 Найден пользователь:', user);
 
             if (user) {
                 if (user.status === 'approved' && !user.is_blocked) {
@@ -395,7 +401,7 @@
                 }
             }
 
-            // Форма регистрации (если пользователь не найден)
+            // Форма регистрации
             container.innerHTML = `
                 <form id="registerForm">
                     <div class="form-group">
@@ -441,7 +447,6 @@
                     return;
                 }
 
-                // Проверка уникальности ника
                 const { data: existing } = await supabase
                     .from('users')
                     .select('nickname')
@@ -451,10 +456,8 @@
                     return;
                 }
 
-                // Хешируем пароль
                 const passwordHash = await hashPassword(password);
 
-                // Если ник совпадает с владельцем - сразу одобряем и назначаем owner
                 let status = 'pending';
                 let role = 'player';
                 if (nickname.toLowerCase() === OWNER_USERNAME.toLowerCase()) {
@@ -467,7 +470,7 @@
                     .insert({
                         telegram_id: tgId,
                         nickname,
-                        password: passwordHash, // сохраняем хеш
+                        password: passwordHash,
                         proof_link: proof,
                         status: status,
                         role: role,
@@ -479,12 +482,10 @@
                     return;
                 }
 
-                // Сохраняем ID в localStorage для быстрого входа
                 localStorage.setItem('bounty_telegram_id', tgId);
 
                 if (role === 'owner') {
                     showToast('✅ Вы зарегистрированы как владелец!', 'success');
-                    // Автоматически войти
                     const { data: newUser } = await supabase
                         .from('users')
                         .select('*')
@@ -500,7 +501,7 @@
             });
 
         } catch (err) {
-            console.error('Ошибка загрузки пользователя:', err);
+            console.error('❌ Критическая ошибка:', err);
             container.innerHTML = `
                 <div style="text-align:center;padding:20px;border-left:4px solid #e74c3c;">
                     <strong>❌ Ошибка</strong>
@@ -511,7 +512,6 @@
         }
     }
 
-    // Форма ручного ввода, если Telegram недоступен
     function showManualLoginForm(container) {
         container.innerHTML = `
             <h3 style="text-align:center;">Вход без Telegram</h3>
@@ -524,7 +524,7 @@
                 <button type="submit" class="btn btn-primary">Войти</button>
             </form>
             <p style="font-size:12px;color:var(--muted);text-align:center;margin-top:12px;">
-                Если вы ещё не зарегистрированы, после входа ID вы сможете создать заявку.
+                Если вы ещё не зарегистрированы, после входа вы сможете создать заявку.
             </p>
         `;
         const form = $('#manualLoginForm');
@@ -533,7 +533,6 @@
             const id = $('#manualTgId').value.trim();
             if (!id) { showToast('Введите ID', 'error'); return; }
             localStorage.setItem('bounty_telegram_id', id);
-            // Перезагружаем страницу, чтобы использовать новый ID
             location.reload();
         });
     }
@@ -607,7 +606,7 @@
     }
 
     // ============================================================
-    // 7. АДМИНКА (все функции)
+    // 7. АДМИНКА (все функции, сокращённо но работают)
     // ============================================================
     function renderAdmin() {
         const container = $('#adminContent');
@@ -1279,7 +1278,6 @@
     // 8. ПУБЛИЧНЫЕ СТРАНИЦЫ (для игроков)
     // ============================================================
 
-    // ---------- Стрелки ----------
     async function renderShooters() {
         const container = $('#shootersContent');
         const actions = $('#shootersActions');
@@ -1306,7 +1304,6 @@
         container.innerHTML = html;
     }
 
-    // ---------- БС ----------
     async function renderBS() {
         const container = $('#bsContent');
         const actions = $('#bsActions');
@@ -1344,7 +1341,6 @@
         }
     }
 
-    // ---------- Задачи ----------
     async function renderTasks() {
         const container = $('#tasksContent');
         const actions = $('#tasksActions');
@@ -1402,7 +1398,6 @@
         }
     }
 
-    // ---------- Устав ----------
     async function renderRules() {
         const container = $('#rulesContent');
         const actions = $('#rulesActions');
@@ -1416,7 +1411,6 @@
         container.innerHTML = `<div style="background:var(--card);border-radius:8px;padding:20px;border:1px solid var(--border);white-space:pre-wrap;line-height:1.7;">${content}</div>`;
     }
 
-    // ---------- Новости ----------
     async function renderNews() {
         const container = $('#newsContent');
         const actions = $('#newsActions');
@@ -1469,27 +1463,23 @@
     }
 
     // ============================================================
-    // 9. ОБРАБОТЧИК КНОПКИ НАЗАД
+    // 9. ОБРАБОТЧИКИ
     // ============================================================
     document.addEventListener('click', (e) => {
         const btn = e.target.closest('.back-btn');
         if (btn) navigate(btn.dataset.page);
     });
 
-    // ============================================================
-    // 10. ЗАКРЫТИЕ МОДАЛОК ПО КЛИКУ НА ФОН
-    // ============================================================
     document.addEventListener('click', (e) => {
         if (e.target.classList.contains('modal-overlay')) e.target.remove();
     });
 
     // ============================================================
-    // 11. ИНИЦИАЛИЗАЦИЯ
+    // 10. ИНИЦИАЛИЗАЦИЯ
     // ============================================================
     (async function init() {
         applyTheme(state.theme);
 
-        // Telegram BackButton
         const tg = window.Telegram?.WebApp;
         if (tg) {
             tg.ready();
@@ -1513,8 +1503,8 @@
         }
 
         await renderAuth();
-        console.log('🚀 Bounty Team запущен. Если видите эту надпись — скрипт работает!');
+        console.log('🚀 Bounty Team запущен. Проверьте консоль на ошибки.');
     })();
 </script>
 </body>
-</html>
+    </html>
