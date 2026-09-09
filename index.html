@@ -7,9 +7,17 @@
     <script src="https://telegram.org/js/telegram-web-app.js?56"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
+        /* ===== Стили (светлая/тёмная тема) ===== */
         * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
-        :root { --bg:#fff; --bg2:#f5f5f5; --card:#fff; --text:#1a1a1a; --text2:#555; --muted:#888; --border:#ddd; --shadow:0 2px 12px rgba(0,0,0,0.08); --accent:#FFCC00; --radius:12px; --font:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif; }
-        [data-theme="dark"] { --bg:#0d0d0d; --bg2:#1a1a1a; --card:#222; --text:#f0f0f0; --text2:#aaa; --muted:#777; --border:#333; --accent:#CC9900; }
+        :root {
+            --bg:#ffffff; --bg2:#f5f5f5; --card:#ffffff; --text:#1a1a1a; --text2:#555; --muted:#888;
+            --border:#ddd; --shadow:0 2px 12px rgba(0,0,0,0.08); --accent:#FFCC00;
+            --radius:12px; --font:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+        }
+        [data-theme="dark"] {
+            --bg:#0d0d0d; --bg2:#1a1a1a; --card:#222; --text:#f0f0f0; --text2:#aaa; --muted:#777;
+            --border:#333; --accent:#CC9900;
+        }
         html,body { height:100%; font-family:var(--font); background:var(--bg); color:var(--text); transition:0.3s; overflow:hidden; }
         #app { display:flex; flex-direction:column; height:100vh; max-width:480px; margin:0 auto; background:var(--bg); overflow:hidden; }
         .header { display:flex; align-items:center; justify-content:space-between; padding:0 16px; height:60px; background:var(--bg); border-bottom:1px solid var(--border); flex-shrink:0; }
@@ -113,12 +121,10 @@
             </div>
         </div>
 
-        <!-- Дашборд -->
+        <!-- Остальные страницы (дашборд, админка и т.д.) -->
         <div class="page" id="page-dashboard">
             <div class="grid" id="dashboardGrid"></div>
         </div>
-
-        <!-- Войс Штаб -->
         <div class="page" id="page-voice">
             <div class="section-header">
                 <button class="back-btn" data-page="dashboard">‹ Назад</button>
@@ -129,8 +135,6 @@
                 <button class="btn btn-primary" id="voiceBtn" style="max-width:280px;margin:0 auto;">🚀 Перейти</button>
             </div>
         </div>
-
-        <!-- Администрация -->
         <div class="page" id="page-admin">
             <div class="section-header">
                 <button class="back-btn" data-page="dashboard">‹ Назад</button>
@@ -138,8 +142,6 @@
             </div>
             <div id="adminContent"></div>
         </div>
-
-        <!-- Стрелки -->
         <div class="page" id="page-shooters">
             <div class="section-header">
                 <button class="back-btn" data-page="dashboard">‹ Назад</button>
@@ -148,8 +150,6 @@
             </div>
             <div id="shootersContent"></div>
         </div>
-
-        <!-- БС Состав -->
         <div class="page" id="page-bs">
             <div class="section-header">
                 <button class="back-btn" data-page="dashboard">‹ Назад</button>
@@ -158,8 +158,6 @@
             </div>
             <div id="bsContent"></div>
         </div>
-
-        <!-- Задачи -->
         <div class="page" id="page-tasks">
             <div class="section-header">
                 <button class="back-btn" data-page="dashboard">‹ Назад</button>
@@ -168,8 +166,6 @@
             </div>
             <div id="tasksContent"></div>
         </div>
-
-        <!-- Устав -->
         <div class="page" id="page-rules">
             <div class="section-header">
                 <button class="back-btn" data-page="dashboard">‹ Назад</button>
@@ -178,8 +174,6 @@
             </div>
             <div id="rulesContent"></div>
         </div>
-
-        <!-- Новости -->
         <div class="page" id="page-news">
             <div class="section-header">
                 <button class="back-btn" data-page="dashboard">‹ Назад</button>
@@ -188,7 +182,6 @@
             </div>
             <div id="newsContent"></div>
         </div>
-
     </div>
 
     <div class="toast" id="toast"></div>
@@ -196,26 +189,27 @@
 
 <script>
     // ============================================================
-    // 1. КОНФИГУРАЦИЯ
+    // 1. КОНФИГУРАЦИЯ SUPABASE (ваши данные)
     // ============================================================
     const SUPABASE_URL = 'https://hhsyhblhqjjsvuumaovg.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imhoc3loYmxocWpqc3Z1dW1hb3ZnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg4NjA0MzgsImV4cCI6MjEwNDQzNjQzOH0.3AvM5HGAIP4PnT1pEIWLuuIvvnPxV2v7bSU4x57rlx8';
 
-    console.log('🔌 Создаём клиент Supabase с URL:', SUPABASE_URL);
     const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-    console.log('✅ Клиент создан');
+    console.log('🔌 Supabase клиент создан');
 
-    // Проверка подключения
+    // Проверка соединения при загрузке
     (async function testConnection() {
         try {
             const { data, error } = await supabase.from('users').select('count', { count: 'exact', head: true });
-            console.log('📊 Проверка подключения к users:', error ? '❌ Ошибка: ' + error.message : '✅ Успешно, таблица users существует');
             if (error) {
-                console.error('❌ Ошибка подключения:', error);
-                showToast('Ошибка подключения к Supabase: ' + error.message, 'error');
+                console.error('❌ Ошибка соединения с users:', error);
+                showToast('Не удалось подключиться к БД. Проверьте консоль.', 'error');
+            } else {
+                console.log('✅ Соединение с users установлено');
             }
         } catch (e) {
             console.error('❌ Критическая ошибка:', e);
+            showToast('Ошибка инициализации', 'error');
         }
     })();
 
@@ -318,12 +312,13 @@
     }
 
     // ============================================================
-    // 4. АВТОРИЗАЦИЯ
+    // 4. АВТОРИЗАЦИЯ (с ручным вводом Telegram ID)
     // ============================================================
     async function renderAuth() {
         const container = $('#authContent');
         if (!container) return;
 
+        // Получаем Telegram ID (если есть)
         const tg = window.Telegram?.WebApp;
         let tgUser = null;
         if (tg && tg.initDataUnsafe && tg.initDataUnsafe.user) {
@@ -335,7 +330,29 @@
             if (savedId) {
                 tgUser = { id: savedId, username: 'player' };
             } else {
-                showManualLoginForm(container);
+                // Показываем форму ручного ввода
+                container.innerHTML = `
+                    <h3 style="text-align:center;">Вход</h3>
+                    <p style="text-align:center;color:var(--text2);margin-bottom:16px;">Введите ваш Telegram ID (число)</p>
+                    <form id="manualLoginForm">
+                        <div class="form-group">
+                            <label>Telegram ID</label>
+                            <input type="number" id="manualTgId" placeholder="Например: 123456789" required />
+                        </div>
+                        <button type="submit" class="btn btn-primary">Войти</button>
+                    </form>
+                    <p style="font-size:12px;color:var(--muted);text-align:center;margin-top:12px;">
+                        Если вы ещё не зарегистрированы, после входа вы сможете создать заявку.
+                    </p>
+                `;
+                const form = $('#manualLoginForm');
+                form.addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    const id = $('#manualTgId').value.trim();
+                    if (!id) { showToast('Введите ID', 'error'); return; }
+                    localStorage.setItem('bounty_telegram_id', id);
+                    location.reload();
+                });
                 return;
             }
         }
@@ -447,6 +464,7 @@
                     return;
                 }
 
+                // Проверка уникальности ника
                 const { data: existing } = await supabase
                     .from('users')
                     .select('nickname')
@@ -510,31 +528,6 @@
                 </div>
             `;
         }
-    }
-
-    function showManualLoginForm(container) {
-        container.innerHTML = `
-            <h3 style="text-align:center;">Вход без Telegram</h3>
-            <p style="text-align:center;color:var(--text2);margin-bottom:16px;">Введите ваш Telegram ID (число)</p>
-            <form id="manualLoginForm">
-                <div class="form-group">
-                    <label>Telegram ID</label>
-                    <input type="number" id="manualTgId" placeholder="Например: 123456789" required />
-                </div>
-                <button type="submit" class="btn btn-primary">Войти</button>
-            </form>
-            <p style="font-size:12px;color:var(--muted);text-align:center;margin-top:12px;">
-                Если вы ещё не зарегистрированы, после входа вы сможете создать заявку.
-            </p>
-        `;
-        const form = $('#manualLoginForm');
-        form.addEventListener('submit', (e) => {
-            e.preventDefault();
-            const id = $('#manualTgId').value.trim();
-            if (!id) { showToast('Введите ID', 'error'); return; }
-            localStorage.setItem('bounty_telegram_id', id);
-            location.reload();
-        });
     }
 
     // ============================================================
@@ -606,7 +599,7 @@
     }
 
     // ============================================================
-    // 7. АДМИНКА (все функции, сокращённо но работают)
+    // 7. АДМИНКА (все функции, компактно)
     // ============================================================
     function renderAdmin() {
         const container = $('#adminContent');
@@ -1507,4 +1500,4 @@
     })();
 </script>
 </body>
-    </html>
+</html>
