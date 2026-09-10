@@ -372,7 +372,7 @@ label{
 .nav-bar button span:first-child{font-size:18px;line-height:1}
 
 /* ═══════════════════════════════════════════════════════════════════
-   11. MODALS (профиль, предложение)
+   11. MODALS
    ═══════════════════════════════════════════════════════════════════ */
 .modal-overlay{
   position:fixed;inset:0;background:var(--overlay);display:none;
@@ -398,7 +398,7 @@ label{
 }
 
 /* ═══════════════════════════════════════════════════════════════════
-   12. FULLSCREEN REGISTRATION — НОВЫЙ ФОРМАТ
+   12. FULLSCREEN SCREENS
    ═══════════════════════════════════════════════════════════════════ */
 .fullscreen-screen{
   position:fixed;inset:0;background:var(--bg);display:none;
@@ -408,7 +408,6 @@ label{
 }
 .fullscreen-screen.active{display:flex}
 
-/* BAN SCREEN */
 #banScreen .big-icon{font-size:88px;margin-bottom:22px;line-height:1;animation:shake 2.5s ease-in-out infinite}
 #banScreen h1{
   font-size:27px;font-weight:900;margin-bottom:12px;
@@ -426,7 +425,6 @@ label{
 }
 #banScreen p{color:var(--text-dim);font-size:15px;line-height:1.6;max-width:380px}
 
-/* PENDING SCREEN */
 #pendingScreen .big-icon{font-size:88px;margin-bottom:22px;line-height:1;animation:spin 3.5s linear infinite}
 #pendingScreen h1{
   font-size:27px;font-weight:900;margin-bottom:12px;
@@ -445,12 +443,10 @@ label{
 #pendingScreen p{color:var(--text-dim);font-size:15px;line-height:1.6;max-width:380px}
 
 /* ═══════════════════════════════════════════════════════════════════
-   13. REGISTRATION SCREEN (FULLSCREEN) — ГЛАВНОЕ
+   13. REGISTRATION SCREEN (FULLSCREEN)
    ═══════════════════════════════════════════════════════════════════ */
 #registrationScreen{
-  padding:0;
-  align-items:stretch;
-  justify-content:flex-start;
+  padding:0;align-items:stretch;justify-content:flex-start;
   background-image:var(--reg-bg);
   background-size:cover;
   background-position:center;
@@ -458,60 +454,44 @@ label{
   background-attachment:fixed;
 }
 #registrationScreen::before{
-  content:'';
-  position:absolute;inset:0;
+  content:'';position:absolute;inset:0;
   background:var(--reg-overlay);
   backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);
-  z-index:1;
-  pointer-events:none;
-  transition:background-color .35s ease;
+  z-index:1;pointer-events:none;transition:background-color .35s ease;
 }
 .reg-screen-inner{
   position:relative;z-index:2;
-  width:100%;
-  max-width:520px;
-  margin:0 auto;
+  width:100%;max-width:520px;margin:0 auto;
   padding:calc(24px + env(safe-area-inset-top)) 20px calc(30px + env(safe-area-inset-bottom));
-  min-height:100vh;
-  min-height:100dvh;
+  min-height:100vh;min-height:100dvh;
   display:flex;flex-direction:column;justify-content:center;
   animation:slideUp .5s cubic-bezier(.2,.9,.3,1);
   box-sizing:border-box;
 }
-
-/* Тема-кнопка в углу */
 .reg-theme-btn-full{
   position:absolute;
   top:calc(18px + env(safe-area-inset-top));
   right:20px;
-  width:44px;height:44px;
-  border-radius:14px;
+  width:44px;height:44px;border-radius:14px;
   background:rgba(255,255,255,.85);
   border:2px solid var(--accent);
-  color:var(--text);
-  font-size:20px;
-  cursor:pointer;
+  color:var(--text);font-size:20px;cursor:pointer;
   display:flex;align-items:center;justify-content:center;
   transition:transform .15s ease,background-color .2s ease;
   z-index:10;
   box-shadow:0 4px 14px rgba(0,0,0,.12);
 }
-[data-theme="dark"] .reg-theme-btn-full{
-  background:rgba(20,20,20,.85);
-}
+[data-theme="dark"] .reg-theme-btn-full{background:rgba(20,20,20,.85)}
 .reg-theme-btn-full:hover{background:var(--accent-soft);transform:scale(1.05)}
 .reg-theme-btn-full:active{transform:scale(.9)}
 
-/* Логотип сверху */
 .reg-logo-full{
   display:flex;flex-direction:column;align-items:center;
   margin-bottom:22px;
   animation:scaleIn .5s cubic-bezier(.34,1.4,.64,1);
 }
 .reg-logo-img-wrap{
-  width:76px;height:76px;
-  border-radius:22px;
-  overflow:hidden;
+  width:76px;height:76px;border-radius:22px;overflow:hidden;
   border:3px solid var(--accent);
   box-shadow:0 8px 26px rgba(255,215,0,.4);
   background:var(--card-2);
@@ -519,16 +499,10 @@ label{
   animation:logoPulse 3s ease-in-out infinite;
   will-change:transform,box-shadow;
 }
-.reg-logo-img-wrap img{
-  width:100%;height:100%;object-fit:cover;display:block;
-}
+.reg-logo-img-wrap img{width:100%;height:100%;object-fit:cover;display:block}
 
-/* Название Bounty Team */
 .reg-title-full{
-  font-size:30px;
-  font-weight:900;
-  letter-spacing:.6px;
-  line-height:1.1;
+  font-size:30px;font-weight:900;letter-spacing:.6px;line-height:1.1;
   background:linear-gradient(90deg,
     #B8860B 0%,#FFD700 8%,#FFF4B0 16%,#FFF 24%,#FFF4B0 32%,
     #FFD700 42%,#FFB800 50%,#FFD700 58%,#FFF4B0 68%,#FFF 76%,
@@ -553,54 +527,36 @@ label{
   -webkit-text-fill-color:transparent;
 }
 .reg-subtitle-full{
-  font-size:11px;
-  color:var(--text-dim);
-  font-weight:700;
-  letter-spacing:3px;
-  text-transform:uppercase;
-  margin-top:6px;
+  font-size:11px;color:var(--text-dim);font-weight:700;
+  letter-spacing:3px;text-transform:uppercase;margin-top:6px;
   text-align:center;
 }
 
-/* Табы Регистрация / Вход */
 .reg-tabs-full{
-  display:flex;
-  gap:6px;
+  display:flex;gap:6px;
   background:var(--reg-input-bg);
-  border-radius:14px;
-  padding:5px;
-  margin-bottom:18px;
+  border-radius:14px;padding:5px;margin-bottom:18px;
   border:1.5px solid var(--border);
   backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
 }
 .reg-tab-full{
-  flex:1;
-  padding:11px 8px;
-  border-radius:11px;
-  background:transparent;
-  border:none;
-  color:var(--text-dim);
-  font-size:13px;
-  font-weight:700;
-  cursor:pointer;
+  flex:1;padding:11px 8px;border-radius:11px;
+  background:transparent;border:none;color:var(--text-dim);
+  font-size:13px;font-weight:700;cursor:pointer;
   transition:background-color .2s ease,color .2s ease,transform .15s ease;
-  font-family:inherit;
-  user-select:none;
+  font-family:inherit;user-select:none;
 }
 .reg-tab-full:hover{color:var(--text)}
 .reg-tab-full:active{transform:scale(.97)}
 .reg-tab-full.active{
   background:linear-gradient(135deg,var(--accent),var(--accent-2));
-  color:#000;
-  box-shadow:0 3px 10px rgba(255,215,0,.45);
+  color:#000;box-shadow:0 3px 10px rgba(255,215,0,.45);
 }
 
-/* Формы */
 .reg-form-full{
   display:block;
   background:var(--reg-input-bg);
-  border-radius:18px;
-  padding:20px;
+  border-radius:18px;padding:20px;
   border:1.5px solid var(--border);
   backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
   box-shadow:var(--shadow);
@@ -608,81 +564,35 @@ label{
 }
 .reg-form-full.hidden{display:none}
 .reg-form-full label{
-  color:var(--text-dim);
-  font-size:11px;
-  font-weight:800;
-  letter-spacing:.6px;
+  color:var(--text-dim);font-size:11px;font-weight:800;letter-spacing:.6px;
 }
-.reg-form-full .input{
-  background:var(--bg);
-  border-color:var(--border);
-}
-.reg-form-full .input:focus{
-  border-color:var(--accent);
-  box-shadow:0 0 0 3px var(--accent-soft);
-}
+.reg-form-full .input{background:var(--bg);border-color:var(--border)}
+.reg-form-full .input:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
 
-/* Хинт под кнопкой */
 .reg-hint-full{
-  margin-top:14px;
-  font-size:11px;
-  color:var(--text-soft);
-  text-align:center;
-  line-height:1.5;
-  padding:0 8px;
+  margin-top:14px;font-size:11px;color:var(--text-soft);
+  text-align:center;line-height:1.5;padding:0 8px;
 }
-
-/* Кнопка "Войти" (когда owner и есть игрок) */
-.reg-owner-hint{
-  display:block;
-  margin-top:10px;
-  padding:10px 14px;
-  background:linear-gradient(135deg,rgba(255,215,0,.18),rgba(184,134,11,.18));
-  border:1.5px dashed var(--accent);
-  border-radius:12px;
-  font-size:12px;
-  font-weight:700;
-  color:var(--accent-2);
-  text-align:center;
-  line-height:1.4;
-}
-[data-theme="dark"] .reg-owner-hint{color:var(--accent)}
-
-/* Badge сверху формы */
 .reg-badge-full{
-  display:inline-block;
-  padding:4px 12px;
+  display:inline-block;padding:4px 12px;
   background:linear-gradient(135deg,var(--accent),var(--accent-2));
-  color:#000;
-  border-radius:20px;
-  font-size:10px;
-  font-weight:800;
-  letter-spacing:.8px;
-  text-transform:uppercase;
-  margin-bottom:14px;
+  color:#000;border-radius:20px;font-size:10px;font-weight:800;
+  letter-spacing:.8px;text-transform:uppercase;margin-bottom:14px;
   box-shadow:0 3px 10px rgba(255,215,0,.35);
 }
 .reg-form-full .reg-head-line{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  margin-bottom:14px;
-  gap:10px;
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:14px;gap:10px;
 }
 .reg-form-full .reg-head-line h3{
-  font-size:16px;
-  font-weight:800;
-  color:var(--text);
-  margin:0;
+  font-size:16px;font-weight:800;color:var(--text);margin:0;
 }
 
 /* ═══════════════════════════════════════════════════════════════════
    14. VOICE CARD
    ═══════════════════════════════════════════════════════════════════ */
 .voice-card .voice-title-anim{
-  font-size:17px;
-  font-weight:900;
-  letter-spacing:.5px;
+  font-size:17px;font-weight:900;letter-spacing:.5px;
   background:linear-gradient(90deg,
     #B8860B 0%,#FFD700 10%,#FFF4B0 22%,#FFF 32%,#FFF4B0 42%,
     #FFD700 52%,#FFB800 60%,#FFD700 70%,#FFF4B0 82%,#FFF 90%,#B8860B 100%);
@@ -707,8 +617,7 @@ label{
 }
 .voice-status{
   display:inline-flex;align-items:center;gap:6px;
-  font-size:12px;color:var(--success);font-weight:700;
-  margin-bottom:8px;
+  font-size:12px;color:var(--success);font-weight:700;margin-bottom:8px;
 }
 .voice-dot{
   width:8px;height:8px;border-radius:50%;background:var(--success);
@@ -755,9 +664,13 @@ label{
   color:var(--accent-2);text-decoration:none;word-break:break-all;
 }
 .request-item .req-meta a:hover{text-decoration:underline}
-.request-item .req-meta code{
-  background:var(--card);padding:2px 6px;border-radius:4px;font-size:11px;
+.request-item .req-pass-hidden{
+  display:inline-flex;align-items:center;gap:6px;
+  background:var(--card);padding:3px 10px;border-radius:6px;
+  font-size:11px;color:var(--text-dim);font-weight:700;
+  letter-spacing:2px;
 }
+
 .news-item{
   background:var(--card-2);border-radius:14px;padding:14px;
   margin-bottom:12px;border-left:4px solid var(--accent-2);
@@ -769,9 +682,8 @@ label{
   font-size:14px;color:var(--text);line-height:1.5;
   margin-bottom:8px;white-space:pre-wrap;word-break:break-word;
 }
-.news-item .news-date{
-  font-size:11px;color:var(--text-soft);font-style:italic;
-}
+.news-item .news-date{font-size:11px;color:var(--text-soft);font-style:italic}
+
 .tag{
   display:inline-block;padding:3px 9px;border-radius:7px;
   font-size:10px;font-weight:800;margin-left:6px;
@@ -786,8 +698,7 @@ label{
 }
 .owner-block{
   position:relative;border:2px solid var(--accent);
-  border-radius:16px;padding:16px;margin-bottom:14px;
-  background:var(--card);
+  border-radius:16px;padding:16px;margin-bottom:14px;background:var(--card);
 }
 .owner-block h3{
   font-size:15px;margin-bottom:14px;color:var(--accent);font-weight:800;
@@ -893,7 +804,6 @@ label{
 
 <div id="app">
 
-  <!-- ═══════════════════ HEADER ═══════════════════ -->
   <header class="app-header">
     <div class="logo-wrap"><img id="logoImg" alt="Bounty Team" src=""></div>
     <div class="title-block">
@@ -907,7 +817,6 @@ label{
     </div>
   </header>
 
-  <!-- ═══════════════════ MAIN ═══════════════════ -->
   <main class="app-main">
 
     <section class="section active" id="section-home">
@@ -942,7 +851,6 @@ label{
 
   </main>
 
-  <!-- ═══════════════════ NAV ═══════════════════ -->
   <nav class="nav-bar">
     <button id="navHome" class="active"><span>🏠</span><span>Главная</span></button>
     <button id="navAdmin" style="display:none;"><span>🛡️</span><span>Админ</span></button>
@@ -950,13 +858,12 @@ label{
 
 </div>
 
-<!-- ═══════════════════ FULLSCREEN REGISTRATION ═══════════════════ -->
+<!-- ═══════════════════ REGISTRATION SCREEN ═══════════════════ -->
 <div class="fullscreen-screen" id="registrationScreen">
   <button class="reg-theme-btn-full" id="regThemeToggle" title="Сменить тему">🌙</button>
 
   <div class="reg-screen-inner">
 
-    <!-- Лого + название -->
     <div class="reg-logo-full">
       <div class="reg-logo-img-wrap">
         <img id="regLogoImg" alt="Bounty Team" src="">
@@ -965,13 +872,11 @@ label{
       <div class="reg-subtitle-full">Фама • Семья</div>
     </div>
 
-    <!-- Табы -->
     <div class="reg-tabs-full">
       <button class="reg-tab-full active" data-tab="register" id="regTabRegister">📝 Регистрация</button>
       <button class="reg-tab-full" data-tab="login" id="regTabLogin">🔑 Вход</button>
     </div>
 
-    <!-- ─── ФОРМА РЕГИСТРАЦИИ ─── -->
     <div class="reg-form-full" id="regFormRegister">
       <div class="reg-head-line">
         <h3 id="regFormTitle">📝 Заявка в Фаму</h3>
@@ -998,7 +903,6 @@ label{
       </div>
     </div>
 
-    <!-- ─── ФОРМА ВХОДА ─── -->
     <div class="reg-form-full hidden" id="regFormLogin">
       <div class="reg-head-line">
         <h3>🔑 Вход</h3>
@@ -1062,7 +966,6 @@ label{
   <p>Ваша заявка отправлена.<br>Лидер или Зам рассмотрит её в ближайшее время.</p>
 </div>
 
-<!-- ═══════════════════ TOAST ═══════════════════ -->
 <div class="toast" id="toast"></div>
 
 <script>
@@ -1088,7 +991,7 @@ try {
 }
 
 let isOnline = !!db;
-const CACHE_KEY = 'bt_cache_v8';
+const CACHE_KEY = 'bt_cache_v9';
 
 /* ═══════════════════════════════════════════════════════════════════
    2. TELEGRAM
@@ -1112,9 +1015,8 @@ const currentId = tgUser.id || 0;
 const currentPhoto = tgUser.photo_url || '';
 const OWNER_USERNAME = 'bounqy';
 
-/* Персональный ключ для "me" — на конкретный Telegram ID */
-const ME_KEY = 'bt_me_v8_' + (currentId || 'anon');
-const THEME_KEY = 'bt_theme_v8';
+const ME_KEY = 'bt_me_v9_' + (currentId || 'anon');
+const THEME_KEY = 'bt_theme_v9';
 
 const RANKS = ['1 ранг','2 ранг','3 ранг','4 ранг (Зам)','5 ранг (Лидер)'];
 const VOICE_URL = 'https://vk.me/join/QwCqYDLM9KG9TjYsaRP8uQ5oIonjcOa0xIc=';
@@ -1305,7 +1207,7 @@ function setupRealtime(){
   if (!db) return;
   try {
     if (rtChannel) { try { db.removeChannel(rtChannel); } catch(e){} }
-    rtChannel = db.channel('bt-changes-v8')
+    rtChannel = db.channel('bt-changes-v9')
       .on('postgres_changes', {event:'*', schema:'public', table:'players'},  scheduleRealtimeRefresh)
       .on('postgres_changes', {event:'*', schema:'public', table:'requests'}, scheduleRealtimeRefresh)
       .on('postgres_changes', {event:'*', schema:'public', table:'news'},     scheduleRealtimeRefresh)
@@ -1444,17 +1346,14 @@ function findBan(){
 }
 
 function findPlayer(){
-  // 1) По Telegram ID
   if (currentId){
     const p = players.find(x => x.tgId === currentId);
     if (p) return p;
   }
-  // 2) По @username
   if (currentUsername){
     const p = players.find(x => nUser(x.tgUsername) === currentUsername);
     if (p) return p;
   }
-  // 3) Fallback — если пользователь ранее залогинился по нику+паролю
   const me = getME();
   if (me && me.nick && me.loggedIn){
     const p = players.find(x => (x.nick||'').toLowerCase() === me.nick.toLowerCase());
@@ -1607,7 +1506,7 @@ function setupNav(){
 }
 
 /* ═══════════════════════════════════════════════════════════════════
-   12. ACCESS CONTROL — показывает нужный экран
+   12. ACCESS CONTROL
    ═══════════════════════════════════════════════════════════════════ */
 function hideAllScreens(){
   dom.banScreen.classList.remove('active');
@@ -1615,7 +1514,7 @@ function hideAllScreens(){
   dom.regScreen.classList.remove('active');
 }
 function checkAccess(){
-  // 1. Бан — сразу
+  // 1. Бан
   if (findBan()){
     dom.banScreen.classList.add('active');
     dom.pendingScreen.classList.remove('active');
@@ -1624,7 +1523,7 @@ function checkAccess(){
     return false;
   }
 
-  // 2. Игрок найден — пропускаем на главную
+  // 2. Игрок найден
   if (findPlayer()){
     hideAllScreens();
     document.body.classList.remove('no-scroll');
@@ -1641,14 +1540,12 @@ function checkAccess(){
     return false;
   }
 
-  // 4. Отклонённая заявка — показываем снова регистрацию
-  // 5. Иначе — регистрация
+  // 4. Иначе — регистрация
   dom.banScreen.classList.remove('active');
   dom.pendingScreen.classList.remove('active');
   dom.regScreen.classList.add('active');
   document.body.classList.add('no-scroll');
 
-  // Настраиваем вид регистрации по роли
   if (isOwner()){
     if (dom.regBadge) dom.regBadge.textContent = 'Лидер';
     if (dom.regFormTitle) dom.regFormTitle.textContent = '👑 Регистрация Лидера';
@@ -1668,7 +1565,7 @@ function checkAccess(){
 }
 
 /* ═══════════════════════════════════════════════════════════════════
-   13. REGISTRATION / LOGIN TABS
+   13. REGISTRATION TABS
    ═══════════════════════════════════════════════════════════════════ */
 function switchRegTab(tab){
   currentRegTab = tab;
@@ -1684,7 +1581,6 @@ function switchRegTab(tab){
     dom.regFormLogin.classList.add('hidden');
   }
 }
-
 function setupRegTabs(){
   if (dom.regTabRegister) dom.regTabRegister.addEventListener('click', ()=>switchRegTab('register'));
   if (dom.regTabLogin) dom.regTabLogin.addEventListener('click', ()=>switchRegTab('login'));
@@ -1719,7 +1615,7 @@ function setupRegistration(){
 
     setBtnLoading(btn, true);
 
-    /* ─── ЛИДЕР ─── сразу 5 ранг */
+    /* ЛИДЕР — сразу 5 ранг */
     if (isOwner()){
       let okDb = true;
       if (db){
@@ -1745,7 +1641,7 @@ function setupRegistration(){
       return;
     }
 
-    /* ─── ОБЫЧНЫЙ ИГРОК ─── заявка */
+    /* ОБЫЧНЫЙ ИГРОК — заявка */
     let ok = true;
     if (db){
       ok = await dbInsertRequest({
@@ -1800,10 +1696,8 @@ function setupLogin(){
 
     setBtnLoading(btn, true);
 
-    // Ищем игрока в локальном кэше
     let player = players.find(p => (p.nick||'').toLowerCase() === nick.toLowerCase());
 
-    // Если не нашли — пробуем через Supabase
     if (!player && db){
       try {
         const {data, error} = await db.from('players')
@@ -1831,7 +1725,6 @@ function setupLogin(){
       return;
     }
 
-    // Успешный вход
     setME({
       nick: player.nick,
       username: currentUsername,
@@ -1959,18 +1852,20 @@ function renderAdmin(){
   attachAdminHandlers();
 }
 
+/* ═══ ЗАЯВКИ — БЕЗ ПАРОЛЯ ═══ */
 function renderRequestsTab(){
   const pending = requests.filter(r => r.status==='pending');
   if (!pending.length) return '<div class="card"><div class="empty">Нет активных заявок</div></div>';
   let h = '<div class="card"><div class="card-title"><span>📥</span><span>Заявки</span><span class="badge">'+pending.length+'</span></div>';
   for (let i=0;i<pending.length;i++){
     const r=pending[i];
+    /* ⚠️ ПАРОЛЬ НЕ ПОКАЗЫВАЕТСЯ — только скрытая плашка */
     h += '<div class="request-item">'+
       '<div class="req-name">👤 '+esc(r.nick)+'</div>'+
       '<div class="req-meta">📱 TG: @'+esc(r.tgUsername||'unknown')+'</div>'+
       '<div class="req-meta">🕐 '+esc(r.date||'')+'</div>'+
       '<div class="req-meta">🔗 <a href="'+esc(r.proof)+'" target="_blank" rel="noopener">'+esc(r.proof)+'</a></div>'+
-      '<div class="req-meta">🔑 Пароль: <code>'+esc(r.password)+'</code></div>'+
+      '<div class="req-meta"><span class="req-pass-hidden">🔒 пароль скрыт</span></div>'+
       '<div class="btn-row">'+
         '<button class="btn btn-success btn-sm" data-approve="'+r.id+'">✅ Одобрить</button>'+
         '<button class="btn btn-danger btn-sm" data-reject="'+r.id+'">❌ Отклонить</button>'+
@@ -2080,14 +1975,16 @@ function attachAdminHandlers(){
       if (db){
         await dbUpdateRequestStatus(id, 'approved');
         await dbInsertPlayer({
-          nick: req.nick, tgUsername: req.tgUsername, tgId: req.tgId, rank: '1 ранг'
+          nick: req.nick, tgUsername: req.tgUsername, tgId: req.tgId,
+          rank: '1 ранг', password: req.password, proof: req.proof
         });
         await refreshFromDB({silent:false});
       } else {
         req.status = 'approved';
         players.push({
           nick: req.nick, tgUsername: req.tgUsername, tgId: req.tgId,
-          rank: '1 ранг', joinedAt: new Date().toISOString()
+          rank: '1 ранг', password: req.password, proof: req.proof,
+          joinedAt: new Date().toISOString()
         });
         saveCache(); rerenderAll();
       }
@@ -2331,19 +2228,16 @@ function attachAdminHandlers(){
    20. INIT
    ═══════════════════════════════════════════════════════════════════ */
 async function init(){
-  // Тема
   applyTheme(localStorage.getItem(THEME_KEY) || 'light');
   if (themeToggle) themeToggle.addEventListener('click', toggleTheme, {passive:true});
   if (regThemeToggle) regThemeToggle.addEventListener('click', toggleTheme, {passive:true});
 
-  // Кэш-рендер — мгновенный отклик
   const hadCache = loadCache();
   if (hadCache){
     renderBS(); renderPlayers(); renderNews();
     setupNav();
   }
 
-  // Настраиваем формы
   setupRegTabs();
   setupRegistration();
   setupLogin();
@@ -2353,7 +2247,6 @@ async function init(){
   if (dom.navHome) dom.navHome.addEventListener('click', showHome, {passive:true});
   if (dom.navAdmin) dom.navAdmin.addEventListener('click', showAdmin, {passive:true});
 
-  // Онлайн-загрузка
   if (db){
     setNetIndicator(true);
     const ok = await refreshFromDB({silent: !hadCache});
@@ -2368,17 +2261,14 @@ async function init(){
     setNetIndicator(false);
   }
 
-  // Финальный доступ
   checkAccess();
 
-  // Модалки: закрытие по фону
   document.querySelectorAll('.modal-overlay').forEach(o => {
     o.addEventListener('click', e => {
       if (e.target === o) o.classList.remove('active');
     });
   });
 
-  // Telegram back
   if (tg && tg.onEvent){
     try {
       tg.onEvent('backButtonClicked', () => {
@@ -2390,7 +2280,6 @@ async function init(){
     } catch (e){}
   }
 
-  // Heartbeat: пробуем переподключиться раз в 20 сек
   setInterval(async () => {
     if (!isOnline && db){
       const ok = await refreshFromDB({silent:false});
@@ -2398,7 +2287,6 @@ async function init(){
     }
   }, 20000);
 
-  // Обновление при возврате фокуса
   document.addEventListener('visibilitychange', () => {
     if (!document.hidden && isOnline){
       refreshFromDB({silent:false});
@@ -2417,4 +2305,4 @@ if (document.readyState === 'loading'){
 })();
 </script>
 </body>
-  </html>
+</html>
