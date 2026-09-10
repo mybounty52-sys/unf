@@ -20,7 +20,6 @@ body{
   padding-bottom:calc(84px + env(safe-area-inset-bottom));
   line-height:1.5;
   -webkit-font-smoothing:antialiased;
-  text-rendering:optimizeSpeed;
 }
 img{max-width:100%;display:block}
 button{font-family:inherit}
@@ -59,7 +58,7 @@ a{color:inherit}
 body{background-color:var(--bg);color:var(--text)}
 
 /* ═══════════════════════════════════════════════════════════════
-   ANIMATIONS (оптимизированные — только transform / opacity / bg-position)
+   ANIMATIONS — только для титула и войса
    ═══════════════════════════════════════════════════════════════ */
 @keyframes titleShine{
   0%{background-position:0% center}
@@ -72,10 +71,6 @@ body{background-color:var(--bg);color:var(--text)}
 @keyframes logoPulse{
   0%,100%{transform:scale(1)}
   50%{transform:scale(1.05)}
-}
-@keyframes stripShine{
-  0%{background-position:0% 0}
-  100%{background-position:300% 0}
 }
 @keyframes fadeIn{from{opacity:0}to{opacity:1}}
 @keyframes fadeSlide{
@@ -109,7 +104,6 @@ header.app-header{
   border-bottom:1px solid var(--border);
   transition:background-color .25s ease,border-color .25s ease;
   box-shadow:var(--shadow-sm);
-  contain:layout style;
 }
 .logo-wrap{
   width:46px;height:46px;border-radius:14px;
@@ -127,6 +121,7 @@ header.app-header{
   display:flex;flex-direction:column;justify-content:center;
   overflow:hidden;
 }
+/* ★ Анимированный заголовок (переливается + летает) */
 .title-main{
   font-size:22px;font-weight:900;letter-spacing:.5px;line-height:1.1;
   background:linear-gradient(90deg,#FFD700 0%,#FFF8C0 15%,#FFFFFF 30%,#FFD700 50%,#FFF8C0 65%,#B8860B 80%,#FFD700 100%);
@@ -172,7 +167,7 @@ main.app-main{
 .section.active{display:block;animation:fadeSlide .3s ease}
 
 /* ═══════════════════════════════════════════════════════════════
-   CARDS — БЕЗ тяжёлого mask-composite. Анимированная полоса сверху.
+   CARDS — без анимации рамок
    ═══════════════════════════════════════════════════════════════ */
 .card{
   position:relative;
@@ -182,28 +177,11 @@ main.app-main{
   margin-bottom:14px;
   border:1px solid var(--border);
   transition:background-color .25s ease,border-color .25s ease;
-  overflow:hidden;
-  contain:content;
-}
-.card::before{
-  content:'';
-  position:absolute;top:0;left:0;right:0;
-  height:2px;
-  background:linear-gradient(90deg,#FFD700 0%,#FFFFFF 25%,#FFD700 50%,#FFFFFF 75%,#B8860B 100%);
-  background-size:300% 100%;
-  animation:stripShine 4s linear infinite;
-  pointer-events:none;
-  will-change:background-position;
-}
-[data-theme="light"] .card::before{
-  background:linear-gradient(90deg,#B8860B 0%,#FFD700 25%,#FFFFFF 50%,#FFD700 75%,#B8860B 100%);
-  background-size:300% 100%;
 }
 .card-title{
   display:flex;align-items:center;gap:8px;
   font-size:17px;font-weight:800;
   margin-bottom:12px;color:var(--text);letter-spacing:.2px;
-  position:relative;z-index:2;
 }
 .card-title .badge{
   margin-left:auto;
@@ -221,7 +199,6 @@ main.app-main{
   padding:11px 13px;background:var(--card-2);border-radius:12px;
   margin-bottom:8px;font-size:14px;font-weight:500;
   transition:background-color .2s ease;
-  position:relative;z-index:2;
 }
 .list-item:hover{background:var(--card-hover)}
 .list-item:last-child{margin-bottom:0}
@@ -245,11 +222,10 @@ main.app-main{
 .empty{
   text-align:center;color:var(--text-dim);
   padding:24px 12px;font-size:14px;font-style:italic;
-  position:relative;z-index:2;
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   BUTTONS — без box-shadow анимаций, только hover/active
+   BUTTONS
    ═══════════════════════════════════════════════════════════════ */
 .btn{
   position:relative;width:100%;
@@ -259,9 +235,8 @@ main.app-main{
   transition:transform .15s ease,filter .2s ease;
   margin-top:10px;letter-spacing:.3px;
   display:flex;align-items:center;justify-content:center;gap:8px;
-  user-select:none;overflow:hidden;
+  user-select:none;
   box-shadow:0 4px 14px rgba(255,215,0,.35);
-  z-index:2;
 }
 .btn:hover{filter:brightness(1.08)}
 .btn:active{transform:scale(.97)}
@@ -296,7 +271,6 @@ main.app-main{
   font-size:15px;margin-bottom:12px;
   transition:border-color .2s ease,box-shadow .2s ease;
   -webkit-appearance:none;appearance:none;
-  position:relative;z-index:2;
 }
 .input:focus,textarea:focus,select:focus{
   outline:none;border-color:var(--accent);
@@ -307,7 +281,7 @@ textarea{resize:vertical;min-height:90px;line-height:1.5}
 label{
   display:block;font-size:12px;color:var(--text-dim);
   margin-bottom:6px;font-weight:700;letter-spacing:.4px;
-  text-transform:uppercase;position:relative;z-index:2;
+  text-transform:uppercase;
 }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -356,7 +330,6 @@ label{
   border:1px solid var(--border);
   animation:modalPop .28s cubic-bezier(.34,1.4,.64,1);
   box-shadow:var(--shadow-lg);
-  contain:layout style;
 }
 .modal h2{
   font-size:21px;font-weight:800;margin-bottom:16px;
@@ -367,34 +340,23 @@ label{
   text-align:center;margin-bottom:20px;line-height:1.5;
 }
 
-/* ─── REGISTRATION MODAL — с фоном и рамкой ─── */
+/* ─── REGISTRATION MODAL ─── */
 #registrationModal .modal{
   background-image:var(--reg-bg);
   background-size:cover;background-position:center;
   background-repeat:no-repeat;
   padding:0;overflow:hidden;border:none;
+  position:relative;
 }
 #registrationModal .modal::before{
   content:'';position:absolute;inset:0;
-  background:rgba(255,255,255,.85);
+  background:rgba(255,255,255,.88);
   backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);
   z-index:1;transition:background-color .3s ease;
   border-radius:inherit;
 }
 [data-theme="dark"] #registrationModal .modal::before{
-  background:rgba(0,0,0,.82);
-}
-/* Анимированная рамка ТОЛЬКО на модалке регистрации */
-#registrationModal .modal::after{
-  content:'';position:absolute;inset:0;border-radius:inherit;
-  padding:2.5px;
-  background:linear-gradient(115deg,#FFD700 0%,#FFFFFF 20%,#FFD700 40%,#FFFFFF 60%,#FFD700 80%,#B8860B 100%);
-  background-size:300% 300%;
-  -webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);
-  -webkit-mask-composite:xor;mask-composite:exclude;
-  animation:stripShine 3s linear infinite;
-  pointer-events:none;z-index:3;
-  will-change:background-position;
+  background:rgba(0,0,0,.85);
 }
 #registrationModal .modal-inner{
   position:relative;z-index:4;padding:24px;
@@ -420,6 +382,38 @@ label{
 }
 .reg-theme-btn:hover{background:var(--accent-soft)}
 .reg-theme-btn:active{transform:scale(.9)}
+
+/* ═══════════════════════════════════════════════════════════════
+   VOICE CARD — здесь оставляем анимацию текста (как у названия)
+   ═══════════════════════════════════════════════════════════════ */
+.voice-card .voice-title-anim{
+  font-size:17px;
+  font-weight:900;
+  letter-spacing:.4px;
+  background:linear-gradient(90deg,#FFD700 0%,#FFF8C0 20%,#FFFFFF 40%,#FFD700 60%,#FFF8C0 80%,#B8860B 100%);
+  background-size:250% auto;
+  -webkit-background-clip:text;background-clip:text;
+  -webkit-text-fill-color:transparent;
+  animation:titleShine 3.5s linear infinite,titleFloat 5s ease-in-out infinite;
+  transform-origin:center;
+  display:inline-block;
+  will-change:transform,background-position;
+}
+[data-theme="light"] .voice-card .voice-title-anim{
+  background:linear-gradient(90deg,#B8860B 0%,#FFD700 20%,#1a1a1a 40%,#FFD700 60%,#B8860B 80%,#FFD700 100%);
+  background-size:250% auto;
+  -webkit-background-clip:text;background-clip:text;
+  -webkit-text-fill-color:transparent;
+}
+.voice-status{
+  display:inline-flex;align-items:center;gap:6px;
+  font-size:12px;color:var(--success);font-weight:700;
+  margin-bottom:8px;
+}
+.voice-dot{
+  width:8px;height:8px;border-radius:50%;background:var(--success);
+  animation:dotPulse 1.5s ease-in-out infinite;
+}
 
 /* ═══════════════════════════════════════════════════════════════
    FULLSCREEN
@@ -478,7 +472,6 @@ label{
 .request-item{
   background:var(--card-2);border-radius:14px;padding:14px;
   margin-bottom:12px;border-left:4px solid var(--accent);
-  position:relative;z-index:2;
 }
 .request-item .req-name{
   font-weight:800;font-size:15px;margin-bottom:6px;color:var(--text);
@@ -497,15 +490,10 @@ label{
 .news-item{
   background:var(--card-2);border-radius:14px;padding:14px;
   margin-bottom:12px;border-left:4px solid var(--accent-2);
-  position:relative;z-index:2;
 }
 .news-item .news-title{
   font-weight:800;font-size:15px;margin-bottom:8px;
-  background:linear-gradient(90deg,var(--accent),var(--accent-2),var(--accent));
-  background-size:200% auto;
-  -webkit-background-clip:text;background-clip:text;
-  -webkit-text-fill-color:transparent;
-  animation:titleShine 4s linear infinite;
+  color:var(--accent);
 }
 .news-item .news-body{
   font-size:14px;color:var(--text);line-height:1.5;
@@ -529,34 +517,11 @@ label{
 .owner-block{
   position:relative;border:2px solid var(--accent);
   border-radius:16px;padding:16px;margin-bottom:14px;
-  background:var(--card);overflow:hidden;isolation:isolate;
-}
-.owner-block::before{
-  content:'';position:absolute;top:0;left:0;right:0;
-  height:3px;
-  background:linear-gradient(90deg,#FFD700 0%,#FFFFFF 25%,#FFD700 50%,#FFFFFF 75%,#B8860B 100%);
-  background-size:300% 100%;
-  animation:stripShine 3s linear infinite;
-  pointer-events:none;
-  will-change:background-position;
+  background:var(--card);
 }
 .owner-block h3{
   font-size:15px;margin-bottom:14px;color:var(--accent);font-weight:800;
-  display:flex;align-items:center;gap:6px;position:relative;z-index:2;
-}
-.owner-block > *{position:relative;z-index:2}
-
-/* ═══════════════════════════════════════════════════════════════
-   VOICE
-   ═══════════════════════════════════════════════════════════════ */
-.voice-status{
-  display:inline-flex;align-items:center;gap:6px;
-  font-size:12px;color:var(--success);font-weight:700;
-  margin-bottom:8px;position:relative;z-index:2;
-}
-.voice-dot{
-  width:8px;height:8px;border-radius:50%;background:var(--success);
-  animation:dotPulse 1.5s ease-in-out infinite;
+  display:flex;align-items:center;gap:6px;
 }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -572,7 +537,6 @@ label{
   pointer-events:none;max-width:90%;text-align:center;
   box-shadow:var(--shadow-lg);
   border:1.5px solid var(--accent);
-  will-change:transform,opacity;
 }
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 
@@ -675,10 +639,11 @@ label{
         <button class="btn btn-secondary" id="suggestNewsBtn">💡 Предложить новость</button>
       </div>
 
-      <div class="card">
-        <div class="card-title"><span>🎙️</span><span>Войс Чат</span></div>
+      <!-- ★ ВОЙС КАРТОЧКА — с анимированным текстом -->
+      <div class="card voice-card">
+        <div class="card-title"><span>🎙️</span><span class="voice-title-anim">Войс Чат</span></div>
         <div class="voice-status"><span class="voice-dot"></span><span>Онлайн</span></div>
-        <p style="font-size:14px;color:var(--text-dim);margin-bottom:8px;position:relative;z-index:2;">Заходи в наш войс — Фама ждёт!</p>
+        <p style="font-size:14px;color:var(--text-dim);margin-bottom:8px;">Заходи в наш войс — Фама ждёт!</p>
         <button class="btn" id="voiceBtn">🔊 Зайти в войс</button>
       </div>
 
@@ -791,9 +756,9 @@ label{
 
   /* ───── 2. CONSTANTS ───── */
   const KEYS = {
-    players:'bt_players_v4', requests:'bt_requests_v4', news:'bt_news_v4',
-    bs:'bt_bs_v4', bans:'bt_bans_v4', admins:'bt_admins_v4',
-    theme:'bt_theme_v4', me:'bt_me_v4'
+    players:'bt_players_v5', requests:'bt_requests_v5', news:'bt_news_v5',
+    bs:'bt_bs_v5', bans:'bt_bans_v5', admins:'bt_admins_v5',
+    theme:'bt_theme_v5', me:'bt_me_v5'
   };
 
   const RANKS = ['1 ранг','2 ранг','3 ранг','4 ранг (Зам)','5 ранг (Лидер)'];
@@ -1002,39 +967,42 @@ label{
     }
     dom.banScreen.classList.remove('active');
 
-    // Игрок — показать главную
+    // Игрок — главная
     if (findPlayer()){
       dom.pendingScreen.classList.remove('active');
       dom.regModal.classList.remove('active');
       return true;
     }
 
-    // Есть заявка
+    // Заявка
     const req = findRequest();
     if (req && req.status === 'pending'){
       dom.pendingScreen.classList.add('active');
       dom.regModal.classList.remove('active');
       return false;
     }
-    // Отклонённая — можно заново
     if (req && req.status === 'rejected'){
       dom.pendingScreen.classList.remove('active');
       dom.regModal.classList.add('active');
       return false;
     }
 
-    // Показать регистрацию (в т.ч. Лидеру)
+    // Показать регистрацию
     dom.regModal.classList.add('active');
 
-    // Если Лидер — меняем текст
+    // ★ Настраиваем вид модалки по роли
     if (isOwner()){
       if (dom.regBadge) dom.regBadge.textContent = 'Лидер';
       if (dom.regTitle) dom.regTitle.textContent = '👑 Регистрация Лидера';
-      if (dom.regSub) dom.regSub.textContent = 'Заполни свои данные — ты автоматически получишь 5 ранг';
+      if (dom.regSub)   dom.regSub.textContent   = 'Заполни свои данные — сразу получишь 5 ранг (Лидер)';
+      const btn = $('submitRegBtn');
+      if (btn) btn.textContent = '👑 Стать Лидером';
     } else {
       if (dom.regBadge) dom.regBadge.textContent = 'Заявка';
       if (dom.regTitle) dom.regTitle.textContent = '📝 Регистрация в Фаме';
-      if (dom.regSub) dom.regSub.textContent = 'Заполни заявку — Лидер рассмотрит её';
+      if (dom.regSub)   dom.regSub.textContent   = 'Заполни заявку — Лидер рассмотрит её';
+      const btn = $('submitRegBtn');
+      if (btn) btn.textContent = '📨 Отправить заявку';
     }
     return false;
   }
@@ -1056,14 +1024,15 @@ label{
       if (!proof){ toast('Вставь ссылку'); proofEl.focus(); return; }
       if (!/^https?:\/\//i.test(proof)){ toast('Ссылка должна с http'); proofEl.focus(); return; }
 
+      // Проверка дубликатов
+      if (players.some(p => (p.nick||'').toLowerCase() === nick.toLowerCase())){
+        toast('Ник уже занят'); return;
+      }
       if (requests.some(r => r.status==='pending' && (r.nick||'').toLowerCase()===nick.toLowerCase())){
         toast('Заявка с таким ником уже есть'); return;
       }
-      if (currentUsername && requests.some(r => r.status==='pending' && nUser(r.tgUsername)===currentUsername)){
-        toast('Ты уже отправил заявку'); return;
-      }
 
-      // Лидер — сразу одобряем и получает 5 ранг
+      /* ★ ВЛАДЕЛЕЦ — сразу 5 ранг (Лидер) */
       if (isOwner()){
         players.push({
           nick: nick,
@@ -1081,14 +1050,14 @@ label{
         dom.regModal.classList.remove('active');
         dom.pendingScreen.classList.remove('active');
 
-        toast('Лидер зарегистрирован ✓');
+        toast('👑 Лидер зарегистрирован!');
         renderPlayers();
         setupNav();
         checkAccess();
         return;
       }
 
-      // Обычная заявка
+      /* ОБЫЧНЫЙ ИГРОК — заявка на одобрение */
       requests.push({
         id: Date.now() + Math.floor(Math.random()*1000),
         nick, password, proof,
@@ -1318,7 +1287,7 @@ label{
       '<div class="card"><div class="card-title"><span>🛡️</span><span>Замы</span><span class="badge">'+admins.length+'</span></div>'+adminsList+'</div>'+
       '<div class="card"><div class="card-title"><span>🚫</span><span>Забаненные</span><span class="badge">'+bans.length+'</span></div>'+bansList+'</div>'+
       '<div class="card"><div class="card-title"><span>👥</span><span>Игроки</span><span class="badge">'+players.length+'</span></div>'+
-        '<p style="font-size:12px;color:var(--text-dim);margin-bottom:10px;position:relative;z-index:2;">Кликни ✏️ чтобы сменить ранг (1→2→3→4 Зам→5 Лидер)</p>'+
+        '<p style="font-size:12px;color:var(--text-dim);margin-bottom:10px;">Кликни ✏️ чтобы сменить ранг (1→2→3→4 Зам→5 Лидер)</p>'+
         playersList + '</div>'
     );
   }
@@ -1476,7 +1445,7 @@ label{
     });
   }
 
-  /* ───── 16. LIVE SYNC (оптимизировано) ───── */
+  /* ───── 16. LIVE SYNC ───── */
   let lastHash = '';
   function hashState(){
     return [
@@ -1578,4 +1547,4 @@ label{
 })();
 </script>
 </body>
-       </html>
+</html>
