@@ -58,19 +58,31 @@ a{color:inherit}
 body{background-color:var(--bg);color:var(--text)}
 
 /* ═══════════════════════════════════════════════════════════════
-   ANIMATIONS — только для титула и войса
+   ANIMATIONS
    ═══════════════════════════════════════════════════════════════ */
 @keyframes titleShine{
   0%{background-position:0% center}
-  100%{background-position:250% center}
+  100%{background-position:300% center}
 }
 @keyframes titleFloat{
-  0%,100%{transform:translateY(0) rotate(-.8deg)}
-  50%{transform:translateY(-3px) rotate(.8deg)}
+  0%,100%{transform:translateY(0) rotate(-1deg) scale(1)}
+  25%{transform:translateY(-2px) rotate(.3deg) scale(1.02)}
+  50%{transform:translateY(-3.5px) rotate(1deg) scale(1.03)}
+  75%{transform:translateY(-1.5px) rotate(.3deg) scale(1.01)}
+}
+@keyframes titleGlow{
+  0%,100%{
+    filter:drop-shadow(0 0 6px rgba(255,215,0,.4))
+           drop-shadow(0 0 14px rgba(255,215,0,.18));
+  }
+  50%{
+    filter:drop-shadow(0 0 10px rgba(255,215,0,.65))
+           drop-shadow(0 0 22px rgba(255,215,0,.35));
+  }
 }
 @keyframes logoPulse{
-  0%,100%{transform:scale(1)}
-  50%{transform:scale(1.05)}
+  0%,100%{transform:scale(1);box-shadow:0 0 0 0 rgba(255,215,0,.5)}
+  50%{transform:scale(1.05);box-shadow:0 0 0 6px rgba(255,215,0,0)}
 }
 @keyframes fadeIn{from{opacity:0}to{opacity:1}}
 @keyframes fadeSlide{
@@ -120,28 +132,69 @@ header.app-header{
   flex:1;min-width:0;
   display:flex;flex-direction:column;justify-content:center;
   overflow:hidden;
+  perspective:600px;
 }
-/* ★ Анимированный заголовок (переливается + летает) */
+
+/* ★ ГЛАВНАЯ АНИМАЦИЯ НАЗВАНИЯ
+   - блеск-перелив по буквам (жёлтый → белый → жёлтый)
+   - парение по кругу с вращением
+   - мягкое пульсирующее свечение
+*/
 .title-main{
-  font-size:22px;font-weight:900;letter-spacing:.5px;line-height:1.1;
-  background:linear-gradient(90deg,#FFD700 0%,#FFF8C0 15%,#FFFFFF 30%,#FFD700 50%,#FFF8C0 65%,#B8860B 80%,#FFD700 100%);
-  background-size:250% auto;
-  -webkit-background-clip:text;background-clip:text;
+  font-size:23px;
+  font-weight:900;
+  letter-spacing:.6px;
+  line-height:1.1;
+  background:linear-gradient(90deg,
+    #B8860B 0%,
+    #FFD700 8%,
+    #FFF4B0 16%,
+    #FFFFFF 24%,
+    #FFF4B0 32%,
+    #FFD700 42%,
+    #FFB800 50%,
+    #FFD700 58%,
+    #FFF4B0 68%,
+    #FFFFFF 76%,
+    #FFF4B0 84%,
+    #FFD700 92%,
+    #B8860B 100%);
+  background-size:300% auto;
+  -webkit-background-clip:text;
+          background-clip:text;
   -webkit-text-fill-color:transparent;
-  animation:titleShine 4s linear infinite,titleFloat 5s ease-in-out infinite;
+  animation:
+    titleShine 3s linear infinite,
+    titleFloat 4.5s ease-in-out infinite,
+    titleGlow 2.8s ease-in-out infinite;
   transform-origin:center;
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
-  will-change:transform,background-position;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  will-change:transform,background-position,filter;
 }
 [data-theme="light"] .title-main{
-  background:linear-gradient(90deg,#B8860B 0%,#FFD700 15%,#1a1a1a 30%,#FFD700 50%,#B8860B 65%,#FFD700 80%,#B8860B 100%);
-  background-size:250% auto;
-  -webkit-background-clip:text;background-clip:text;
+  background:linear-gradient(90deg,
+    #8B6508 0%,
+    #B8860B 8%,
+    #FFD700 16%,
+    #1a1a1a 26%,
+    #FFD700 36%,
+    #B8860B 46%,
+    #FFD700 54%,
+    #1a1a1a 66%,
+    #FFD700 76%,
+    #B8860B 86%,
+    #8B6508 100%);
+  background-size:300% auto;
+  -webkit-background-clip:text;
+          background-clip:text;
   -webkit-text-fill-color:transparent;
 }
 .title-sub{
   font-size:10px;color:var(--text-dim);font-weight:700;
   letter-spacing:2.5px;text-transform:uppercase;margin-top:2px;
+  animation:fadeIn 1s ease;
 }
 .header-actions{display:flex;gap:8px;align-items:center;flex-shrink:0}
 .icon-btn{
@@ -167,7 +220,7 @@ main.app-main{
 .section.active{display:block;animation:fadeSlide .3s ease}
 
 /* ═══════════════════════════════════════════════════════════════
-   CARDS — без анимации рамок
+   CARDS
    ═══════════════════════════════════════════════════════════════ */
 .card{
   position:relative;
@@ -384,24 +437,33 @@ label{
 .reg-theme-btn:active{transform:scale(.9)}
 
 /* ═══════════════════════════════════════════════════════════════
-   VOICE CARD — здесь оставляем анимацию текста (как у названия)
+   VOICE CARD — анимированный заголовок как название
    ═══════════════════════════════════════════════════════════════ */
 .voice-card .voice-title-anim{
   font-size:17px;
   font-weight:900;
-  letter-spacing:.4px;
-  background:linear-gradient(90deg,#FFD700 0%,#FFF8C0 20%,#FFFFFF 40%,#FFD700 60%,#FFF8C0 80%,#B8860B 100%);
-  background-size:250% auto;
+  letter-spacing:.5px;
+  background:linear-gradient(90deg,
+    #B8860B 0%,#FFD700 10%,#FFF4B0 22%,#FFFFFF 32%,
+    #FFF4B0 42%,#FFD700 52%,#FFB800 60%,
+    #FFD700 70%,#FFF4B0 82%,#FFFFFF 90%,#B8860B 100%);
+  background-size:300% auto;
   -webkit-background-clip:text;background-clip:text;
   -webkit-text-fill-color:transparent;
-  animation:titleShine 3.5s linear infinite,titleFloat 5s ease-in-out infinite;
+  animation:
+    titleShine 3s linear infinite,
+    titleFloat 4.5s ease-in-out infinite,
+    titleGlow 2.8s ease-in-out infinite;
   transform-origin:center;
   display:inline-block;
-  will-change:transform,background-position;
+  will-change:transform,background-position,filter;
 }
 [data-theme="light"] .voice-card .voice-title-anim{
-  background:linear-gradient(90deg,#B8860B 0%,#FFD700 20%,#1a1a1a 40%,#FFD700 60%,#B8860B 80%,#FFD700 100%);
-  background-size:250% auto;
+  background:linear-gradient(90deg,
+    #8B6508 0%,#B8860B 8%,#FFD700 18%,#1a1a1a 30%,
+    #FFD700 42%,#B8860B 52%,#FFD700 62%,
+    #1a1a1a 72%,#FFD700 82%,#B8860B 92%,#8B6508 100%);
+  background-size:300% auto;
   -webkit-background-clip:text;background-clip:text;
   -webkit-text-fill-color:transparent;
 }
@@ -545,7 +607,7 @@ label{
    ═══════════════════════════════════════════════════════════════ */
 @media (min-width:640px){
   main.app-main{padding:20px 24px}
-  .title-main{font-size:24px}
+  .title-main{font-size:25px}
   .logo-wrap{width:48px;height:48px}
   .card{padding:20px;border-radius:20px}
   .nav-bar{
@@ -561,7 +623,7 @@ label{
   body{padding-bottom:92px}
   header.app-header{padding:14px 32px}
   main.app-main{max-width:860px;padding:24px 32px}
-  .title-main{font-size:26px}
+  .title-main{font-size:27px}
   .logo-wrap{width:52px;height:52px;border-radius:16px}
   .card{padding:24px;border-radius:22px;margin-bottom:18px}
   .card-title{font-size:19px}
@@ -639,7 +701,6 @@ label{
         <button class="btn btn-secondary" id="suggestNewsBtn">💡 Предложить новость</button>
       </div>
 
-      <!-- ★ ВОЙС КАРТОЧКА — с анимированным текстом -->
       <div class="card voice-card">
         <div class="card-title"><span>🎙️</span><span class="voice-title-anim">Войс Чат</span></div>
         <div class="voice-status"><span class="voice-dot"></span><span>Онлайн</span></div>
@@ -666,7 +727,6 @@ label{
 
 </div>
 
-<!-- REGISTRATION MODAL -->
 <div class="modal-overlay" id="registrationModal">
   <div class="modal">
     <div class="modal-inner">
@@ -693,7 +753,6 @@ label{
   </div>
 </div>
 
-<!-- PROFILE MODAL -->
 <div class="modal-overlay" id="profileModal">
   <div class="modal">
     <h2>👤 Профиль</h2>
@@ -702,7 +761,6 @@ label{
   </div>
 </div>
 
-<!-- SUGGEST NEWS MODAL -->
 <div class="modal-overlay" id="suggestModal">
   <div class="modal">
     <h2>💡 Предложить новость</h2>
@@ -756,10 +814,13 @@ label{
 
   /* ───── 2. CONSTANTS ───── */
   const KEYS = {
-    players:'bt_players_v5', requests:'bt_requests_v5', news:'bt_news_v5',
-    bs:'bt_bs_v5', bans:'bt_bans_v5', admins:'bt_admins_v5',
-    theme:'bt_theme_v5', me:'bt_me_v5'
+    players:'bt_players_v6', requests:'bt_requests_v6', news:'bt_news_v6',
+    bs:'bt_bs_v6', bans:'bt_bans_v6', admins:'bt_admins_v6',
+    theme:'bt_theme_v6', me:'bt_me_v6'
   };
+
+  /* ★ КЛЮЧ "me" теперь ПЕРСОНАЛЬНЫЙ для каждого Telegram-аккаунта */
+  const ME_KEY = KEYS.me + '_' + (currentId || 'anon');
 
   const RANKS = ['1 ранг','2 ранг','3 ранг','4 ранг (Зам)','5 ранг (Лидер)'];
   const VOICE_URL = 'https://vk.me/join/QwCqYDLM9KG9TjYsaRP8uQ5oIonjcOa0xIc=';
@@ -825,34 +886,39 @@ label{
     return admins.some(a => nUser(a.username) === currentUsername);
   };
 
+  /* ★★★ ИСПРАВЛЕНИЕ №1: поиск теперь строго по telegram ID аккаунта,
+     без небезопасного fallback на общий `me`. */
   function findBan(){
+    if (currentId){
+      const b = bans.find(x => x.tgId === currentId);
+      if (b) return b;
+    }
     if (currentUsername){
       const b = bans.find(x => nUser(x.username) === currentUsername);
       if (b) return b;
     }
-    const me = Store.get(KEYS.me, null);
-    if (me && me.username){
-      const nu = nUser(me.username);
-      return bans.find(x => nUser(x.username) === nu) || null;
-    }
     return null;
   }
   function findPlayer(){
+    if (currentId){
+      const p = players.find(x => x.tgId === currentId);
+      if (p) return p;
+    }
     if (currentUsername){
       const p = players.find(x => nUser(x.tgUsername) === currentUsername);
       if (p) return p;
     }
-    const me = Store.get(KEYS.me, null);
-    if (me && me.nick) return players.find(x => x.nick === me.nick) || null;
     return null;
   }
   function findRequest(){
+    if (currentId){
+      const r = requests.find(x => x.tgId === currentId);
+      if (r) return r;
+    }
     if (currentUsername){
       const r = requests.find(x => nUser(x.tgUsername) === currentUsername);
       if (r) return r;
     }
-    const me = Store.get(KEYS.me, null);
-    if (me && me.nick) return requests.find(x => x.nick === me.nick) || null;
     return null;
   }
 
@@ -958,7 +1024,6 @@ label{
 
   /* ───── 10. ACCESS ───── */
   function checkAccess(){
-    // Бан
     if (findBan()){
       dom.banScreen.classList.add('active');
       dom.pendingScreen.classList.remove('active');
@@ -967,14 +1032,12 @@ label{
     }
     dom.banScreen.classList.remove('active');
 
-    // Игрок — главная
     if (findPlayer()){
       dom.pendingScreen.classList.remove('active');
       dom.regModal.classList.remove('active');
       return true;
     }
 
-    // Заявка
     const req = findRequest();
     if (req && req.status === 'pending'){
       dom.pendingScreen.classList.add('active');
@@ -987,10 +1050,9 @@ label{
       return false;
     }
 
-    // Показать регистрацию
     dom.regModal.classList.add('active');
 
-    // ★ Настраиваем вид модалки по роли
+    // Настраиваем вид модалки по роли
     if (isOwner()){
       if (dom.regBadge) dom.regBadge.textContent = 'Лидер';
       if (dom.regTitle) dom.regTitle.textContent = '👑 Регистрация Лидера';
@@ -1024,7 +1086,7 @@ label{
       if (!proof){ toast('Вставь ссылку'); proofEl.focus(); return; }
       if (!/^https?:\/\//i.test(proof)){ toast('Ссылка должна с http'); proofEl.focus(); return; }
 
-      // Проверка дубликатов
+      // Проверка дубликатов (по нику)
       if (players.some(p => (p.nick||'').toLowerCase() === nick.toLowerCase())){
         toast('Ник уже занят'); return;
       }
@@ -1032,7 +1094,7 @@ label{
         toast('Заявка с таким ником уже есть'); return;
       }
 
-      /* ★ ВЛАДЕЛЕЦ — сразу 5 ранг (Лидер) */
+      /* ★ Лидер — сразу 5 ранг */
       if (isOwner()){
         players.push({
           nick: nick,
@@ -1044,7 +1106,7 @@ label{
           joinedAt: Date.now()
         });
         Store.set(KEYS.players, players);
-        Store.set(KEYS.me, { nick: nick, username: currentUsername });
+        Store.set(ME_KEY, { nick: nick, username: currentUsername, tgId: currentId });
 
         nickEl.value=''; passEl.value=''; proofEl.value='';
         dom.regModal.classList.remove('active');
@@ -1057,7 +1119,7 @@ label{
         return;
       }
 
-      /* ОБЫЧНЫЙ ИГРОК — заявка на одобрение */
+      /* Обычный игрок — заявка */
       requests.push({
         id: Date.now() + Math.floor(Math.random()*1000),
         nick, password, proof,
@@ -1069,7 +1131,7 @@ label{
         status: 'pending'
       });
       Store.set(KEYS.requests, requests);
-      Store.set(KEYS.me, { nick: nick, username: currentUsername });
+      Store.set(ME_KEY, { nick: nick, username: currentUsername, tgId: currentId });
 
       nickEl.value=''; passEl.value=''; proofEl.value='';
       dom.regModal.classList.remove('active');
@@ -1371,7 +1433,13 @@ label{
       const target = nUser(raw);
       const found = players.find(p => nUser(p.tgUsername)===target || (p.nick||'').toLowerCase()===target);
       if (bans.some(b => nUser(b.username) === target)){ toast('Уже забанен'); return; }
-      bans.push({ username:target, nick: found ? found.nick : target, date: nowDate(), createdAt: Date.now() });
+      bans.push({
+        username:target,
+        nick: found ? found.nick : target,
+        tgId: found ? found.tgId : null,
+        date: nowDate(),
+        createdAt: Date.now()
+      });
       Store.set(KEYS.bans, bans);
       if (found){
         players = players.filter(p => p !== found);
@@ -1387,7 +1455,7 @@ label{
       const target = nUser((inp.value||'').trim());
       if (!target){ toast('Введи ник или @username'); inp.focus(); return; }
       const before = bans.length;
-      bans = bans.filter(b => nUser(b.username) !== target);
+      bans = bans.filter(b => nUser(b.username) !== target && (b.nick||'').toLowerCase() !== target);
       if (bans.length === before){ toast('Не найден'); return; }
       Store.set(KEYS.bans, bans);
       toast('Разбанен ✓');
@@ -1500,11 +1568,12 @@ label{
     if (themeToggle) themeToggle.addEventListener('click', toggleTheme, { passive:true });
     if (regThemeToggle) regThemeToggle.addEventListener('click', toggleTheme, { passive:true });
 
-    if (currentUsername){
-      const me = Store.get(KEYS.me, {}) || {};
-      me.username = currentUsername;
-      if (!me.nick) me.nick = currentFirstName;
-      Store.set(KEYS.me, me);
+    /* ★ Персональный "me" — только для текущего пользователя */
+    if (currentId || currentUsername){
+      const me = Store.get(ME_KEY, {}) || {};
+      if (currentUsername) me.username = currentUsername;
+      if (currentId) me.tgId = currentId;
+      Store.set(ME_KEY, me);
     }
 
     setupNav();
