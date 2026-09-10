@@ -1,25 +1,37 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="ru" data-theme="light">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SPA Web Application</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Bounty Team — Семейная Платформа</title>
+    <!-- Telegram WebApp SDK -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
+        /* ═══════════════════════════════════════════════════════════
+           ПЕРЕМЕННЫЕ И ТЕМЫ
+        ═══════════════════════════════════════════════════════════ */
         :root {
-            --bg-main: #0f172a;
-            --bg-card: #1e293b;
-            --bg-element: #334155;
-            --primary: #6366f1;
-            --primary-hover: #4f46e5;
-            --danger: #ef4444;
-            --danger-hover: #dc2626;
-            --success: #22c55e;
-            --success-hover: #16a34a;
-            --warning: #f59e0b;
-            --warning-hover: #d97706;
-            --text-main: #f8fafc;
-            --text-muted: #94a3b8;
-            --border: #475569;
+            --bg-color: #FFFFFF;
+            --card-bg: #F5F5F7;
+            --border-color: #E5E5EA;
+            --text-color: #1A1A1A;
+            --text-muted: #8E8E93;
+            --accent-color: #FFD700;
+            --accent-hover: #E6C200;
+            --accent-secondary: #B8860B;
+            --danger-color: #FF3B30;
+            --success-color: #34C759;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            --radius: 16px;
+        }
+
+        [data-theme="dark"] {
+            --bg-color: #000000;
+            --card-bg: #1A1A1A;
+            --border-color: #2A2A2A;
+            --text-color: #FFFFFF;
+            --text-muted: #A0A0A0;
+            --shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
         }
 
         * {
@@ -27,638 +39,972 @@
             margin: 0;
             padding: 0;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            -webkit-tap-highlight-color: transparent;
         }
 
         body {
-            background-color: var(--bg-main);
-            color: var(--text-main);
-            padding-bottom: 75px;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            transition: background-color 0.3s ease, color 0.3s ease;
+            padding-bottom: 80px;
             min-height: 100vh;
         }
 
-        .container {
-            max-width: 600px;
-            margin: 0 auto;
-            padding: 16px;
+        /* ═══════════════════════════════════════════════════════════
+           ШАПКА (HEADER)
+        ═══════════════════════════════════════════════════════════ */
+        header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 20px;
+            background: var(--card-bg);
+            border-bottom: 1px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(10px);
         }
 
-        /* Навигационная панель */
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-icon {
+            font-size: 26px;
+        }
+
+        .header-title {
+            font-size: 22px;
+            font-weight: 800;
+            background: linear-gradient(90deg, #FFFFFF, #FFD700, #FFFFFF);
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: colorShift 3s linear infinite;
+        }
+
+        [data-theme="light"] .header-title {
+            animation: colorShiftLight 3s linear infinite;
+        }
+
+        @keyframes colorShift {
+            0% { background-position: 0% center; }
+            100% { background-position: 200% center; }
+        }
+
+        @keyframes colorShiftLight {
+            0% { color: #1a1a1a; }
+            50% { color: #B8860B; }
+            100% { color: #1a1a1a; }
+        }
+
+        .header-controls {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .icon-btn {
+            background: rgba(0,0,0,0.05);
+            border: 1px solid var(--border-color);
+            border-radius: 50%;
+            width: 38px;
+            height: 38px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            cursor: pointer;
+            color: var(--text-color);
+            transition: transform 0.2s;
+        }
+
+        [data-theme="dark"] .icon-btn {
+            background: rgba(255,255,255,0.05);
+        }
+
+        .icon-btn:active {
+            transform: scale(0.92);
+        }
+
+        /* ═══════════════════════════════════════════════════════════
+           ОСНОВНОЙ КОНТЕНТ И КАРТОЧКИ
+        ═══════════════════════════════════════════════════════════ */
+        main {
+            padding: 16px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .section {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            padding: 18px;
+            box-shadow: var(--shadow);
+            transition: transform 0.2s;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* ЭЛЕМЕНТЫ ИНТЕРФЕЙСА */
+        .btn {
+            background: var(--accent-color);
+            color: #000;
+            border: none;
+            border-radius: 12px;
+            padding: 12px 18px;
+            font-weight: 700;
+            font-size: 14px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: opacity 0.2s, transform 0.1s;
+            width: 100%;
+        }
+
+        .btn:active {
+            transform: scale(0.98);
+            opacity: 0.9;
+        }
+
+        .btn-secondary {
+            background: rgba(0,0,0,0.05);
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+        }
+        [data-theme="dark"] .btn-secondary {
+            background: rgba(255,255,255,0.08);
+        }
+
+        .btn-danger {
+            background: var(--danger-color);
+            color: #fff;
+        }
+
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 12px;
+            width: auto;
+            border-radius: 8px;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            margin-bottom: 12px;
+        }
+
+        .input-group label {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-muted);
+        }
+
+        input, textarea, select {
+            background: var(--bg-color);
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            padding: 12px;
+            border-radius: 10px;
+            font-size: 14px;
+            outline: none;
+            width: 100%;
+        }
+
+        input:focus, textarea:focus, select:focus {
+            border-color: var(--accent-color);
+        }
+
+        /* СТИЛИ СПИСКОВ И ЭЛЕМЕНТОВ */
+        .user-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .user-item:last-child {
+            border-bottom: none;
+        }
+
+        .user-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .user-name {
+            font-weight: 700;
+            font-size: 15px;
+        }
+
+        .user-meta {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .badge {
+            background: var(--accent-color);
+            color: #000;
+            font-size: 10px;
+            font-weight: 800;
+            padding: 2px 8px;
+            border-radius: 20px;
+            text-transform: uppercase;
+        }
+
+        .news-item {
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 12px;
+            margin-bottom: 12px;
+        }
+        .news-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .news-date {
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-bottom: 4px;
+        }
+
+        /* ═══════════════════════════════════════════════════════════
+           НИЖНЯЯ НАВИГАЦИЯ
+        ═══════════════════════════════════════════════════════════ */
         .nav-bar {
             position: fixed;
             bottom: 0;
             left: 0;
             right: 0;
             height: 65px;
-            background: rgba(30, 41, 59, 0.95);
-            backdrop-filter: blur(10px);
+            background: var(--card-bg);
+            border-top: 1px solid var(--border-color);
             display: flex;
             justify-content: space-around;
             align-items: center;
-            border-top: 1px solid var(--border);
-            z-index: 1000;
+            z-index: 100;
+            max-width: 600px;
+            margin: 0 auto;
         }
 
-        .nav-item {
+        .nav-bar button {
             background: none;
             border: none;
             color: var(--text-muted);
+            font-size: 13px;
+            font-weight: 600;
             display: flex;
             flex-direction: column;
             align-items: center;
             gap: 4px;
-            font-size: 11px;
-            font-weight: 500;
             cursor: pointer;
-            width: 100%;
+            width: 50%;
             height: 100%;
             justify-content: center;
-            transition: color 0.2s ease;
         }
 
-        .nav-item.active {
-            color: var(--primary);
+        .nav-bar button.active {
+            color: var(--accent-secondary);
+        }
+        [data-theme="dark"] .nav-bar button.active {
+            color: var(--accent-color);
         }
 
-        .nav-item .icon {
-            font-size: 20px;
-        }
-
-        /* Секции SPA */
-        .section {
-            display: none;
-            animation: fadeIn 0.25s ease-in-out;
-        }
-
-        .section.active {
-            display: block;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(6px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        h2 {
-            font-size: 20px;
-            margin-bottom: 16px;
+        /* ═══════════════════════════════════════════════════════════
+           ЭКРАНЫ СОСТОЯНИЙ (РЕГИСТРАЦИЯ, ОЖИДАНИЕ, БАН)
+        ═══════════════════════════════════════════════════════════ */
+        .full-screen-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: var(--bg-color);
+            z-index: 1000;
             display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        /* Карточки и блоки */
-        .card {
-            background: var(--bg-card);
-            border-radius: 12px;
-            padding: 16px;
-            margin-bottom: 16px;
-            border: 1px solid var(--border);
-        }
-
-        /* Формы и Инпуты */
-        .form-group {
-            margin-bottom: 12px;
-        }
-
-        .form-group label {
-            display: block;
-            font-size: 13px;
-            color: var(--text-muted);
-            margin-bottom: 6px;
-        }
-
-        input[type="text"], textarea {
-            width: 100%;
-            padding: 10px 14px;
-            background: var(--bg-element);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            color: var(--text-main);
-            font-size: 14px;
-            outline: none;
-            transition: border-color 0.2s;
-        }
-
-        input[type="text"]:focus, textarea:focus {
-            border-color: var(--primary);
-        }
-
-        textarea {
-            resize: vertical;
-            min-height: 80px;
-        }
-
-        /* Сетка Кнопок */
-        .btn-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
-            gap: 8px;
-            margin-top: 12px;
-        }
-
-        .btn {
-            padding: 10px 14px;
-            border: none;
-            border-radius: 8px;
-            font-size: 13px;
-            font-weight: 600;
-            cursor: pointer;
-            display: inline-flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
-            gap: 6px;
-            color: #fff;
-            transition: opacity 0.2s, transform 0.1s;
+            padding: 24px;
+            text-align: center;
         }
 
-        .btn:active {
-            transform: scale(0.97);
+        .overlay-icon {
+            font-size: 64px;
+            margin-bottom: 16px;
         }
 
-        .btn:hover {
-            opacity: 0.9;
-        }
-
-        .btn-primary { background: var(--primary); }
-        .btn-danger { background: var(--danger); }
-        .btn-success { background: var(--success); }
-        .btn-warning { background: var(--warning); color: #000; }
-        .btn-secondary { background: var(--bg-element); color: var(--text-main); }
-
-        /* Лента постов */
-        .post-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 16px;
-            margin-bottom: 12px;
-            position: relative;
-        }
-
-        .post-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+        .overlay-title {
+            font-size: 22px;
+            font-weight: 800;
             margin-bottom: 8px;
         }
 
-        .post-author {
-            font-weight: 600;
-            color: var(--primary);
+        .overlay-desc {
             font-size: 14px;
-        }
-
-        .post-date {
-            font-size: 11px;
             color: var(--text-muted);
-        }
-
-        .post-content {
-            font-size: 14px;
+            margin-bottom: 24px;
             line-height: 1.5;
-            color: #e2e8f0;
-            white-space: pre-wrap;
         }
 
-        .post-actions {
-            margin-top: 10px;
-            display: flex;
-            justify-content: flex-end;
-            gap: 8px;
-        }
-
-        /* Модальные окна */
-        .modal-overlay {
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0, 0, 0, 0.75);
-            display: none;
-            justify-content: center;
-            align-items: center;
-            z-index: 2000;
-            padding: 16px;
-        }
-
-        .modal-overlay.active {
-            display: flex;
-        }
-
-        .modal-content {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            max-width: 500px;
-            width: 100%;
-            max-height: 85vh;
-            overflow-y: auto;
-            padding: 20px;
-        }
-
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 14px;
-        }
-
-        .close-btn {
-            background: none;
-            border: none;
-            color: var(--text-muted);
-            font-size: 20px;
-            cursor: pointer;
-        }
-
-        /* Список пользователей в "Все функции" */
-        .user-item-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px 0;
-            border-bottom: 1px solid var(--border);
-            font-size: 13px;
-        }
-
-        .badge {
-            padding: 2px 6px;
-            border-radius: 4px;
-            font-size: 10px;
-            font-weight: bold;
-        }
-
-        .badge-owner { background: #f59e0b; color: #000; }
-        .badge-admin { background: #6366f1; color: #fff; }
-        .badge-banned { background: #ef4444; color: #fff; }
-
-        /* Полноэкранный блок бана */
-        #banScreen {
-            display: none;
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: #090d16;
-            z-index: 99999;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
+        .modal-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
             padding: 24px;
-        }
-
-        #banScreen.active {
-            display: flex;
-        }
-
-        #banScreen h1 {
-            font-size: 32px;
-            color: var(--danger);
-            margin-bottom: 12px;
-        }
-
-        #banScreen p {
-            color: var(--text-muted);
+            width: 100%;
             max-width: 400px;
-            line-height: 1.5;
+            text-align: left;
         }
     </style>
 </head>
 <body>
 
-    <!-- Экран Блокировки (Забанен) -->
-    <div id="banScreen">
-        <h1>🔨 Вы заблокированы</h1>
-        <p>Ваш аккаунт был заблокирован владельцем системы. Доступ к приложению полностью ограничен.</p>
-    </div>
+    <!-- ═══════════════════════════════════════════════════════════
+         ШАПКА
+    ═══════════════════════════════════════════════════════════ -->
+    <header>
+        <div class="header-left">
+            <span class="logo-icon">👑</span>
+            <div class="header-title">Bounty Team</div>
+        </div>
+        <div class="header-controls">
+            <button class="icon-btn" id="themeToggleBtn" onclick="toggleTheme()">🌙</button>
+            <button class="icon-btn" id="profileBtn" onclick="showProfileInfo()">👤</button>
+        </div>
+    </header>
 
-    <div class="container">
-
-        <!-- 1. СЕКЦИЯ ЛЕНТЫ ПУБЛИКАЦИЙ -->
-        <section class="section active" id="section-feed">
-            <h2>📜 Лента публикаций</h2>
+    <!-- ═══════════════════════════════════════════════════════════
+         ОСНОВНОЙ КОНТЕНТ
+    ═══════════════════════════════════════════════════════════ -->
+    <main>
+        <!-- СЕКЦИЯ: ГЛАВНАЯ -->
+        <section class="section" id="section-home">
             
+            <!-- 6.1 БС Состав -->
             <div class="card">
-                <div class="form-group">
-                    <textarea id="newPostContent" placeholder="Что у вас нового?..."></textarea>
+                <div class="card-header">
+                    <div class="card-title">🎯 БС Состав</div>
                 </div>
-                <button class="btn btn-primary" onclick="createPost()" style="width: 100%;">Опубликовать</button>
+                <div id="bsList">
+                    <!-- Заполняется из JS -->
+                </div>
             </div>
 
-            <div id="postsList"></div>
+            <!-- 6.2 Игроки (Фама) -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">👥 Игроки Семьи</div>
+                </div>
+                <div id="playersList">
+                    <!-- Заполняется из JS -->
+                </div>
+            </div>
+
+            <!-- 6.3 Новости -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">📰 Новости Семьи</div>
+                </div>
+                <div id="newsList">
+                    <!-- Заполняется из JS -->
+                </div>
+                <div style="margin-top: 15px;">
+                    <button class="btn btn-secondary" onclick="suggestNews()">💡 Предложить новость</button>
+                </div>
+            </div>
+
+            <!-- 6.4 Войс Чат -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">🎙️ Войс Чат</div>
+                </div>
+                <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 12px;">
+                    Подключайтесь к голосовому общению Семьи ВКонтакте.
+                </p>
+                <button class="btn" onclick="openVoiceChat()">🔊 Войти в голосовой чат</button>
+            </div>
+
         </section>
 
-        <!-- 2. СЕКЦИЯ АДМИН-ПАНЕЛИ -->
-        <section class="section" id="section-admin">
+        <!-- СЕКЦИЯ: АДМИН-ПАНЕЛЬ -->
+        <section class="section" id="section-admin" style="display:none;">
             <h2>🛡️ Админ-панель</h2>
-            <div id="adminPanelContent"></div>
+            
+            <!-- Заявки игроков -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">📥 Заявки игроков</div>
+                </div>
+                <div id="adminRequestsList">
+                    <!-- Заполняется динамически -->
+                </div>
+            </div>
+
+            <!-- Управление новостями -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">📰 Опубликовать новость</div>
+                </div>
+                <div class="input-group">
+                    <label>Текст новости</label>
+                    <textarea id="newsInput" rows="3" placeholder="Введите текст новости..."></textarea>
+                </div>
+                <button class="btn" onclick="addNews()">Опубликовать</button>
+            </div>
+
+            <!-- Управление БС Составом (Только Владелец) -->
+            <div class="card" id="bsManagementCard" style="display:none;">
+                <div class="card-header">
+                    <div class="card-title">🎯 Управление БС Составом</div>
+                </div>
+                <div class="input-group">
+                    <label>Игровой Ник (Nick_Name)</label>
+                    <input type="text" id="bsNickInput" placeholder="Например: Gg_Monolit">
+                </div>
+                <div style="display: flex; gap: 8px;">
+                    <button class="btn" onclick="addBsMember()">Добавить в БС</button>
+                </div>
+            </div>
+
+            <!-- Управление пользователями (Только Владелец) -->
+            <div class="card" id="ownerUserManagementCard" style="display:none;">
+                <div class="card-header">
+                    <div class="card-title">👑 Управление пользователями</div>
+                </div>
+                <div class="input-group">
+                    <label>Ник в игре (Nick_Name) или Telegram (@username)</label>
+                    <input type="text" id="targetUserInput" placeholder="Gg_Monolit или @bounty">
+                </div>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px;">
+                    <button class="btn btn-danger" id="adminBanBtn" onclick="handleUserAction('ban')">🔨 Забанить</button>
+                    <button class="btn btn-secondary" id="adminUnbanBtn" onclick="handleUserAction('unban')">🔓 Разбанить</button>
+                    <button class="btn" id="adminMakeAdminBtn" onclick="handleUserAction('makeAdmin')">👑 Назначить админа</button>
+                    <button class="btn btn-secondary" id="adminRemoveAdminBtn" onclick="handleUserAction('removeAdmin')">⬇️ Снять админа</button>
+                </div>
+
+                <div class="input-group" style="margin-top: 12px;">
+                    <label>Изменить ранг игроку</label>
+                    <select id="rankSelect">
+                        <option value="Новичок">Новичок</option>
+                        <option value="Боец">Боец</option>
+                        <option value="Ветеран">Ветеран</option>
+                        <option value="Офицер">Офицер</option>
+                    </select>
+                </div>
+                <button class="btn btn-secondary" onclick="changeUserRank()">Изменить ранг</button>
+            </div>
+
         </section>
+    </main>
 
-    </div>
-
-    <!-- Нижняя навигация -->
+    <!-- ═══════════════════════════════════════════════════════════
+         НИЖНЯЯ НАВИГАЦИЯ
+    ═══════════════════════════════════════════════════════════ -->
     <nav class="nav-bar">
-        <button class="nav-item active" onclick="switchSection('section-feed')">
-            <span class="icon">📜</span>
-            <span>Лента</span>
+        <button id="navHome" class="active" onclick="switchSection('home')">
+            <span>🏠</span>
+            <span>Главная</span>
         </button>
-        <button class="nav-item" id="navAdminBtn" style="display: none;" onclick="switchSection('section-admin')">
-            <span class="icon">🛡️</span>
+        <button id="navAdmin" style="display:none;" onclick="switchSection('admin')">
+            <span>🛡️</span>
             <span>Админ</span>
         </button>
     </nav>
 
-    <!-- Модальное окно "Все функции" -->
-    <div class="modal-overlay" id="allFunctionsModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3>⚙️ Системный менеджер функций</h3>
-                <button class="close-btn" onclick="closeModal('allFunctionsModal')">&times;</button>
+    <!-- ═══════════════════════════════════════════════════════════
+         МОДАЛЬНОЕ ОКНО РЕГИСТРАЦИИ
+    ═══════════════════════════════════════════════════════════ -->
+    <div id="registrationModal" class="full-screen-overlay" style="display:none;">
+        <div class="modal-card">
+            <div style="text-align: center; margin-bottom: 16px;">
+                <span style="font-size: 40px;">📜</span>
+                <h2 style="font-size: 20px; font-weight: 800; margin-top: 8px;">Регистрация в Семье</h2>
+                <p style="font-size: 12px; color: var(--text-muted);">Заполните форму для вступления в Bounty Team</p>
             </div>
-            <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 12px;">Полная база зарегистрированных пользователей приложения:</p>
-            <div id="usersListContent"></div>
+
+            <div class="input-group">
+                <label>Ник в игре (например: Gg_Monolit)</label>
+                <input type="text" id="regGameNick" placeholder="Nick_Name">
+            </div>
+
+            <div class="input-group">
+                <label>Пароль</label>
+                <input type="password" id="regPassword" placeholder="Придумайте пароль">
+            </div>
+
+            <div class="input-group">
+                <label>Ссылка на док-во (Видео/Фото с таймом)</label>
+                <input type="url" id="regProofUrl" placeholder="https://imgur.com/...">
+            </div>
+
+            <button class="btn" onclick="submitRegistration()">Отправить заявку</button>
         </div>
     </div>
 
+    <!-- ═══════════════════════════════════════════════════════════
+         ЭКРАН ОЖИДАНИЯ ОДОБРЕНИЯ
+    ═══════════════════════════════════════════════════════════ -->
+    <div id="pendingScreen" class="full-screen-overlay" style="display:none;">
+        <div class="overlay-icon">⏳</div>
+        <div class="overlay-title">Заявка на рассмотрении</div>
+        <div class="overlay-desc">
+            Ожидайте одобрения вашей заявки от владельца или администратора Семьи.
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════
+         ЭКРАН БАНА
+    ═══════════════════════════════════════════════════════════ -->
+    <div id="banScreen" class="full-screen-overlay" style="display:none;">
+        <div class="overlay-icon">🚫</div>
+        <div class="overlay-title">Доступ ограничен</div>
+        <div class="overlay-desc">
+            Ваш аккаунт был заблокирован администрацией Bounty Team.
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════
+         СКРИПТ ЛОГИКИ ПРИЛОЖЕНИЯ
+    ═══════════════════════════════════════════════════════════ -->
     <script>
-        // Инициализация базы данных в LocalStorage
-        const defaultUsers = [
-            { id: "101", username: "bounqy", nickname: "Главный Владелец", isAdmin: true, isOwner: true, isBanned: false },
-            { id: "102", username: "GG_Monolit", nickname: "Monolit_Player", isAdmin: false, isOwner: false, isBanned: false },
-            { id: "103", username: "alex_pro", nickname: "Alex_Game", isAdmin: true, isOwner: false, isBanned: false },
-            { id: "104", username: "cheater99", nickname: "Banned_User", isAdmin: false, isOwner: false, isBanned: true }
-        ];
-
-        const defaultPosts = [
-            { id: 1, author: "bounqy", content: "Добро пожаловать в обновленное единое приложение!", date: "10.09.2026, 10:00" },
-            { id: 2, author: "GG_Monolit", content: "Всем привет! Отличный скрипт получается.", date: "10.09.2026, 10:15" }
-        ];
-
-        let usersDB = JSON.parse(localStorage.getItem('app_users_db')) || defaultUsers;
-        let postsDB = JSON.parse(localStorage.getItem('app_posts_db')) || defaultPosts;
-
-        // Авторизованный пользователь (меняй username для теста)
-        const currentUser = { username: 'bounqy' };
-
-        function saveData() {
-            localStorage.setItem('app_users_db', JSON.stringify(usersDB));
-            localStorage.setItem('app_posts_db', JSON.stringify(postsDB));
+        // Инициализация Telegram WebApp
+        const tg = window.Telegram?.WebApp;
+        if (tg) {
+            tg.ready();
+            tg.expand();
         }
 
-        function getCurrentUserData() {
-            return usersDB.find(u => u.username === currentUser.username) || {
-                id: "0",
-                username: currentUser.username,
-                nickname: currentUser.username,
-                isAdmin: false,
-                isOwner: currentUser.username === 'bounqy',
-                isBanned: false
-            };
-        }
+        // Данные текущего пользователя
+        const tgUser = tg?.initDataUnsafe?.user || {};
+        // Для тестирования без Telegram используется значение по умолчанию или bounqy
+        const currentTelegramUsername = tgUser.username ? tgUser.username.replace('@', '') : 'bounqy';
 
-        // Проверка на статус блокировки
-        function checkBanStatus() {
-            const userData = getCurrentUserData();
-            const banScreen = document.getElementById('banScreen');
-            if (userData.isBanned) {
-                banScreen.classList.add('active');
-            } else {
-                banScreen.classList.remove('active');
+        const isOwner = currentTelegramUsername.toLowerCase() === 'bounqy';
+
+        // Инициализация LocalStorage по умолчанию
+        function initStorage() {
+            if (!localStorage.getItem('bt_users')) {
+                // Предустановленные игроки
+                const initialUsers = [
+                    { gameNick: 'Gg_Monolit', tgUsername: 'bounqy', role: 'owner', rank: 'Офицер', status: 'approved' }
+                ];
+                localStorage.setItem('bt_users', JSON.stringify(initialUsers));
+            }
+
+            if (!localStorage.getItem('bt_requests')) {
+                localStorage.setItem('bt_requests', JSON.stringify([]));
+            }
+
+            if (!localStorage.getItem('bt_bs')) {
+                localStorage.setItem('bt_bs', JSON.stringify(['Gg_Monolit']));
+            }
+
+            if (!localStorage.getItem('bt_news')) {
+                const initialNews = [
+                    { id: 1, text: 'Добро пожаловать на официальную платформу Семьи Bounty Team!', date: new Date().toLocaleDateString() }
+                ];
+                localStorage.setItem('bt_news', JSON.stringify(initialNews));
+            }
+
+            if (!localStorage.getItem('bt_admins')) {
+                localStorage.setItem('bt_admins', JSON.stringify(['bounqy']));
+            }
+
+            if (!localStorage.getItem('bt_bans')) {
+                localStorage.setItem('bt_bans', JSON.stringify([]));
             }
         }
 
-        // Навигация между страницами SPA
-        function switchSection(sectionId) {
-            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-            document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+        initStorage();
 
-            document.getElementById(sectionId).classList.add('active');
-
-            if (sectionId === 'section-feed') {
-                document.querySelectorAll('.nav-item')[0].classList.add('active');
-            } else if (sectionId === 'section-admin') {
-                document.getElementById('navAdminBtn').classList.add('active');
-            }
+        // Получение данных из Хранилища
+        function getData(key) {
+            return JSON.parse(localStorage.getItem(key) || '[]');
+        }
+        function setData(key, data) {
+            localStorage.setItem(key, JSON.stringify(data));
         }
 
-        // ОТРИСОВКА ЛЕНТЫ ПУБЛИКАЦИЙ
-        function renderPosts() {
-            const container = document.getElementById('postsList');
-            const userData = getCurrentUserData();
-            const isOwner = userData.username === 'bounqy';
-            const isAdmin = userData.isAdmin || isOwner;
+        // Проверка ролей и банов
+        function checkAccess() {
+            const bans = getData('bt_bans');
+            const users = getData('bt_users');
+            const requests = getData('bt_requests');
+            const admins = getData('bt_admins');
 
-            container.innerHTML = postsDB.map(post => `
-                <div class="post-card">
-                    <div class="post-header">
-                        <span class="post-author">@${post.author}</span>
-                        <span class="post-date">${post.date}</span>
+            const currentUser = users.find(u => u.tgUsername.toLowerCase() === currentTelegramUsername.toLowerCase());
+            
+            // Проверка на бан (по tgUsername или по gameNick)
+            const isBanned = bans.some(b => 
+                b.toLowerCase() === `@${currentTelegramUsername.toLowerCase()}` || 
+                b.toLowerCase() === currentTelegramUsername.toLowerCase() ||
+                (currentUser && b.toLowerCase() === currentUser.gameNick.toLowerCase())
+            );
+
+            if (isBanned) {
+                document.getElementById('banScreen').style.display = 'flex';
+                return false;
+            }
+
+            if (currentUser) {
+                // Пользователь зарегистрирован и одобрен
+                document.getElementById('registrationModal').style.display = 'none';
+                document.getElementById('pendingScreen').style.display = 'none';
+
+                // Проверка прав администратора
+                const isAdmin = admins.some(a => a.toLowerCase() === currentTelegramUsername.toLowerCase()) || isOwner;
+                
+                if (isAdmin) {
+                    document.getElementById('navAdmin').style.display = 'flex';
+                }
+
+                if (isOwner) {
+                    document.getElementById('bsManagementCard').style.display = 'block';
+                    document.getElementById('ownerUserManagementCard').style.display = 'block';
+                }
+
+                return true;
+            }
+
+            // Проверка на находящуюся на рассмотрении заявку
+            const hasPendingRequest = requests.some(r => r.tgUsername.toLowerCase() === currentTelegramUsername.toLowerCase());
+            if (hasPendingRequest) {
+                document.getElementById('pendingScreen').style.display = 'flex';
+                return false;
+            }
+
+            // Новый пользователь -> показать регистрацию
+            document.getElementById('registrationModal').style.display = 'flex';
+            return false;
+        }
+
+        // РЕНДЕРИНГ ДАННЫХ
+        function renderAll() {
+            renderBS();
+            renderPlayers();
+            renderNews();
+            renderAdminRequests();
+        }
+
+        // 6.1 Рендер БС Состава
+        function renderBS() {
+            const bs = getData('bt_bs');
+            const container = document.getElementById('bsList');
+            if (bs.length === 0) {
+                container.innerHTML = '<div style="color:var(--text-muted); font-size:13px;">Список пуст</div>';
+                return;
+            }
+            container.innerHTML = bs.map(nick => `
+                <div class="user-item">
+                    <div class="user-info">
+                        <span class="user-name">🎯 ${nick}</span>
                     </div>
-                    <div class="post-content">${escapeHTML(post.content)}</div>
-                    ${(isAdmin) ? `
-                        <div class="post-actions">
-                            <button class="btn btn-danger" onclick="deletePost(${post.id})" style="padding: 4px 8px; font-size: 11px;">🗑️ Удалить пост</button>
-                        </div>
-                    ` : ''}
+                    ${isOwner ? `<button class="btn btn-danger btn-sm" onclick="removeBsMember('${nick}')">Удалить</button>` : ''}
                 </div>
             `).join('');
         }
 
-        function createPost() {
-            const input = document.getElementById('newPostContent');
-            const text = input.value.trim();
-            if (!text) return alert('Введите текст публикации!');
+        // 6.2 Рендер Игроков Семьи
+        function renderPlayers() {
+            const users = getData('bt_users');
+            const container = document.getElementById('playersList');
+            container.innerHTML = users.map(u => `
+                <div class="user-item">
+                    <div class="user-info">
+                        <span class="user-name">${u.gameNick} <span class="badge">${u.rank || 'Новичок'}</span></span>
+                        <span class="user-meta">@${u.tgUsername}</span>
+                    </div>
+                </div>
+            `).join('');
+        }
 
-            const newPost = {
+        // 6.3 Рендер Новостей
+        function renderNews() {
+            const news = getData('bt_news');
+            const admins = getData('bt_admins');
+            const isAdmin = admins.some(a => a.toLowerCase() === currentTelegramUsername.toLowerCase()) || isOwner;
+            const container = document.getElementById('newsList');
+
+            if (news.length === 0) {
+                container.innerHTML = '<div style="color:var(--text-muted); font-size:13px;">Новостей пока нет</div>';
+                return;
+            }
+
+            container.innerHTML = news.map(n => `
+                <div class="news-item">
+                    <div class="news-date">${n.date}</div>
+                    <div style="font-size:14px; line-height:1.4;">${n.text}</div>
+                    ${isAdmin ? `<button class="btn btn-danger btn-sm" style="margin-top:8px;" onclick="deleteNews(${n.id})">Удалить</button>` : ''}
+                </div>
+            `).join('');
+        }
+
+        // Рендер заявок в Админ-панели
+        function renderAdminRequests() {
+            const requests = getData('bt_requests');
+            const container = document.getElementById('adminRequestsList');
+            
+            if (requests.length === 0) {
+                container.innerHTML = '<div style="color:var(--text-muted); font-size:13px;">Заявок нет</div>';
+                return;
+            }
+
+            container.innerHTML = requests.map((r, index) => `
+                <div class="user-item" style="flex-direction:column; align-items:flex-start; gap:8px;">
+                    <div class="user-info">
+                        <span class="user-name">${r.gameNick} (@${r.tgUsername})</span>
+                        <a href="${r.proofUrl}" target="_blank" style="color:var(--accent-secondary); font-size:12px; text-decoration:none;">🔗 Смотреть доказательства</a>
+                    </div>
+                    <div style="display:flex; gap:8px; width:100%;">
+                        <button class="btn btn-sm" onclick="approveRequest(${index})">Одобрить</button>
+                        <button class="btn btn-danger btn-sm" onclick="rejectRequest(${index})">Отклонить</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // ДЕЙСТВИЯ ПОЛЬЗОВАТЕЛЕЙ И АДМИНИСТРАЦИИ
+
+        // Отправка заявки на регистрацию
+        function submitRegistration() {
+            const gameNick = document.getElementById('regGameNick').value.trim();
+            const password = document.getElementById('regPassword').value.trim();
+            const proofUrl = document.getElementById('regProofUrl').value.trim();
+
+            if (!gameNick || !password || !proofUrl) {
+                alert('Пожалуйста, заполните все поля!');
+                return;
+            }
+
+            const requests = getData('bt_requests');
+            requests.push({
+                gameNick,
+                password,
+                proofUrl,
+                tgUsername: currentTelegramUsername
+            });
+            setData('bt_requests', requests);
+
+            document.getElementById('registrationModal').style.display = 'none';
+            document.getElementById('pendingScreen').style.display = 'flex';
+        }
+
+        // Одобрение заявки
+        function approveRequest(index) {
+            const requests = getData('bt_requests');
+            const users = getData('bt_users');
+            
+            const req = requests.splice(index, 1)[0];
+            users.push({
+                gameNick: req.gameNick,
+                tgUsername: req.tgUsername,
+                role: 'member',
+                rank: 'Новичок',
+                status: 'approved'
+            });
+
+            setData('bt_requests', requests);
+            setData('bt_users', users);
+            renderAll();
+        }
+
+        // Отклонение заявки
+        function rejectRequest(index) {
+            const requests = getData('bt_requests');
+            requests.splice(index, 1);
+            setData('bt_requests', requests);
+            renderAdminRequests();
+        }
+
+        // Управление БС
+        function addBsMember() {
+            const nick = document.getElementById('bsNickInput').value.trim();
+            if (!nick) return;
+
+            const bs = getData('bt_bs');
+            if (!bs.includes(nick)) {
+                bs.push(nick);
+                setData('bt_bs', bs);
+                document.getElementById('bsNickInput').value = '';
+                renderBS();
+            }
+        }
+
+        function removeBsMember(nick) {
+            let bs = getData('bt_bs');
+            bs = bs.filter(item => item !== nick);
+            setData('bt_bs', bs);
+            renderBS();
+        }
+
+        // Управление Новостями
+        function addNews() {
+            const text = document.getElementById('newsInput').value.trim();
+            if (!text) return;
+
+            const news = getData('bt_news');
+            news.unshift({
                 id: Date.now(),
-                author: currentUser.username,
-                content: text,
-                date: new Date().toLocaleString('ru-RU')
-            };
-
-            postsDB.unshift(newPost);
-            saveData();
-            input.value = '';
-            renderPosts();
+                text: text,
+                date: new Date().toLocaleDateString()
+            });
+            setData('bt_news', news);
+            document.getElementById('newsInput').value = '';
+            renderNews();
         }
 
-        function deletePost(postId) {
-            if (confirm('Удалить эту публикацию из ленты?')) {
-                postsDB = postsDB.filter(p => p.id !== postId);
-                saveData();
-                renderPosts();
+        function deleteNews(id) {
+            let news = getData('bt_news');
+            news = news.filter(n => n.id !== id);
+            setData('bt_news', news);
+            renderNews();
+        }
+
+        // Предложить новость в ТГ
+        function suggestNews() {
+            const text = prompt("Введите предложение для новости:");
+            if (text) {
+                const url = `https://t.me/bounqy31?text=${encodeURIComponent('Предложение новости: ' + text)}`;
+                if (tg && tg.openTelegramLink) {
+                    tg.openTelegramLink(url);
+                } else {
+                    window.open(url, '_blank');
+                }
             }
         }
 
-        // ИНИЦИАЛИЗАЦИЯ АДМИН-ПАНЕЛИ
-        function initAdminPanel() {
-            const userData = getCurrentUserData();
-            const isOwner = userData.username === 'bounqy';
-            const isAdmin = userData.isAdmin || isOwner;
-
-            const navAdminBtn = document.getElementById('navAdminBtn');
-            const adminContent = document.getElementById('adminPanelContent');
-
-            // Показываем кнопку админа в nav-bar только авторизованным модераторам/владельцам
-            if (isAdmin) {
-                navAdminBtn.style.display = 'flex';
+        // Открыть войс чат
+        function openVoiceChat() {
+            const url = "https://vk.me/join/QwCqYDLM9KG9TjYsaRP8uQ5oIonjcOa0xIc=";
+            if (tg && tg.openLink) {
+                tg.openLink(url);
             } else {
-                navAdminBtn.style.display = 'none';
-                return;
-            }
-
-            let html = '';
-
-            // 👑 БЛОК УПРАВЛЕНИЯ ПОЛЬЗОВАТЕЛЯМИ ДЛЯ ВЛАДЕЛЬЦА
-            if (isOwner) {
-                html += `
-                    <div class="card">
-                        <h3 style="color: var(--warning); font-size: 16px; margin-bottom: 12px;">👑 Управление пользователями (владелец)</h3>
-                        <div class="form-group">
-                            <label>Введите username, Nick_Name или ID пользователя:</label>
-                            <input type="text" id="adminTargetInput" placeholder="Например: GG_Monolit, bounqy или ID 102...">
-                        </div>
-                        <div class="btn-grid">
-                            <button class="btn btn-secondary" id="adminAllFunctionsBtn">⚙️ Все функции</button>
-                            <button class="btn btn-danger" id="adminBanBtn">🔨 Забанить</button>
-                            <button class="btn btn-success" id="adminUnbanBtn">🔓 Разбанить</button>
-                            <button class="btn btn-warning" id="adminMakeAdminBtn">👑 Сделать админом</button>
-                            <button class="btn btn-secondary" id="adminRemoveAdminBtn">⬇️ Снять админа</button>
-                        </div>
-                    </div>
-                `;
-            }
-
-            // Стандартный блок модерации
-            html += `
-                <div class="card">
-                    <h3 style="font-size: 15px; margin-bottom: 8px;">🛡️ Стандартные функции системы</h3>
-                    <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 12px;">Вам доступны права модератора приложения.</p>
-                    <button class="btn btn-danger" onclick="clearFeedByAdmin()">🗑️ Очистить всю ленту публикаций</button>
-                </div>
-            `;
-
-            adminContent.innerHTML = html;
-
-            // Привязываем события для кнопок владельца
-            if (isOwner) {
-                document.getElementById('adminAllFunctionsBtn').addEventListener('click', openAllFunctionsModal);
-                document.getElementById('adminBanBtn').addEventListener('click', () => processOwnerAction('ban'));
-                document.getElementById('adminUnbanBtn').addEventListener('click', () => processOwnerAction('unban'));
-                document.getElementById('adminMakeAdminBtn').addEventListener('click', () => processOwnerAction('makeAdmin'));
-                document.getElementById('adminRemoveAdminBtn').addEventListener('click', () => processOwnerAction('removeAdmin'));
+                window.open(url, '_blank');
             }
         }
 
-        // ПОИСК ПОЛЬЗОВАТЕЛЯ ПО Username, Nick_Name ИЛИ ID
-        function findUser(query) {
-            if (!query) return null;
-            const target = query.trim().toLowerCase();
-            return usersDB.find(u => 
-                u.id.toLowerCase() === target ||
-                u.username.toLowerCase() === target ||
-                u.nickname.toLowerCase() === target
+        // Управление пользователями (Владелец)
+        function handleUserAction(action) {
+            const input = document.getElementById('targetUserInput').value.trim();
+            if (!input) {
+                alert('Введите ник или @username');
+                return;
+            }
+
+            let bans = getData('bt_bans');
+            let admins = getData('bt_admins');
+
+            if (action === 'ban') {
+                if (!bans.includes(input)) bans.push(input);
+                setData('bt_bans', bans);
+                alert(`Пользователь ${input} забанен.`);
+            } else if (action === 'unban') {
+                bans = bans.filter(b => b.toLowerCase() !== input.toLowerCase());
+                setData('bt_bans', bans);
+                alert(`Пользователь ${input} разбанен.`);
+            } else if (action === 'makeAdmin') {
+                const cleanUser = input.replace('@', '');
+                if (!admins.includes(cleanUser)) admins.push(cleanUser);
+                setData('bt_admins', admins);
+                alert(`Пользователь ${input} назначен админом.`);
+            } else if (action === 'removeAdmin') {
+                const cleanUser = input.replace('@', '');
+                admins = admins.filter(a => a.toLowerCase() !== cleanUser.toLowerCase());
+                setData('bt_admins', admins);
+                alert(`Пользователь ${input} снят с поста админа.`);
+            }
+
+            document.getElementById('targetUserInput').value = '';
+            checkAccess();
+            renderAll();
+        }
+
+        // Изменение ранга
+        function changeUserRank() {
+            const input = document.getElementById('targetUserInput').value.trim();
+            const rank = document.getElementById('rankSelect').value;
+            if (!input) {
+                alert('Введите ник игрока!');
+                return;
+            }
+
+            const users = getData('bt_users');
+            const user = users.find(u => 
+                u.gameNick.toLowerCase() === input.toLowerCase() || 
+                u.tgUsername.toLowerCase() === input.replace('@', '').toLowerCase()
             );
-        }
 
-        // ОБРАБОТКА ДЕЙСТВИЙ КНОПОК ВЛАДЕЛЬЦА
-        function processOwnerAction(action) {
-            const inputField = document.getElementById('adminTargetInput');
-            const val = inputField.value;
-
-            if (!val) {
-                alert('Пожалуйста, укажите username, Nick_Name или ID!');
-                return;
-            }
-
-            let targetUser = findUser(val);
-
-            // Если пользователя нет в базе — создаем его запись для корректного применения функции
-            if (!targetUser) {
-                targetUser = {
-                    id: String(Date.now()),
-                    username: val,
-                    nickname: val,
-                    isAdmin: false,
-                    isOwner: false,
-                    isBanned: false
-                };
-                usersDB.push(targetUser);
-            }
-
-            // Защита системы: Запрет любых санкций против Владельца 'bounqy'
-            if (targetUser.username === 'bounqy' && action !== 'unban') {
-                alert('Ошибка: Запрещено применять данные действия к Владельцу!');
-                return;
-            }
-
-            switch (action) {
-                case 'ban':
-                    targetUser.isBanned = true;
-                    alert(`Пользователь ${targetUser.nickname} (@${targetUser.username}) забанен! 🔨`);
-                    break;
-                case 'unban':
-                    targetUser.isBanned = false;
-                    alert(`Пользователь ${targetUser.nickname} (@${targetUser.username}) разбанен! 🔓`);
-                    break;
-                case 'makeAdmin':
-                    targetUser.isAdmin = true;
-                    alert(`Пользователю ${targetUser.nickname} (@${targetUser.username}) выдан доступ Администратора! 👑`);
-                    break;
-                case 'removeAdmin':
-                    targetUser.isAdmin = false;
-                    alert(`У пользователя ${targetUser.nickname} (@${targetUser.username}) отозваны права Администратора! ⬇️`);
-                    break;
-            }
-
-            saveData();
-            inputField.value = '';
-            checkBanStatus();
-            renderPosts();
-            initAdminPanel();
-        }
-
-        // КНОПКА "⚙️ ВСЕ ФУНКЦИИ"
-        function openAllFunctionsModal() {
-            const container = document.getElementById('usersListContent');
-            container.innerHTML = usersDB.map(u => `
-                <div class="user-item-row">
-                    <div>
-                        <strong>${escapeHTML(u.nickname)}</strong> 
-                        <span style="color: var(--text-muted); font-size: 11px;">(@${u.username} | ID: ${u.id})</span>
-                    </div>
-                    <div>
-                        ${u.isOwner ? '<span class="badge badge-owner">Владелец</span>' : ''}
-                        ${u.isAdmin && !u.isOwner ? '<span class="badge badge-admin">Админ</span>' : ''}
-                        ${u.isBanned ? '<span class="badge badge-banned">Забанен</span>' : ''}
-                    </div>
-                </div>
-            `).join('');
-
-            document.getElementById('allFunctionsModal').classList.add('active');
-        }
-
-        function closeModal(modalId) {
-            document.getElementById(modalId).classList.remove('active');
-        }
-
-        function clearFeedByAdmin() {
-            if (confirm('Вы действительно хотите полностью очистить ленту публикаций?')) {
-                postsDB = [];
-                saveData();
-                renderPosts();
+            if (user) {
+                user.rank = rank;
+                setData('bt_users', users);
+                renderPlayers();
+                alert(`Ранг игрока ${user.gameNick} изменен на ${rank}`);
+            } else {
+                alert('Игрок не найден');
             }
         }
 
-        function escapeHTML(str) {
-            return str.replace(/[&<>'"]/g, 
-                tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)
-            );
+        // ПЕРЕКЛЮЧЕНИЕ ВКЛАДОК
+        function switchSection(section) {
+            document.getElementById('section-home').style.display = section === 'home' ? 'flex' : 'none';
+            document.getElementById('section-admin').style.display = section === 'admin' ? 'flex' : 'none';
+
+            document.getElementById('navHome').classList.toggle('active', section === 'home');
+            document.getElementById('navAdmin').classList.toggle('active', section === 'admin');
         }
 
-        // Запуск при загрузке документа
-        document.addEventListener('DOMContentLoaded', () => {
-            checkBanStatus();
-            renderPosts();
-            initAdminPanel();
-        });
+        // ПЕРЕКЛЮЧЕНИЕ ТЕМЫ
+        function toggleTheme() {
+            const html = document.documentElement;
+            const currentTheme = html.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            
+            html.setAttribute('data-theme', newTheme);
+            localStorage.setItem('bt_theme', newTheme);
+            document.getElementById('themeToggleBtn').innerText = newTheme === 'dark' ? '☀️' : '🌙';
+        }
+
+        // Показать инфо о профиле
+        function showProfileInfo() {
+            alert(`Вы вошли как: @${currentTelegramUsername}\nРоль: ${isOwner ? 'Владелец' : 'Участник Семьи'}`);
+        }
+
+        // Старт приложения
+        (function initApp() {
+            const savedTheme = localStorage.getItem('bt_theme') || 'light';
+            document.documentElement.setAttribute('data-theme', savedTheme);
+            document.getElementById('themeToggleBtn').innerText = savedTheme === 'dark' ? '☀️' : '🌙';
+
+            if (checkAccess()) {
+                renderAll();
+            }
+        })();
     </script>
 </body>
 </html>
