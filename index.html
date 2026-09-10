@@ -344,7 +344,7 @@
       <h2>Панель управления</h2>
       
       <div class="tabs" id="adminTabs" style="margin-top: 12px;">
-        <!-- Динамически заполняется в зависимости от прав -->
+        <!-- Динамически заполняется -->
       </div>
 
       <div id="adminTabContent"></div>
@@ -440,10 +440,7 @@
     ------------------------------------------------------------------------- */
     const defaultData = {
       users: [
-        { id: "owner_tg", nick: "Владелец", role: "owner", status: "approved", permissions: {} },
-        { id: "admin_tg", nick: "ГлавАдмин", role: "admin", status: "approved", permissions: {
-          requests: true, shooters: true, bs: true, tasks: true, rules: true, news: true
-        }}
+        { id: "owner_tg", nick: "bounqy (Владелец)", role: "owner", status: "approved", permissions: {} }
       ],
       shooters: { 1: ["Shadow"], 2: ["Hunter"], 3: ["Sniper"] },
       bs: ["Shadow", "Hunter"],
@@ -452,7 +449,7 @@
       ],
       rules: "1. Уважать соклановцев.\n2. Слушать указания командира.\n3. Явка на БС обязательна.",
       news: [
-        { id: 1, title: "Открытие нового сезона!", text: "Мы начинаем набор новых бойцов.", date: "10.09.2026", author: "Владелец" }
+        { id: 1, title: "Открытие нового сезона!", text: "Мы начинаем набор новых бойцов.", date: "10.09.2026", author: "bounqy" }
       ]
     };
 
@@ -476,17 +473,40 @@
     }
 
     /* -------------------------------------------------------------------------
-       АВТОРИЗАЦИЯ И ИНИЦИАЛИЗАЦИЯ
+       АВТОРИЗАЦИЯ С АВТО-ВЫДАЧЕЙ ОВНЕРА ДЛЯ BOUNQY
     ------------------------------------------------------------------------- */
     function initApp() {
       const tgUser = tg && tg.initDataUnsafe ? tg.initDataUnsafe.user : null;
       const currentTgId = tgUser ? String(tgUser.id) : "test_user_id";
+      const currentUsername = tgUser && tgUser.username ? tgUser.username.toLowerCase() : "";
+      const currentFirstName = tgUser && tgUser.first_name ? tgUser.first_name.toLowerCase() : "";
 
-      // Поиск или авторизация
+      // Ищем пользователя по ID
       currentUser = db.users.find(u => u.id === currentTgId);
 
+      // ПРОВЕРКА НА ВЛАДЕЛЬЦА (bounqy)
+      const isBounqy = currentUsername === 'bounqy' || currentFirstName.includes('bounqy') || currentTgId === 'test_user_id';
+
+      if (isBounqy) {
+        if (!currentUser) {
+          currentUser = {
+            id: currentTgId,
+            nick: "bounqy (Владелец)",
+            role: "owner",
+            status: "approved",
+            permissions: {}
+          };
+          db.users.push(currentUser);
+        } else {
+          currentUser.role = "owner";
+          currentUser.status = "approved";
+          if (!currentUser.nick) currentUser.nick = "bounqy (Владелец)";
+        }
+        saveDB(db);
+      }
+
+      // Если стандартный новый игрок
       if (!currentUser) {
-        // Первичный вход - отправка на регистрацию
         currentUser = { id: currentTgId, nick: "", role: "player", status: "registration" };
         navigateTo('page-auth');
       } else if (currentUser.status === 'pending') {
@@ -532,7 +552,7 @@
     }
 
     function setupDashboard() {
-      document.getElementById('userNickDisplay').innerText = currentUser.nick;
+      document.getElementById('userNickDisplay').innerText = currentUser.nick || "Игрок";
       const badge = document.getElementById('userRoleBadge');
       badge.innerText = currentUser.role === 'owner' ? 'Владелец' : (currentUser.role === 'admin' ? 'Админ' : 'Игрок');
 
@@ -550,7 +570,6 @@
       document.querySelectorAll('.page').forEach(el => el.classList.remove('active'));
       document.getElementById(pageId).classList.add('active');
 
-      // Логика инициализации при открытии конкретной страницы
       if (pageId === 'page-admin') renderAdminPanel();
       if (pageId === 'page-shooters') renderShooters();
       if (pageId === 'page-bs') renderBS();
@@ -581,10 +600,10 @@
     }
 
     /* -------------------------------------------------------------------------
-       3.1 - 3.7 ФУНКЦИОНАЛ СТРАНИЦ
+       ФУНКЦИОНАЛ РАЗДЕЛОВ
     ------------------------------------------------------------------------- */
 
-    // 2. АДМИНИСТРАЦИЯ
+    // 2. АДМИНИСТРАЦИЯ И ПРИЕМ ЗАЯВОК
     function hasPerm(permKey) {
       if (currentUser.role === 'owner') return true;
       if (currentUser.role === 'admin' && currentUser.permissions && currentUser.permissions[permKey]) return true;
@@ -604,7 +623,7 @@
         const btn = document.createElement('button');
         btn.className = `tab-btn ${i === 0 ? 'active' : ''}`;
         btn.innerText = t.label;
-        btn.onclick = (e) => {
+        btn.onclick = () => {
           document.querySelectorAll('#adminTabs .tab-btn').forEach(b => b.classList.remove('active'));
           btn.classList.add('active');
           renderAdminTabContent(t.id);
@@ -622,15 +641,15 @@
       if (tabId === 'requests') {
         const pending = db.users.filter(u => u.status === 'pending');
         if (pending.length === 0) {
-          container.innerHTML = '<p style="color:var(--subtext-color);">Заявок пока нет.</p>';
+          container.innerHTML = '<p style="color:var(--subtext-color); margin-top:10px;">Новых заявок пока нет.</p>';
           return;
         }
         pending.forEach(u => {
           container.innerHTML += `
             <div class="card">
-              <h4>${u.nick}</h4>
-              <p style="font-size:13px; color:var(--subtext-color); margin: 4px 0;">Доказательство: <a href="${u.proof}" target="_blank" style="color:var(--accent-color);">Ссылка</a></p>
-              <button class="btn" onclick="approveUser('${u.id}')">Одобрить</button>
+              <h4>Ник: ${u.nick}</h4>
+              <p style="font-size:13px; color:var(--subtext-color); margin: 6px 0;">Доказательство: <a href="${u.proof}" target="_blank" style="color:var(--accent-color);">Открыть скрин/видео</a></p>
+              <button class="btn" onclick="approveUser('${u.id}')">Принять в клан</button>
               <button class="btn btn-danger" onclick="rejectUser('${u.id}')" style="margin-top:4px;">Отклонить</button>
             </div>
           `;
@@ -649,12 +668,12 @@
             </div>
           `;
         }
-        html += '<h4>Все зарегистрированные пользователи:</h4>';
+        html += '<h4 style="margin-bottom:8px;">Все пользователи:</h4>';
         db.users.forEach(u => {
           html += `
             <div class="card" style="display:flex; justify-content:space-between; align-items:center;">
               <div>
-                <strong>${u.nick}</strong> [${u.role}]
+                <strong>${u.nick || 'Без ника'}</strong> [${u.role}]
                 <div style="font-size:12px; color:var(--subtext-color);">Статус: ${u.status}</div>
               </div>
             </div>
@@ -664,13 +683,13 @@
       }
 
       if (tabId === 'roles' && currentUser.role === 'owner') {
-        let html = '<h4>Управление правами админов</h4>';
+        let html = '<h4 style="margin-bottom:8px;">Права администраторов</h4>';
         db.users.forEach(u => {
           const isOwner = u.role === 'owner';
           html += `
             <div class="card">
               <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 8px;">
-                <strong>${u.nick}</strong>
+                <strong>${u.nick || u.id}</strong>
                 <select onchange="changeUserRole('${u.id}', this.value)" ${isOwner ? 'disabled' : ''}>
                   <option value="player" ${u.role==='player'?'selected':''}>Игрок</option>
                   <option value="admin" ${u.role==='admin'?'selected':''}>Админ</option>
@@ -679,11 +698,11 @@
               </div>
               ${u.role === 'admin' ? `
                 <div style="font-size:13px; margin-top:8px;">
-                  <strong>Разрешения:</strong>
-                  <div class="checkbox-group"><input type="checkbox" ${u.permissions?.requests?'checked':''} onchange="togglePerm('${u.id}', 'requests')"> Заявки</div>
+                  <strong>Разрешенные разделы:</strong>
+                  <div class="checkbox-group"><input type="checkbox" ${u.permissions?.requests?'checked':''} onchange="togglePerm('${u.id}', 'requests')"> Приём заявок</div>
                   <div class="checkbox-group"><input type="checkbox" ${u.permissions?.shooters?'checked':''} onchange="togglePerm('${u.id}', 'shooters')"> Стрелки</div>
                   <div class="checkbox-group"><input type="checkbox" ${u.permissions?.bs?'checked':''} onchange="togglePerm('${u.id}', 'bs')"> БС Состав</div>
-                  <div class="checkbox-group"><input type="checkbox" ${u.permissions?.tasks?'checked':''} onchange="togglePerm('${u.id}', 'tasks')"> Задачи & Цели</div>
+                  <div class="checkbox-group"><input type="checkbox" ${u.permissions?.tasks?'checked':''} onchange="togglePerm('${u.id}', 'tasks')"> Задачи</div>
                   <div class="checkbox-group"><input type="checkbox" ${u.permissions?.rules?'checked':''} onchange="togglePerm('${u.id}', 'rules')"> Устав</div>
                   <div class="checkbox-group"><input type="checkbox" ${u.permissions?.news?'checked':''} onchange="togglePerm('${u.id}', 'news')"> Новости</div>
                 </div>
@@ -697,7 +716,12 @@
 
     function approveUser(userId) {
       const u = db.users.find(x => x.id === userId);
-      if (u) { u.status = 'approved'; saveDB(db); renderAdminPanel(); }
+      if (u) { 
+        u.status = 'approved'; 
+        saveDB(db); 
+        renderAdminPanel(); 
+        alert(`Игрок ${u.nick} успешно принят!`);
+      }
     }
 
     function rejectUser(userId) {
@@ -951,4 +975,3 @@
   </script>
 </body>
 </html>
-
