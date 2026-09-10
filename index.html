@@ -2,390 +2,1558 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Arizona Online — Маркетплейс</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Bounty Team — Black Russia</title>
+    <!-- Telegram WebApp SDK -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
     <style>
+        /* ===== 1. CSS ПЕРЕМЕННЫЕ И ТЕМЫ ===== */
         :root {
-            --bg-color: #0f172a;
-            --card-bg: #1e293b;
-            --accent-color: #3b82f6;
-            --accent-hover: #2563eb;
-            --text-color: #f8fafc;
-            --text-muted: #94a3b8;
-            --danger-color: #ef4444;
-            --success-color: #22c55e;
-            --warning-color: #f59e0b;
+            --bg-main: #f4f5f7;
+            --bg-card: #ffffff;
+            --bg-nav: #ffffff;
+            --text-main: #111827;
+            --text-muted: #6b7280;
+            --accent: #ffcc00;
+            --accent-hover: #e6b800;
+            --border-color: #e5e7eb;
+            --shadow: 0 4px 12px rgba(0,0,0,0.05);
+            --danger: #ef4444;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --shimmer-grad: linear-gradient(90deg, #ffcc00, #111827, #ffcc00, #ffcc00);
+            --safe-top: env(safe-area-inset-top, 0px);
+            --safe-bottom: env(safe-area-inset-bottom, 0px);
+        }
+
+        [data-theme="dark"] {
+            --bg-main: #0d0f12;
+            --bg-card: #161920;
+            --bg-nav: #161920;
+            --text-main: #f9fafb;
+            --text-muted: #9ca3af;
+            --accent: #cc9900;
+            --accent-hover: #b38600;
+            --border-color: #272a34;
+            --shadow: 0 4px 16px rgba(0,0,0,0.4);
+            --shimmer-grad: linear-gradient(90deg, #ffcc00, #ffffff, #cc9900, #ffcc00);
         }
 
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
         }
 
         body {
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            padding-bottom: 70px;
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            padding-top: calc(60px + var(--safe-top));
+            padding-bottom: calc(75px + var(--safe-bottom));
+            min-height: 100vh;
+            overflow-x: hidden;
+            transition: background-color 0.25s ease, color 0.25s ease;
         }
 
+        /* ===== 2. ШАПКА ПРИЛОЖЕНИЯ ===== */
         header {
-            background-color: var(--card-bg);
-            padding: 15px;
-            text-align: center;
-            border-bottom: 1px solid #334155;
-            position: sticky;
+            position: fixed;
             top: 0;
-            z-index: 100;
+            left: 0;
+            right: 0;
+            height: calc(60px + var(--safe-top));
+            padding-top: var(--safe-top);
+            background: var(--bg-card);
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-left: 16px;
+            padding-right: 16px;
+            z-index: 1000;
         }
 
+        .header-title {
+            font-size: 1.25rem;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+            background: var(--shimmer-grad);
+            background-size: 300%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: shimmer 3s linear infinite;
+        }
+
+        @keyframes shimmer {
+            0% { background-position: 0%; }
+            100% { background-position: 300%; }
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .theme-toggle, .avatar-btn {
+            background: var(--bg-main);
+            border: 1px solid var(--border-color);
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 1.1rem;
+            color: var(--text-main);
+        }
+
+        /* ===== 3. КОНТЕЙНЕР И СЕКЦИИ ===== */
         .container {
-            max-width: 600px;
+            max-width: 900px;
             margin: 0 auto;
-            padding: 15px;
+            padding: 16px;
         }
 
         .section {
             display: none;
-            background: var(--card-bg);
-            border-radius: 12px;
-            padding: 20px;
-            margin-bottom: 20px;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+            opacity: 0;
+            transform: translateY(8px);
+            transition: opacity 0.25s ease, transform 0.25s ease;
         }
 
         .section.active {
             display: block;
+            opacity: 1;
+            transform: translateY(0);
         }
 
-        h2 {
-            margin-bottom: 15px;
-            font-size: 1.3rem;
-            color: #fff;
-            border-bottom: 2px solid var(--accent-color);
-            padding-bottom: 5px;
+        .page-title {
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
-        /* Кнопки */
+        /* ===== 4. КАРТОЧКИ И ПЛИТКИ ===== */
+        .grid-dashboard {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+
+        @media (min-width: 600px) {
+            .grid-dashboard { grid-template-columns: repeat(3, 1fr); }
+        }
+
+        .tile-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            gap: 8px;
+            cursor: pointer;
+            box-shadow: var(--shadow);
+            transition: transform 0.15s ease, border-color 0.15s ease;
+            min-height: 110px;
+        }
+
+        .tile-card:active {
+            transform: scale(0.97);
+        }
+
+        .tile-icon {
+            font-size: 2rem;
+        }
+
+        .tile-title {
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 12px;
+            box-shadow: var(--shadow);
+        }
+
+        /* ===== 5. ЭЛЕМЕНТЫ ФОРМ И КНОПКИ ===== */
         .btn {
             display: inline-flex;
             align-items: center;
             justify-content: center;
             gap: 8px;
             width: 100%;
+            min-height: 48px;
             padding: 12px 16px;
-            margin-bottom: 10px;
+            border-radius: 12px;
             border: none;
-            border-radius: 8px;
-            background-color: var(--accent-color);
-            color: white;
+            background: var(--accent);
+            color: #000000;
             font-size: 0.95rem;
             font-weight: 600;
             cursor: pointer;
             transition: background 0.2s ease, transform 0.1s ease;
         }
 
-        .btn:hover {
-            background-color: var(--accent-hover);
-        }
-
         .btn:active {
             transform: scale(0.98);
         }
 
-        .btn-danger { background-color: var(--danger-color); }
-        .btn-danger:hover { background-color: #dc2626; }
-
-        .btn-success { background-color: var(--success-color); }
-        .btn-success:hover { background-color: #16a34a; }
-
-        .btn-warning { background-color: var(--warning-color); }
-        .btn-warning:hover { background-color: #d97706; }
+        .btn-danger { background: var(--danger); color: #fff; }
+        .btn-success { background: var(--success); color: #fff; }
+        .btn-secondary { background: var(--bg-main); color: var(--text-main); border: 1px solid var(--border-color); }
 
         .btn-group {
             display: flex;
-            gap: 10px;
+            gap: 8px;
+            margin-top: 8px;
         }
 
-        .btn-group .btn {
-            flex: 1;
+        .form-group {
+            margin-bottom: 14px;
         }
 
-        /* Формы и поля */
-        .input-group {
-            margin-bottom: 15px;
-        }
-
-        label {
+        .form-group label {
             display: block;
-            margin-bottom: 5px;
             font-size: 0.85rem;
             color: var(--text-muted);
+            margin-bottom: 6px;
+            font-weight: 500;
         }
 
-        input[type="text"], input[type="number"] {
+        .input-field {
             width: 100%;
-            padding: 10px 12px;
-            border-radius: 6px;
-            border: 1px solid #334155;
-            background-color: #0f172a;
-            color: #fff;
+            min-height: 46px;
+            padding: 10px 14px;
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+            background: var(--bg-main);
+            color: var(--text-main);
+            font-size: 0.95rem;
             outline: none;
         }
 
-        input:focus {
-            border-color: var(--accent-color);
+        .input-field:focus {
+            border-color: var(--accent);
         }
 
-        /* Карточка задачи */
-        .task-card {
-            background: #0f172a;
-            border-radius: 8px;
-            padding: 15px;
-            margin-bottom: 15px;
-            border: 1px solid #334155;
-        }
-
+        /* ===== 6. ПРОГРЕСС БАР И СПИСКИ ===== */
         .progress-bar-bg {
-            background: #334155;
-            height: 12px;
-            border-radius: 6px;
+            background: var(--bg-main);
+            height: 10px;
+            border-radius: 5px;
             overflow: hidden;
             margin: 10px 0;
+            border: 1px solid var(--border-color);
         }
 
         .progress-bar-fill {
-            background: var(--accent-color);
+            background: var(--accent);
             height: 100%;
             width: 0%;
             transition: width 0.3s ease;
         }
 
-        /* Навигационная панель */
+        .tabs-header {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 8px;
+            overflow-x: auto;
+        }
+
+        .tab-btn {
+            padding: 8px 16px;
+            border-radius: 8px;
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            font-weight: 600;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+
+        .tab-btn.active {
+            background: var(--accent);
+            color: #000;
+        }
+
+        /* ===== 7. НИЖНЯЯ НАВИГАЦИЯ ===== */
         .nav-bar {
             position: fixed;
             bottom: 0;
             left: 0;
             right: 0;
-            background-color: var(--card-bg);
+            height: calc(65px + var(--safe-bottom));
+            padding-bottom: var(--safe-bottom);
+            background: var(--bg-nav);
+            border-top: 1px solid var(--border-color);
             display: flex;
             justify-content: space-around;
-            padding: 10px 0;
-            border-top: 1px solid #334155;
+            align-items: center;
             z-index: 1000;
         }
 
         .nav-item {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
             background: none;
             border: none;
             color: var(--text-muted);
             font-size: 0.75rem;
+            font-weight: 500;
             cursor: pointer;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 4px;
-            flex: 1;
+            height: 100%;
         }
 
         .nav-item.active {
-            color: var(--accent-color);
+            color: var(--accent);
         }
 
-        .nav-item icon {
-            font-size: 1.2rem;
+        .nav-icon {
+            font-size: 1.3rem;
         }
+
+        /* ===== 8. МОДАЛЬНЫЕ ОКНА И TOAST ===== */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(4px);
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            z-index: 2000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.25s ease;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .modal-container {
+            background: var(--bg-card);
+            width: 100%;
+            max-width: 500px;
+            border-radius: 20px 20px 0 0;
+            padding: 20px;
+            max-height: 85vh;
+            overflow-y: auto;
+            transform: translateY(100%);
+            transition: transform 0.25s cubic-bezier(0.1, 0.9, 0.2, 1);
+        }
+
+        .modal-overlay.active .modal-container {
+            transform: translateY(0);
+        }
+
+        #toast-container {
+            position: fixed;
+            top: calc(70px + var(--safe-top));
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 3000;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            width: 90%;
+            max-width: 400px;
+            pointer-events: none;
+        }
+
+        .toast {
+            background: var(--bg-card);
+            color: var(--text-main);
+            border: 1px solid var(--border-color);
+            padding: 12px 16px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            font-size: 0.9rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            animation: toastIn 0.3s forwards;
+        }
+
+        @keyframes toastIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Доп типы элементов */
+        .badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            background: var(--bg-main);
+            border: 1px solid var(--border-color);
+        }
+        .badge-admin { background: rgba(245, 158, 11, 0.15); color: var(--warning); border-color: var(--warning); }
+        .badge-owner { background: rgba(239, 68, 68, 0.15); color: var(--danger); border-color: var(--danger); }
     </style>
 </head>
 <body>
 
+    <!-- ШАПКА -->
     <header>
-        <h1>Arizona Online</h1>
+        <div class="header-title">BOUNTY TEAM</div>
+        <div class="header-actions">
+            <button class="theme-toggle" id="themeToggleBtn">🌓</button>
+            <div class="avatar-btn" id="userAvatarBtn">👤</div>
+        </div>
     </header>
 
+    <!-- TOAST УВЕДОМЛЕНИЯ -->
+    <div id="toast-container"></div>
+
+    <!-- ОСНОВНОЙ КОНТЕЙНЕР -->
     <div class="container">
-        <!-- Главный раздел -->
-        <section class="section active" id="section-home">
-            <h2>🛒 Маркетплейс</h2>
-            <p style="color: var(--text-muted);">Добро пожаловать в магазин Arizona Online!</p>
-        </section>
-
-        <!-- Раздел Задачи (Проценты) -->
-        <section class="section" id="section-tasks">
-            <h2>🎯 Управление задачами</h2>
-            <div class="task-card">
-                <h3>Прогресс выполнения</h3>
-                <div class="progress-bar-bg">
-                    <div class="progress-bar-fill" id="taskProgress"></div>
-                </div>
-                <p>Текущий процент: <strong id="progressPercentText">0%</strong></p>
+        
+        <!-- [0] ЭКРАН АВТОРИЗАЦИИ / РЕГИСТРАЦИИ -->
+        <section class="section" id="section-auth">
+            <div class="card">
+                <h2 class="page-title">🔐 Авторизация</h2>
                 
-                <hr style="border-color: #334155; margin: 15px 0;">
-
-                <div class="input-group">
-                    <label>Изменить на значение (%)</label>
-                    <input type="number" id="percentStepInput" value="10" min="1" max="100">
+                <div class="tabs-header">
+                    <button class="tab-btn active" id="tabAuthLoginBtn">Вход</button>
+                    <button class="tab-btn" id="tabAuthRegisterBtn">Подача заявки</button>
                 </div>
 
-                <div class="btn-group">
-                    <button class="btn btn-success" id="btnIncreasePercent">➕ Повысить</button>
-                    <button class="btn btn-warning" id="btnDecreasePercent">➖ Убрать</button>
-                </div>
-                <button class="btn btn-danger" id="btnResetPercent">🔄 Сбросить до 0%</button>
+                <!-- Форма входа -->
+                <form id="formLogin">
+                    <div class="form-group">
+                        <label>Игровой ник (Nick_Name)</label>
+                        <input type="text" class="input-field" id="loginNick" placeholder="например: Bounty_Leader" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Пароль</label>
+                        <input type="password" class="input-field" id="loginPassword" placeholder="••••••••" required>
+                    </div>
+                    <button type="submit" class="btn">Войти</button>
+                </form>
+
+                <!-- Форма регистрации (Заявка) -->
+                <form id="formRegister" style="display: none;">
+                    <div class="form-group">
+                        <label>Игровой ник (Nick_Name)</label>
+                        <input type="text" class="input-field" id="regNick" placeholder="например: Gg_Monolit" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Пароль (≥ 6 символов)</label>
+                        <input type="password" class="input-field" id="regPassword" placeholder="••••••••" required minlength="6">
+                    </div>
+                    <div class="form-group">
+                        <label>Доказательство нахождения в семье (Ссылка на Доказательство)</label>
+                        <input type="url" class="input-field" id="regProof" placeholder="https://postimages.org/..." required>
+                        <small style="color: var(--text-muted); font-size: 0.75rem;">Разрешены: youtube.com, youtu.be, radikal.cloud, allwebs.ru, postimages.org, ru.imgbb.com</small>
+                    </div>
+                    <button type="submit" class="btn btn-success">Отправить заявку</button>
+                </form>
             </div>
         </section>
 
-        <!-- Очищенный раздел Админ-панели (Только кнопки Владельца) -->
+        <!-- [1] ГЛАВНАЯ (ДАШБОРД) -->
+        <section class="section" id="section-home">
+            <h2 class="page-title">🏠 Штаб-квартира</h2>
+            <div class="grid-dashboard">
+                <div class="tile-card" id="tileVoice">
+                    <div class="tile-icon">🎙️</div>
+                    <div class="tile-title">Войс Штаб</div>
+                </div>
+                <div class="tile-card" id="tileAdmin" style="display: none;">
+                    <div class="tile-icon">🛡️</div>
+                    <div class="tile-title">Администрация</div>
+                </div>
+                <div class="tile-card" id="tileArrows">
+                    <div class="tile-icon">🎯</div>
+                    <div class="tile-title">Стрелки</div>
+                </div>
+                <div class="tile-card" id="tileSquad">
+                    <div class="tile-icon">👥</div>
+                    <div class="tile-title">БС Состав</div>
+                </div>
+                <div class="tile-card" id="tileTasks">
+                    <div class="tile-icon">✅</div>
+                    <div class="tile-title">Задачи & Цели</div>
+                </div>
+                <div class="tile-card" id="tileCharter">
+                    <div class="tile-icon">📜</div>
+                    <div class="tile-title">Устав & Правила</div>
+                </div>
+                <div class="tile-card" id="tileNews">
+                    <div class="tile-icon">📢</div>
+                    <div class="tile-title">Новости</div>
+                </div>
+                <div class="tile-card" id="tileRating">
+                    <div class="tile-icon">🏆</div>
+                    <div class="tile-title">Рейтинг</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- [2] АДМИН-ПАНЕЛЬ -->
         <section class="section" id="section-admin">
-            <h2>🛡️ Админ-панель</h2>
-            <div id="adminPanelContent">
-                <div class="input-group">
-                    <label for="adminTargetUser">Имя пользователя (Username) или ID:</label>
-                    <input type="text" id="adminTargetUser" placeholder="Введите username (например: alex)">
-                </div>
+            <h2 class="page-title">🛡️ Управление</h2>
+            
+            <div class="tabs-header" id="adminTabsHeader">
+                <!-- Динамические табы прав -->
+            </div>
 
-                <button class="btn" id="adminAllFunctionsBtn">⚙️ Все функции</button>
-                <button class="btn btn-danger" id="adminBanBtn">🔨 Забанить</button>
-                <button class="btn btn-success" id="adminUnbanBtn">🔓 Разбанить</button>
-                <button class="btn btn-warning" id="adminMakeAdminBtn">👑 Сделать админом</button>
-                <button class="btn btn-danger" id="adminRemoveAdminBtn">⬇️ Снять админа</button>
+            <div id="adminTabContent">
+                <!-- Сюда динамически рендерится контент выбранного раздела админки -->
             </div>
         </section>
+
+        <!-- [3] СТРЕЛКИ -->
+        <section class="section" id="section-arrows">
+            <h2 class="page-title">🎯 Состав Стрелков</h2>
+            <div class="tabs-header">
+                <button class="tab-btn active" onclick="app.filterArrows(1, this)">1 Ранг</button>
+                <button class="tab-btn" onclick="app.filterArrows(2, this)">2 Ранг</button>
+                <button class="tab-btn" onclick="app.filterArrows(3, this)">3 Ранг</button>
+            </div>
+            <div id="arrowsList"></div>
+        </section>
+
+        <!-- [4] БС СОСТАВ -->
+        <section class="section" id="section-squad">
+            <h2 class="page-title">👥 БС Состав</h2>
+            <div id="squadList"></div>
+        </section>
+
+        <!-- [5] ЗАДАЧИ -->
+        <section class="section" id="section-tasks">
+            <h2 class="page-title">✅ Задачи & Цели</h2>
+            <div id="tasksList"></div>
+        </section>
+
+        <!-- [6] УСТАВ -->
+        <section class="section" id="section-charter">
+            <h2 class="page-title">📜 Устав & Правила</h2>
+            <div class="card" id="charterContent" style="white-space: pre-wrap; line-height: 1.6;"></div>
+        </section>
+
+        <!-- [7] НОВОСТИ -->
+        <section class="section" id="section-news">
+            <h2 class="page-title">📢 Важное & Новости</h2>
+            <div id="newsList"></div>
+        </section>
+
+        <!-- [8] РЕЙТИНГ -->
+        <section class="section" id="section-rating">
+            <h2 class="page-title">🏆 Топ Игроков</h2>
+            <div class="card">
+                <div id="ratingTable"></div>
+            </div>
+        </section>
+
+        <!-- [9] ПРОФИЛЬ -->
+        <section class="section" id="section-profile">
+            <h2 class="page-title">👤 Личный Профиль</h2>
+            <div class="card">
+                <div style="display:flex; align-items:center; gap:16px; margin-bottom:16px;">
+                    <div style="font-size:3rem; background:var(--bg-main); width:70px; height:70px; border-radius:50%; display:flex; align-items:center; justify-content:center; border:1px solid var(--border-color);">👤</div>
+                    <div>
+                        <h3 id="profileNick">Bounty_Leader</h3>
+                        <p id="profileRole" style="color:var(--text-muted); font-size:0.85rem; margin-top:2px;"></p>
+                    </div>
+                </div>
+
+                <div style="margin-bottom:16px; font-size:0.9rem;">
+                    <p>Рейтинг: <strong id="profilePoints">0</strong> баллов</p>
+                    <p>Дата регистрации: <span id="profileRegDate">-</span></p>
+                </div>
+
+                <hr style="border-color:var(--border-color); margin: 16px 0;">
+
+                <h4>⚙️ Настройки</h4>
+                <div style="margin-top:10px; display:flex; flex-direction:column; gap:10px;">
+                    <button class="btn btn-secondary" id="btnToggleSound">🔊 Звуковые эффекты: Включены</button>
+                    
+                    <div class="form-group" style="margin-top:10px;">
+                        <label>Режим отладки (Debug Role):</label>
+                        <select class="input-field" id="debugRoleSelect">
+                            <option value="none">По умолчанию (Реальная)</option>
+                            <option value="owner">Тест: Владелец</option>
+                            <option value="admin">Тест: Админ</option>
+                            <option value="player">Тест: Игрок</option>
+                        </select>
+                    </div>
+
+                    <button class="btn btn-danger" id="btnLogout">Выйти из аккаунта</button>
+                </div>
+            </div>
+        </section>
+
     </div>
 
-    <!-- Нижний Nav-Bar -->
-    <nav class="nav-bar">
+    <!-- НИЖНЯЯ НАВИГАЦИЯ -->
+    <nav class="nav-bar" id="bottomNav">
         <button class="nav-item active" data-target="section-home">
-            <span>🏠</span>
+            <span class="nav-icon">🏠</span>
             <span>Главная</span>
         </button>
-        <button class="nav-item" data-target="section-tasks">
-            <span>🎯</span>
-            <span>Задачи</span>
-        </button>
-        <!-- Кнопка Админ (видима для bounqy) -->
-        <button class="nav-item" id="navAdminBtn" data-target="section-admin" style="display: none;">
-            <span>🛡️</span>
+        <button class="nav-item" id="navAdminBtn" data-target="section-admin" style="display:none;">
+            <span class="nav-icon">🛡️</span>
             <span>Админ</span>
+        </button>
+        <button class="nav-item" data-target="section-profile">
+            <span class="nav-icon">👤</span>
+            <span>Профиль</span>
         </button>
     </nav>
 
+    <!-- МОДАЛЬНОЕ ОКНО -->
+    <div class="modal-overlay" id="globalModal">
+        <div class="modal-container">
+            <h3 id="modalTitle" style="margin-bottom: 12px;">Заголовок</h3>
+            <div id="modalBody"></div>
+            <div class="btn-group" style="margin-top: 16px;">
+                <button class="btn btn-secondary" onclick="app.closeModal()">Закрыть</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== JS ЛОГИКА ПРИЛОЖЕНИЯ ===== -->
     <script>
-        // Текущий пользователь системы
-        const currentUser = {
-            username: 'bounqy', // Для проверки прав Владельца
-            isBanned: false
+    (function() {
+        'use strict';
+
+        // ===== 1. МОДУЛЬ LOCALSTORAGE =====
+        const storage = {
+            get: function(key, defaultValue) {
+                try {
+                    const item = localStorage.getItem('bounty_' + key);
+                    return item ? JSON.parse(item) : defaultValue;
+                } catch (e) {
+                    console.error('Storage Get Error:', e);
+                    return defaultValue;
+                }
+            },
+            set: function(key, value) {
+                try {
+                    localStorage.setItem('bounty_' + key, JSON.stringify(value));
+                } catch (e) {
+                    console.error('Storage Set Error:', e);
+                }
+            },
+            remove: function(key) {
+                try {
+                    localStorage.removeItem('bounty_' + key);
+                } catch (e) {
+                    console.error('Storage Remove Error:', e);
+                }
+            }
         };
 
-        // Состояние задач
-        let currentProgress = 35; // Стартовый процент
-
-        // Инициализация при загрузке DOM
-        document.addEventListener('DOMContentLoaded', () => {
-            initApp();
-            setupEventListeners();
-        });
-
-        function initApp() {
-            // Проверка прав на отображение кнопки Админ-панели
-            if (currentUser.username === 'bounqy') {
-                document.getElementById('navAdminBtn').style.display = 'flex';
-            }
-
-            // Обновляем прогресс-бар
-            updateProgressBar();
+        // ===== 2. ХЕШИРОВАНИЕ ПАРОЛЯ =====
+        async function hashPassword(password, salt = 'bounty_br_salt') {
+            const enc = new TextEncoder();
+            const data = enc.encode(password + salt);
+            const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
         }
 
-        // Переключение секций SPA
-        function switchSection(targetId) {
-            document.querySelectorAll('.section').forEach(sec => sec.classList.remove('active'));
-            document.querySelectorAll('.nav-item').forEach(btn => btn.classList.remove('active'));
+        // ===== 3. ЗВУКИ И ХАПТИК =====
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        function playSfx(type) {
+            if (!storage.get('sfx_enabled', true)) return;
+            try {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
 
-            const targetSection = document.getElementById(targetId);
-            if (targetSection) {
-                targetSection.classList.add('active');
-            }
-
-            const activeNavBtn = document.querySelector(`.nav-item[data-target="${targetId}"]`);
-            if (activeNavBtn) {
-                activeNavBtn.classList.add('active');
-            }
-        }
-
-        // Логика управления процентами
-        function updateProgressBar() {
-            if (currentProgress > 100) currentProgress = 100;
-            if (currentProgress < 0) currentProgress = 0;
-
-            const fill = document.getElementById('taskProgress');
-            const text = document.getElementById('progressPercentText');
-
-            fill.style.width = `${currentProgress}%`;
-            text.innerText = `${currentProgress}%`;
-        }
-
-        function setupEventListeners() {
-            // 1. Клики по нижнему меню navigation bar
-            document.querySelectorAll('.nav-item').forEach(item => {
-                item.addEventListener('click', (e) => {
-                    const target = item.getAttribute('data-target');
-                    switchSection(target);
-                });
-            });
-
-            // 2. Кнопки управления процентами задач
-            document.getElementById('btnIncreasePercent').addEventListener('click', () => {
-                const step = parseInt(document.getElementById('percentStepInput').value) || 0;
-                currentProgress += step;
-                updateProgressBar();
-            });
-
-            document.getElementById('btnDecreasePercent').addEventListener('click', () => {
-                const step = parseInt(document.getElementById('percentStepInput').value) || 0;
-                currentProgress -= step;
-                updateProgressBar();
-            });
-
-            document.getElementById('btnResetPercent').addEventListener('click', () => {
-                currentProgress = 0;
-                updateProgressBar();
-            });
-
-            // 3. Кнопки панели владельца (bounqy)
-            const getTargetUser = () => {
-                const val = document.getElementById('adminTargetUser').value.trim();
-                if (!val) {
-                    alert('Пожалуйста, укажите имя пользователя или ID!');
-                    return null;
+                if (type === 'click') {
+                    osc.frequency.setValueAtTime(400, audioCtx.currentTime);
+                    gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.05);
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + 0.05);
+                } else if (type === 'success') {
+                    osc.frequency.setValueAtTime(587.33, audioCtx.currentTime);
+                    osc.frequency.setValueAtTime(880, audioCtx.currentTime + 0.08);
+                    gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.25);
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + 0.25);
                 }
-                return val;
-            };
-
-            document.getElementById('adminAllFunctionsBtn').addEventListener('click', () => {
-                alert('⚙️ Открыто меню управления всеми функциями системы.');
-            });
-
-            document.getElementById('adminBanBtn').addEventListener('click', () => {
-                const user = getTargetUser();
-                if (user) alert(`🔨 Пользователь "${user}" успешно забанен!`);
-            });
-
-            document.getElementById('adminUnbanBtn').addEventListener('click', () => {
-                const user = getTargetUser();
-                if (user) alert(`🔓 Пользователь "${user}" успешно разбанен!`);
-            });
-
-            document.getElementById('adminMakeAdminBtn').addEventListener('click', () => {
-                const user = getTargetUser();
-                if (user) alert(`👑 Пользователю "${user}" успешно выданы права администратора!`);
-            });
-
-            document.getElementById('adminRemoveAdminBtn').addEventListener('click', () => {
-                const user = getTargetUser();
-                if (user) alert(`⬇️ С пользователя "${user}" сняты права администратора.`);
-            });
+            } catch(e) {}
         }
+
+        function triggerHaptic() {
+            if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.HapticFeedback) {
+                window.Telegram.WebApp.HapticFeedback.impactOccurred('light');
+            }
+        }
+
+        // ===== 4. ПЕРЕЧЕНЬ ПРАВ И ДЕФОЛТНЫЕ ДАННЫЕ =====
+        function initDefaultData() {
+            if (!storage.get('users', null)) {
+                // Демо аккаунты
+                const defaultUsers = [
+                    { id: '1', nick: 'bounqy', role: 'owner', registeredAt: '2026-01-01', isBanned: false, hash: 'cf73210452358c21a1f0a28f8045a16d5fb9b276709f6d741a418931b268f7b7' }, // bounty123
+                    { id: '2', nick: 'Admin_Monolit', role: 'admin', registeredAt: '2026-01-05', isBanned: false, hash: '0192023a7bbd73250516f069df18b500ee3120968cf499614ee593642d54a65d' }, // admin123
+                    { id: '3', nick: 'Player_Gg', role: 'player', registeredAt: '2026-02-10', isBanned: false, hash: '42f4c3a2f77d33d7b8720164b3c7d686f0302482e9a59b5810b42f022ef7a221' } // player123
+                ];
+                storage.set('users', defaultUsers);
+
+                // Права для Admin_Monolit
+                storage.set('admin_permissions', {
+                    '2': ['applications', 'arrows', 'tasks', 'news', 'ratings']
+                });
+
+                // Стрелки
+                storage.set('arrows', [
+                    { id: '1', nick: 'Gg_Monolit', rank: 1 },
+                    { id: '2', nick: 'Bounty_Shooter', rank: 2 },
+                    { id: '3', nick: 'Black_Sniper', rank: 3 }
+                ]);
+
+                // БС Состав
+                storage.set('combat_squad', [
+                    { id: '1', nick: 'Bounty_Leader', roleInSquad: 'Командир' },
+                    { id: '2', nick: 'Black_Fighter', roleInSquad: 'Штурмовик' }
+                ]);
+
+                // Задачи
+                storage.set('tasks', [
+                    { id: '1', title: 'Захват бизнеса 21:00', desc: 'Всем быть в дискорде/войсе за 15 минут', progress: 80 },
+                    { id: '2', title: 'Набор стрелков в 1 ранг', desc: 'Провести дуэли и отобрать лучших', progress: 40 }
+                ]);
+
+                // Устав
+                storage.set('charter', '1. Соблюдать правила сервера Black Russia.\n2. Уважать руководство и участников Bounty Team.\n3. Явка на фамвар/стрелы обязательна по сигналу Владельца/Администрации.\n4. Оскорбления соклановцев — кик с занесением в ЧС.');
+
+                // Новости
+                storage.set('news', [
+                    { id: '1', title: 'Открытие портала Bounty Team', text: 'Запущен обновленный портал команды для Black Russia! Подавайте заявки.', date: '2026-05-10', author: 'bounqy' }
+                ]);
+
+                // Рейтинг
+                storage.set('ratings', { '1': 150, '2': 90, '3': 40 });
+
+                // Заявки
+                storage.set('registrations', []);
+                // Лог
+                storage.set('action_log', []);
+            }
+        }
+
+        // ===== 5. ГЛОБАЛЬНЫЙ КЛАСС ПРИЛОЖЕНИЯ =====
+        class App {
+            constructor() {
+                this.currentUser = null;
+                this.currentArrowRank = 1;
+            }
+
+            init() {
+                initDefaultData();
+                this.applySavedTheme();
+                this.setupNavigation();
+                this.checkSession();
+                this.bindEvents();
+            }
+
+            applySavedTheme() {
+                const theme = storage.get('theme', 'dark');
+                document.documentElement.setAttribute('data-theme', theme);
+            }
+
+            toggleTheme() {
+                const current = document.documentElement.getAttribute('data-theme');
+                const next = current === 'dark' ? 'light' : 'dark';
+                document.documentElement.setAttribute('data-theme', next);
+                storage.set('theme', next);
+                this.toast(`Переключено на ${next === 'dark' ? 'тёмную' : 'светлую'} тему`);
+            }
+
+            logAction(actionText) {
+                if (!this.currentUser) return;
+                const logs = storage.get('action_log', []);
+                logs.unshift({
+                    id: Date.now().toString(),
+                    timestamp: new Date().toLocaleString(),
+                    adminNick: this.currentUser.nick,
+                    action: actionText
+                });
+                if (logs.length > 200) logs.pop();
+                storage.set('action_log', logs);
+            }
+
+            toast(msg, type = 'info') {
+                const container = document.getElementById('toast-container');
+                const toast = document.createElement('div');
+                toast.className = 'toast';
+                const icon = type === 'error' ? '❌' : type === 'success' ? '✅' : 'ℹ️';
+                toast.innerHTML = `<span>${icon}</span> <span>${msg}</span>`;
+                container.appendChild(toast);
+                setTimeout(() => {
+                    toast.style.opacity = '0';
+                    setTimeout(() => toast.remove(), 300);
+                }, 3000);
+            }
+
+            showModal(title, htmlContent) {
+                document.getElementById('modalTitle').innerText = title;
+                document.getElementById('modalBody').innerHTML = htmlContent;
+                document.getElementById('globalModal').classList.add('active');
+            }
+
+            closeModal() {
+                document.getElementById('globalModal').classList.remove('active');
+            }
+
+            // Получение актуальной роли с учетом отладки
+            getEffectiveRole() {
+                const debugRole = storage.get('debug_role', 'none');
+                if (debugRole !== 'none') return debugRole;
+                return this.currentUser ? this.currentUser.role : 'guest';
+            }
+
+            checkSession() {
+                const user = storage.get('current_user', null);
+                if (user) {
+                    this.currentUser = user;
+                    this.showMainApp();
+                } else {
+                    this.switchSection('section-auth');
+                }
+            }
+
+            showMainApp() {
+                const role = this.getEffectiveRole();
+                const isOwnerOrAdmin = role === 'owner' || role === 'admin';
+                
+                document.getElementById('navAdminBtn').style.display = isOwnerOrAdmin ? 'flex' : 'none';
+                document.getElementById('tileAdmin').style.display = isOwnerOrAdmin ? 'flex' : 'none';
+
+                this.switchSection('section-home');
+                this.renderProfile();
+            }
+
+            switchSection(sectionId) {
+                playSfx('click');
+                triggerHaptic();
+                
+                document.querySelectorAll('.section').forEach(sec => sec.classList.remove('active'));
+                document.querySelectorAll('.nav-item').forEach(btn => btn.classList.remove('active'));
+
+                const target = document.getElementById(sectionId);
+                if (target) target.classList.add('active');
+
+                const navBtn = document.querySelector(`.nav-item[data-target="${sectionId}"]`);
+                if (navBtn) navBtn.classList.add('active');
+
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+
+                // Рендер страниц по клику
+                if (sectionId === 'section-arrows') this.renderArrows();
+                if (sectionId === 'section-squad') this.renderSquad();
+                if (sectionId === 'section-tasks') this.renderTasks();
+                if (sectionId === 'section-charter') this.renderCharter();
+                if (sectionId === 'section-news') this.renderNews();
+                if (sectionId === 'section-rating') this.renderRating();
+                if (sectionId === 'section-admin') this.renderAdminPanel();
+            }
+
+            setupNavigation() {
+                document.querySelectorAll('.nav-item').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        const target = btn.getAttribute('data-target');
+                        this.switchSection(target);
+                    });
+                });
+            }
+
+            // ===== 6. РЕНДЕР СТРАНИЦ =====
+            filterArrows(rank, btn) {
+                this.currentArrowRank = rank;
+                if (btn) {
+                    btn.parentNode.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                }
+                this.renderArrows();
+            }
+
+            renderArrows() {
+                const arrows = storage.get('arrows', []);
+                const filtered = arrows.filter(a => a.rank === this.currentArrowRank);
+                const container = document.getElementById('arrowsList');
+                
+                let html = filtered.length ? '' : '<p style="color:var(--text-muted);">В этом ранге пока нет стрелков.</p>';
+                filtered.forEach(a => {
+                    html += `
+                        <div class="card" style="display:flex; justify-content:space-between; align-items:center;">
+                            <div>
+                                <strong>🎯 ${a.nick}</strong>
+                                <div style="font-size:0.8rem; color:var(--text-muted);">Стрелок ${a.rank} Ранга</div>
+                            </div>
+                        </div>
+                    `;
+                });
+                container.innerHTML = html;
+            }
+
+            renderSquad() {
+                const squad = storage.get('combat_squad', []);
+                const container = document.getElementById('squadList');
+                let html = squad.length ? '' : '<p style="color:var(--text-muted);">Состав пуст.</p>';
+                squad.forEach(s => {
+                    html += `
+                        <div class="card" style="display:flex; justify-content:space-between; align-items:center;">
+                            <div>
+                                <strong>👥 ${s.nick}</strong>
+                                <div style="font-size:0.8rem; color:var(--text-muted);">${s.roleInSquad}</div>
+                            </div>
+                        </div>
+                    `;
+                });
+                container.innerHTML = html;
+            }
+
+            renderTasks() {
+                const tasks = storage.get('tasks', []);
+                const container = document.getElementById('tasksList');
+                let html = '';
+                tasks.forEach(t => {
+                    html += `
+                        <div class="card">
+                            <h3>${t.title}</h3>
+                            <p style="font-size:0.9rem; color:var(--text-muted); margin: 6px 0;">${t.desc}</p>
+                            <div class="progress-bar-bg">
+                                <div class="progress-bar-fill" style="width: ${t.progress}%;"></div>
+                            </div>
+                            <div style="display:flex; justify-content:space-between; align-items:center;">
+                                <span style="font-size:0.85rem; font-weight:600;">Прогресс: ${t.progress}%</span>
+                                <button class="btn btn-secondary" style="width:auto; min-height:36px; padding:4px 12px; font-size:0.8rem;" onclick="window.open('https://t.me/bounqy31?text=Сообщение по задаче: ${encodeURIComponent(t.title)}')">Сообщить менеджеру</button>
+                            </div>
+                        </div>
+                    `;
+                });
+                container.innerHTML = html;
+            }
+
+            renderCharter() {
+                const text = storage.get('charter', 'Устав не заполнен.');
+                document.getElementById('charterContent').innerText = text;
+            }
+
+            renderNews() {
+                const news = storage.get('news', []);
+                const container = document.getElementById('newsList');
+                let html = '';
+                news.forEach(n => {
+                    html += `
+                        <div class="card">
+                            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                                <h3>${n.title}</h3>
+                                <span style="font-size:0.75rem; color:var(--text-muted);">${n.date}</span>
+                            </div>
+                            <p style="font-size:0.9rem; margin-bottom:12px; white-space:pre-wrap;">${n.text}</p>
+                            <div style="display:flex; justify-content:space-between; align-items:center;">
+                                <span class="badge">Автор: ${n.author}</span>
+                                <button class="btn btn-secondary" style="width:auto; min-height:36px; padding:4px 12px; font-size:0.8rem;" onclick="window.open('https://t.me/bounqy31?text=Новость: ${encodeURIComponent(n.title)}')">Поделиться</button>
+                            </div>
+                        </div>
+                    `;
+                });
+                container.innerHTML = html;
+            }
+
+            renderRating() {
+                const users = storage.get('users', []);
+                const ratings = storage.get('ratings', {});
+                
+                const sorted = users.map(u => ({
+                    nick: u.nick,
+                    points: ratings[u.id] || 0
+                })).sort((a,b) => b.points - a.points);
+
+                let html = '<table style="width:100%; border-collapse:collapse; text-align:left;">';
+                html += '<tr style="border-bottom:1px solid var(--border-color); color:var(--text-muted); font-size:0.85rem;"><th style="padding:8px;">Место</th><th>Ник</th><th>Баллы</th></tr>';
+                sorted.forEach((item, idx) => {
+                    const medal = idx === 0 ? '🥇' : idx === 1 ? '🥈' : idx === 2 ? '🥉' : `${idx + 1}`;
+                    html += `
+                        <tr style="border-bottom:1px solid var(--border-color); font-size:0.9rem;">
+                            <td style="padding:12px 8px;"><strong>${medal}</strong></td>
+                            <td>${item.nick}</td>
+                            <td><strong>${item.points}</strong></td>
+                        </tr>
+                    `;
+                });
+                html += '</table>';
+                document.getElementById('ratingTable').innerHTML = html;
+            }
+
+            renderProfile() {
+                if (!this.currentUser) return;
+                document.getElementById('profileNick').innerText = this.currentUser.nick;
+                
+                const roleText = this.currentUser.role === 'owner' ? '👑 Владелец' : this.currentUser.role === 'admin' ? '🛡️ Администратор' : '🎮 Игрок';
+                document.getElementById('profileRole').innerText = roleText;
+                
+                const ratings = storage.get('ratings', {});
+                document.getElementById('profilePoints').innerText = ratings[this.currentUser.id] || 0;
+                document.getElementById('profileRegDate').innerText = this.currentUser.registeredAt || '2026-01-01';
+            }
+
+            // ===== 7. АДМИН-ПАНЕЛЬ С ЗАЯВКАМИ И УПРАВЛЕНИЕМ =====
+            hasPermission(permKey) {
+                const role = this.getEffectiveRole();
+                if (role === 'owner') return true;
+                if (role !== 'admin') return false;
+                
+                const perms = storage.get('admin_permissions', {})[this.currentUser.id] || [];
+                return perms.includes(permKey);
+            }
+
+            renderAdminPanel() {
+                const header = document.getElementById('adminTabsHeader');
+                let tabsHtml = '';
+
+                const availableTabs = [
+                    { key: 'applications', label: '📥 Заявки', perm: 'applications' },
+                    { key: 'users', label: '👥 Игроки', perm: 'owner' },
+                    { key: 'rights', label: '👑 Права Админов', perm: 'owner' },
+                    { key: 'arrows_manage', label: '🎯 Стрелки', perm: 'arrows' },
+                    { key: 'squad_manage', label: '👥 БС Состав', perm: 'owner' },
+                    { key: 'tasks_manage', label: '✅ Задачи', perm: 'tasks' },
+                    { key: 'charter_manage', label: '📜 Устав', perm: 'charter' },
+                    { key: 'news_manage', label: '📢 Новости', perm: 'news' },
+                    { key: 'rating_manage', label: '🏆 Рейтинг', perm: 'ratings' },
+                    { key: 'logs', label: '📜 Журнал', perm: 'owner' }
+                ];
+
+                const activeTabs = availableTabs.filter(t => t.perm === 'owner' ? this.getEffectiveRole() === 'owner' : this.hasPermission(t.perm));
+
+                if (!activeTabs.length) {
+                    document.getElementById('adminTabContent').innerHTML = '<p style="color:var(--text-muted);">У вас нет доступных модулей управления.</p>';
+                    header.innerHTML = '';
+                    return;
+                }
+
+                activeTabs.forEach((t, idx) => {
+                    tabsHtml += `<button class="tab-btn ${idx === 0 ? 'active' : ''}" onclick="app.switchAdminSubTab('${t.key}', this)">${t.label}</button>`;
+                });
+                header.innerHTML = tabsHtml;
+
+                // Переключаем на первый доступный таб
+                this.switchAdminSubTab(activeTabs[0].key);
+            }
+
+            switchAdminSubTab(tabKey, btn) {
+                if (btn) {
+                    btn.parentNode.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                }
+                const content = document.getElementById('adminTabContent');
+
+                if (tabKey === 'applications') {
+                    const regs = storage.get('registrations', []);
+                    let html = '<h3>📥 Поступившие заявки на вступление</h3><br>';
+                    if (!regs.length) html += '<p style="color:var(--text-muted);">Заявок пока нет.</p>';
+                    regs.forEach(r => {
+                        html += `
+                            <div class="card">
+                                <h4>Игровой Ник: ${r.nick}</h4>
+                                <p style="font-size:0.85rem; color:var(--text-muted);">Дата: ${r.date}</p>
+                                <p style="font-size:0.85rem; margin:8px 0;"><a href="${r.proofUrl}" target="_blank" style="color:var(--accent);">Открыть Доказательство</a></p>
+                                <div class="btn-group">
+                                    <button class="btn btn-success" onclick="app.approveRegistration('${r.id}')">Одобрить</button>
+                                    <button class="btn btn-danger" onclick="app.rejectRegistration('${r.id}')">Отклонить</button>
+                                </div>
+                            </div>
+                        `;
+                    });
+                    content.innerHTML = html;
+                }
+
+                else if (tabKey === 'users') {
+                    const users = storage.get('users', []);
+                    let html = `
+                        <div class="card">
+                            <h4>➕ Прямое создание игрока</h4>
+                            <div class="form-group" style="margin-top:8px;">
+                                <input type="text" class="input-field" id="directNick" placeholder="Игровой Ник (Nick_Name)">
+                            </div>
+                            <div class="form-group">
+                                <input type="password" class="input-field" id="directPass" placeholder="Пароль">
+                            </div>
+                            <button class="btn btn-success" onclick="app.createPlayerDirect()">Создать Игрока</button>
+                        </div>
+                        <h3>Список игроков</h3><br>
+                    `;
+                    users.forEach(u => {
+                        html += `
+                            <div class="card" style="display:flex; justify-content:space-between; align-items:center;">
+                                <div>
+                                    <strong>${u.nick}</strong> <span class="badge">${u.role}</span>
+                                    ${u.isBanned ? '<span class="badge badge-owner">ЗАБАНЕН</span>' : ''}
+                                </div>
+                                <div style="display:flex; gap:6px;">
+                                    ${u.isBanned 
+                                        ? `<button class="btn btn-success" style="padding:4px 8px; min-height:32px; font-size:0.75rem;" onclick="app.toggleBan('${u.id}', false)">Разбанить</button>`
+                                        : `<button class="btn btn-danger" style="padding:4px 8px; min-height:32px; font-size:0.75rem;" onclick="app.toggleBan('${u.id}', true)">🔨 Забанить</button>`
+                                    }
+                                </div>
+                            </div>
+                        `;
+                    });
+                    content.innerHTML = html;
+                }
+
+                else if (tabKey === 'rights') {
+                    const users = storage.get('users', []).filter(u => u.role === 'admin');
+                    const permsMap = storage.get('admin_permissions', {});
+                    let html = '<h3>👑 Назначение прав Администраторам</h3><br>';
+                    
+                    if (!users.length) html += '<p style="color:var(--text-muted);">В системе нет назначенных администраторов.</p>';
+                    
+                    users.forEach(u => {
+                        const userPerms = permsMap[u.id] || [];
+                        html += `
+                            <div class="card">
+                                <h4>Администратор: ${u.nick}</h4>
+                                <div style="margin-top:10px; display:flex; flex-direction:column; gap:6px; font-size:0.9rem;">
+                                    <label><input type="checkbox" ${userPerms.includes('applications') ? 'checked' : ''} onchange="app.toggleAdminRight('${u.id}', 'applications')"> ☐ Приём заявок</label>
+                                    <label><input type="checkbox" ${userPerms.includes('arrows') ? 'checked' : ''} onchange="app.toggleAdminRight('${u.id}', 'arrows')"> ☐ Управление стрелками</label>
+                                    <label><input type="checkbox" ${userPerms.includes('tasks') ? 'checked' : ''} onchange="app.toggleAdminRight('${u.id}', 'tasks')"> ☐ Управление задачами</label>
+                                    <label><input type="checkbox" ${userPerms.includes('charter') ? 'checked' : ''} onchange="app.toggleAdminRight('${u.id}', 'charter')"> ☐ Управление уставом</label>
+                                    <label><input type="checkbox" ${userPerms.includes('news') ? 'checked' : ''} onchange="app.toggleAdminRight('${u.id}', 'news')"> ☐ Управление новостями</label>
+                                    <label><input type="checkbox" ${userPerms.includes('ratings') ? 'checked' : ''} onchange="app.toggleAdminRight('${u.id}', 'ratings')"> ☐ Управление рейтингом</label>
+                                </div>
+                            </div>
+                        `;
+                    });
+                    content.innerHTML = html;
+                }
+
+                else if (tabKey === 'arrows_manage') {
+                    content.innerHTML = `
+                        <div class="card">
+                            <h4>🎯 Добавить Стрелка</h4>
+                            <div class="form-group" style="margin-top:8px;">
+                                <input type="text" class="input-field" id="arrowNickInput" placeholder="Ник (например: Gg_Monolit)">
+                            </div>
+                            <div class="form-group">
+                                <label>Ранг:</label>
+                                <select class="input-field" id="arrowRankSelect">
+                                    <option value="1">1 Ранг</option>
+                                    <option value="2">2 Ранг</option>
+                                    <option value="3">3 Ранг</option>
+                                </select>
+                            </div>
+                            <button class="btn btn-success" onclick="app.addArrow()">Добавить</button>
+                        </div>
+                    `;
+                }
+
+                else if (tabKey === 'squad_manage') {
+                    content.innerHTML = `
+                        <div class="card">
+                            <h4>👥 Добавить в БС Состав (Только Владелец)</h4>
+                            <div class="form-group" style="margin-top:8px;">
+                                <input type="text" class="input-field" id="squadNickInput" placeholder="Ник игрока">
+                            </div>
+                            <div class="form-group">
+                                <input type="text" class="input-field" id="squadRoleInput" placeholder="Роль (например: Штурмовик)">
+                            </div>
+                            <button class="btn btn-success" onclick="app.addSquadMember()">Добавить в Состав</button>
+                        </div>
+                    `;
+                }
+
+                else if (tabKey === 'tasks_manage') {
+                    content.innerHTML = `
+                        <div class="card">
+                            <h4>✅ Создать Задачу</h4>
+                            <div class="form-group" style="margin-top:8px;">
+                                <input type="text" class="input-field" id="taskTitleInput" placeholder="Название">
+                            </div>
+                            <div class="form-group">
+                                <input type="text" class="input-field" id="taskDescInput" placeholder="Описание">
+                            </div>
+                            <div class="form-group">
+                                <label>Процент выполнения (0-100%):</label>
+                                <input type="number" class="input-field" id="taskProgressInput" value="0" min="0" max="100">
+                            </div>
+                            <button class="btn btn-success" onclick="app.createTask()">Сохранить Задачу</button>
+                        </div>
+                    `;
+                }
+
+                else if (tabKey === 'charter_manage') {
+                    const text = storage.get('charter', '');
+                    content.innerHTML = `
+                        <div class="card">
+                            <h4>📜 Редактировать Устав</h4>
+                            <div class="form-group" style="margin-top:8px;">
+                                <textarea class="input-field" id="charterTextInput" style="height:150px; resize:vertical;">${text}</textarea>
+                            </div>
+                            <button class="btn btn-success" onclick="app.saveCharter()">Сохранить Изменения</button>
+                        </div>
+                    `;
+                }
+
+                else if (tabKey === 'news_manage') {
+                    content.innerHTML = `
+                        <div class="card">
+                            <h4>📢 Опубликовать Новость</h4>
+                            <div class="form-group" style="margin-top:8px;">
+                                <input type="text" class="input-field" id="newsTitleInput" placeholder="Заголовок">
+                            </div>
+                            <div class="form-group">
+                                <textarea class="input-field" id="newsTextInput" placeholder="Текст новости" style="height:100px;"></textarea>
+                            </div>
+                            <button class="btn btn-success" onclick="app.publishNews()">Опубликовать</button>
+                        </div>
+                    `;
+                }
+
+                else if (tabKey === 'rating_manage') {
+                    const users = storage.get('users', []);
+                    let options = '';
+                    users.forEach(u => options += `<option value="${u.id}">${u.nick}</option>`);
+                    content.innerHTML = `
+                        <div class="card">
+                            <h4>🏆 Изменение Рейтинга Игрока</h4>
+                            <div class="form-group" style="margin-top:8px;">
+                                <label>Выберите Игрока:</label>
+                                <select class="input-field" id="ratingUserSelect">${options}</select>
+                            </div>
+                            <div class="form-group">
+                                <label>Количество баллов (можно с минусом):</label>
+                                <input type="number" class="input-field" id="ratingPointsInput" placeholder="например: 15">
+                            </div>
+                            <button class="btn btn-success" onclick="app.changeRating()">Обновить Баллы</button>
+                        </div>
+                    `;
+                }
+
+                else if (tabKey === 'logs') {
+                    const logs = storage.get('action_log', []);
+                    let html = '<h3>📜 Журнал Действий Администрации</h3><br>';
+                    if (!logs.length) html += '<p style="color:var(--text-muted);">Лог пуст.</p>';
+                    logs.forEach(l => {
+                        html += `
+                            <div style="font-size:0.8rem; border-bottom:1px solid var(--border-color); padding:6px 0;">
+                                <span style="color:var(--text-muted);">[${l.timestamp}]</span> <strong>${l.adminNick}:</strong> ${l.action}
+                            </div>
+                        `;
+                    });
+                    content.innerHTML = html;
+                }
+            }
+
+            // ===== 8. ОБРАБОТЧИКИ АДМИН-ДЕЙСТВИЙ =====
+            approveRegistration(regId) {
+                const regs = storage.get('registrations', []);
+                const reg = regs.find(r => r.id === regId);
+                if (!reg) return;
+
+                const users = storage.get('users', []);
+                users.push({
+                    id: Date.now().toString(),
+                    nick: reg.nick,
+                    role: 'player',
+                    registeredAt: new Date().toISOString().split('T')[0],
+                    isBanned: false,
+                    hash: reg.passwordHash
+                });
+
+                storage.set('users', users);
+                storage.set('registrations', regs.filter(r => r.id !== regId));
+                this.logAction(`Одобрена заявка для ${reg.nick}`);
+                this.toast(`Заявка ${reg.nick} одобрена!`, 'success');
+                this.switchAdminSubTab('applications');
+            }
+
+            rejectRegistration(regId) {
+                const regs = storage.get('registrations', []);
+                const reg = regs.find(r => r.id === regId);
+                if (!reg) return;
+
+                storage.set('registrations', regs.filter(r => r.id !== regId));
+                this.logAction(`Отклонена заявка для ${reg.nick}`);
+                this.toast(`Заявка ${reg.nick} отклонена.`, 'error');
+                this.switchAdminSubTab('applications');
+            }
+
+            async createPlayerDirect() {
+                const nick = document.getElementById('directNick').value.trim();
+                const pass = document.getElementById('directPass').value.trim();
+
+                if (!nick || !pass) return this.toast('Заполните все поля!', 'error');
+
+                const users = storage.get('users', []);
+                const hash = await hashPassword(pass);
+                users.push({
+                    id: Date.now().toString(),
+                    nick: nick,
+                    role: 'player',
+                    registeredAt: new Date().toISOString().split('T')[0],
+                    isBanned: false,
+                    hash: hash
+                });
+
+                storage.set('users', users);
+                this.logAction(`Прямое создание игрока: ${nick}`);
+                this.toast(`Игрок ${nick} успешно создан!`, 'success');
+                this.switchAdminSubTab('users');
+            }
+
+            toggleBan(userId, isBan) {
+                const users = storage.get('users', []);
+                const user = users.find(u => u.id === userId);
+                if (user) {
+                    user.isBanned = isBan;
+                    storage.set('users', users);
+                    this.logAction(`${isBan ? 'Забанен' : 'Разбанен'} игрок: ${user.nick}`);
+                    this.toast(`Статус бана игрока ${user.nick} изменен!`, 'info');
+                    this.switchAdminSubTab('users');
+                }
+            }
+
+            toggleAdminRight(userId, rightKey) {
+                const permsMap = storage.get('admin_permissions', {});
+                let userPerms = permsMap[userId] || [];
+                
+                if (userPerms.includes(rightKey)) {
+                    userPerms = userPerms.filter(k => k !== rightKey);
+                } else {
+                    userPerms.push(rightKey);
+                }
+                permsMap[userId] = userPerms;
+                storage.set('admin_permissions', permsMap);
+                this.logAction(`Изменены права для админа ID:${userId}`);
+                this.toast('Права обновлены!', 'success');
+            }
+
+            addArrow() {
+                const nick = document.getElementById('arrowNickInput').value.trim();
+                const rank = parseInt(document.getElementById('arrowRankSelect').value);
+                if (!nick) return this.toast('Введите ник!', 'error');
+
+                const arrows = storage.get('arrows', []);
+                arrows.push({ id: Date.now().toString(), nick, rank });
+                storage.set('arrows', arrows);
+                this.logAction(`Добавлен стрелок ${nick} в ${rank} ранг`);
+                this.toast('Стрелок добавлен!', 'success');
+                document.getElementById('arrowNickInput').value = '';
+            }
+
+            addSquadMember() {
+                const nick = document.getElementById('squadNickInput').value.trim();
+                const roleInSquad = document.getElementById('squadRoleInput').value.trim();
+                if (!nick || !roleInSquad) return this.toast('Заполните все поля!', 'error');
+
+                const squad = storage.get('combat_squad', []);
+                squad.push({ id: Date.now().toString(), nick, roleInSquad });
+                storage.set('combat_squad', squad);
+                this.logAction(`Добавлен в БС Состав: ${nick}`);
+                this.toast('Боец добавлен в состав!', 'success');
+                document.getElementById('squadNickInput').value = '';
+                document.getElementById('squadRoleInput').value = '';
+            }
+
+            createTask() {
+                const title = document.getElementById('taskTitleInput').value.trim();
+                const desc = document.getElementById('taskDescInput').value.trim();
+                const progress = parseInt(document.getElementById('taskProgressInput').value) || 0;
+                if (!title) return this.toast('Укажите название задачи!', 'error');
+
+                const tasks = storage.get('tasks', []);
+                tasks.push({ id: Date.now().toString(), title, desc, progress });
+                storage.set('tasks', tasks);
+                this.logAction(`Создана задача: ${title}`);
+                this.toast('Задача сохранена!', 'success');
+            }
+
+            saveCharter() {
+                const text = document.getElementById('charterTextInput').value;
+                storage.set('charter', text);
+                this.logAction('Обновлен устав команды');
+                this.toast('Устав сохранен!', 'success');
+            }
+
+            publishNews() {
+                const title = document.getElementById('newsTitleInput').value.trim();
+                const text = document.getElementById('newsTextInput').value.trim();
+                if (!title || !text) return this.toast('Заполните заголовок и текст!', 'error');
+
+                const news = storage.get('news', []);
+                news.unshift({
+                    id: Date.now().toString(),
+                    title,
+                    text,
+                    date: new Date().toISOString().split('T')[0],
+                    author: this.currentUser.nick
+                });
+                storage.set('news', news);
+                this.logAction(`Опубликована новость: ${title}`);
+                this.toast('Новость опубликована!', 'success');
+            }
+
+            changeRating() {
+                const userId = document.getElementById('ratingUserSelect').value;
+                const points = parseInt(document.getElementById('ratingPointsInput').value) || 0;
+                
+                const ratings = storage.get('ratings', {});
+                ratings[userId] = (ratings[userId] || 0) + points;
+                storage.set('ratings', ratings);
+                this.logAction(`Изменен рейтинг игрока ID:${userId} на ${points}`);
+                this.toast('Рейтинг обновлен!', 'success');
+            }
+
+            // ===== 9. СОБЫТИЯ И АВТОРИЗАЦИЯ =====
+            bindEvents() {
+                document.getElementById('themeToggleBtn').addEventListener('click', () => this.toggleTheme());
+
+                // Переключение Вход / Заявка
+                document.getElementById('tabAuthLoginBtn').addEventListener('click', (e) => {
+                    e.target.classList.add('active');
+                    document.getElementById('tabAuthRegisterBtn').classList.remove('active');
+                    document.getElementById('formLogin').style.display = 'block';
+                    document.getElementById('formRegister').style.display = 'none';
+                });
+
+                document.getElementById('tabAuthRegisterBtn').addEventListener('click', (e) => {
+                    e.target.classList.add('active');
+                    document.getElementById('tabAuthLoginBtn').classList.remove('active');
+                    document.getElementById('formLogin').style.display = 'none';
+                    document.getElementById('formRegister').style.display = 'block';
+                });
+
+                // Обработка Формы Входа
+                document.getElementById('formLogin').addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    const nick = document.getElementById('loginNick').value.trim();
+                    const pass = document.getElementById('loginPassword').value.trim();
+                    
+                    const users = storage.get('users', []);
+                    const hash = await hashPassword(pass);
+                    const user = users.find(u => u.nick.toLowerCase() === nick.toLowerCase() && u.hash === hash);
+
+                    if (!user) {
+                        return this.toast('Неверный ник или пароль!', 'error');
+                    }
+                    if (user.isBanned) {
+                        return this.toast('Ваш аккаунт заблокирован!', 'error');
+                    }
+
+                    this.currentUser = user;
+                    storage.set('current_user', user);
+                    playSfx('success');
+                    this.toast(`С возвращением, ${user.nick}!`, 'success');
+                    this.showMainApp();
+                });
+
+                // Обработка Заявки (Регистрация)
+                document.getElementById('formRegister').addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    const nick = document.getElementById('regNick').value.trim();
+                    const pass = document.getElementById('regPassword').value.trim();
+                    const proofUrl = document.getElementById('regProof').value.trim();
+
+                    // Проверка белого списка доменов
+                    const allowedDomains = ['youtube.com', 'youtu.be', 'radikal.cloud', 'allwebs.ru', 'postimages.org', 'ru.imgbb.com'];
+                    const isValidUrl = allowedDomains.some(domain => proofUrl.includes(domain));
+
+                    if (!isValidUrl) {
+                        return this.toast('Ссылка должна быть с разрешенного фото/видео хостинга!', 'error');
+                    }
+
+                    const regs = storage.get('registrations', []);
+                    const hash = await hashPassword(pass);
+                    
+                    regs.push({
+                        id: Date.now().toString(),
+                        nick,
+                        passwordHash: hash,
+                        proofUrl,
+                        date: new Date().toISOString().split('T')[0]
+                    });
+
+                    storage.set('registrations', regs);
+                    playSfx('success');
+                    this.toast('Заявка успешно отправлена! Ожидайте одобрения администратора.', 'success');
+                    
+                    // Переключаем назад на вход
+                    document.getElementById('tabAuthLoginBtn').click();
+                });
+
+                // Плитки дашборда
+                document.getElementById('tileVoice').addEventListener('click', () => {
+                    window.open('https://vk.me/join/QwCqYDLM9KG9TjYsaRP8uQ5oIonjcOa0xIc=', '_blank');
+                });
+                document.getElementById('tileAdmin').addEventListener('click', () => this.switchSection('section-admin'));
+                document.getElementById('tileArrows').addEventListener('click', () => this.switchSection('section-arrows'));
+                document.getElementById('tileSquad').addEventListener('click', () => this.switchSection('section-squad'));
+                document.getElementById('tileTasks').addEventListener('click', () => this.switchSection('section-tasks'));
+                document.getElementById('tileCharter').addEventListener('click', () => this.switchSection('section-charter'));
+                document.getElementById('tileNews').addEventListener('click', () => this.switchSection('section-news'));
+                document.getElementById('tileRating').addEventListener('click', () => this.switchSection('section-rating'));
+
+                // Профиль и Настройки
+                document.getElementById('btnToggleSound').addEventListener('click', () => {
+                    const current = storage.get('sfx_enabled', true);
+                    storage.set('sfx_enabled', !current);
+                    document.getElementById('btnToggleSound').innerText = `🔊 Звуковые эффекты: ${!current ? 'Включены' : 'Выключены'}`;
+                    this.toast(`Звуки ${!current ? 'включены' : 'выключены'}`);
+                });
+
+                document.getElementById('debugRoleSelect').addEventListener('change', (e) => {
+                    storage.set('debug_role', e.target.value);
+                    this.toast(`Отладочная роль: ${e.target.value}`);
+                    this.showMainApp();
+                });
+
+                document.getElementById('btnLogout').addEventListener('click', () => {
+                    storage.remove('current_user');
+                    this.currentUser = null;
+                    this.toast('Вы вышли из системы');
+                    this.switchSection('section-auth');
+                });
+            }
+        }
+
+        // Инициализация
+        window.app = new App();
+        document.addEventListener('DOMContentLoaded', () => window.app.init());
+
+    })();
     </script>
 </body>
 </html>
